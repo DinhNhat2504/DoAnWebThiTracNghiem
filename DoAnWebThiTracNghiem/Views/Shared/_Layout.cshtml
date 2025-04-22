@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DoAnWebThiTracNghiem</title>
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-blue-600 text-white fixed h-full">
+            <nav class="p-4">
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold">ExamPro</h1>
+                </div>
+
+                <ul class="space-y-2">
+                    <li class="p-2 bg-blue-700 flex items-center rounded">
+                        <i data-lucide="home" class="w-5 h-5 mr-2" asp-area="" asp-controller="Home" asp-action="Index"></i>
+                        Trang chủ
+                    </li>
+                    <li class="p-2 flex items-center rounded hover:bg-blue-700" asp-area="" asp-controller="Home" asp-action="Privacy">
+                        <i data-lucide="book-open" class="w-5 h-5 mr-2"></i>
+                        Đề thi
+                    </li>
+                    <li class="p-2 flex items-center rounded hover:bg-blue-700">
+                        <i data-lucide="clock" class="w-5 h-5 mr-2"></i>
+                        Lịch sử
+                    </li>
+                    <li class="p-2 flex items-center rounded hover:bg-blue-700">
+                        <i data-lucide="bar-chart" class="w-5 h-5 mr-2"></i>
+                        Thống kê
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+    
+        <main class="ml-64 p-8 flex-1">
+            @RenderBody()
+        </main>
+    
+    </div>
+    <script>
+        lucide.createIcons(); // Khởi tạo icons
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
