@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Tham gia lớp học";
+}
+
+<h2>Tham gia lớp học</h2>
+
+@if (TempData["Message"] != null)
+{
+    <p style="color: green;">@TempData["Message"]</p>
+}
+@if (TempData["ErrorMessage"] != null)
+        {
+            <div class="text-red-400">
+                <p>@TempData["ErrorMessage"]</p>
+            </div>
+        }
+<form asp-action="Join" method="post">
+    <div>
+        
+        <label for="inviteCode">Mã lớp học</label>
+        <input type="text" id="inviteCode" name="inviteCode" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Tham gia</button>
+</form>
+
+

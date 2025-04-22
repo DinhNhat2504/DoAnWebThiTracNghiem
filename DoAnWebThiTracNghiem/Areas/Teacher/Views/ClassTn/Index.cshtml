@@ -1,0 +1,75 @@
+﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.ClassTn>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ClassName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InviteCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Creator)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedAt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClassName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InviteCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject.Subject_Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Creator.User_Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsActive)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+                <td>
+                    <a asp-area="Teacher" asp-controller="StudentClass" asp-action="Index" asp-route-classId="@item.Class_Id" class="btn btn-info">Xem danh sách</a>
+                </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Class_Id">Edit</a> |
+               
+                <a asp-action="Delete" asp-route-id="@item.Class_Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

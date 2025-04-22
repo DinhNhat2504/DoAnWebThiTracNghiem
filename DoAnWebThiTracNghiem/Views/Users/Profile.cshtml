@@ -1,0 +1,48 @@
+﻿@model DoAnWebThiTracNghiem.Models.Users
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<h2>Thông tin cá nhân</h2>
+
+@if (TempData["Message"] != null)
+{
+    <p style="color: green;">@TempData["Message"]</p>
+}
+
+<form asp-action="Profile" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="User_Id" />
+    <div>
+        <label>Họ và tên</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" readonly />
+    </div>
+    <div>
+        <label>Số điện thoại</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Địa chỉ</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Ảnh đại diện</label>
+        <input type="file" name="avatarUrl" class="form-control" />
+        @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+        {
+            <img src="@Model.AvatarUrl" alt="Avatar" style="width: 150px; height: 150px;" />
+        }
+    </div>
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+</form>
+<a asp-action="ChangePassword" asp-controller="Users">Đổi mật khẩu</a>

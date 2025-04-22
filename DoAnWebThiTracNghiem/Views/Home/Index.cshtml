@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<header class="mb-8 flex items-center justify-between">
+    <div class="relative w-96">
+        <input type="search"
+               placeholder="Tìm kiếm đề thi..."
+               class="w-full rounded-lg border py-2 pr-4 pl-10 focus:outline-none focus:border-blue-500">
+        <i data-lucide="search" class="absolute top-2.5 left-3 text-gray-400"></i>
+    </div>
+
+    <div class="flex items-center space-x-2">
+        <div class="h-8 w-8 rounded-full bg-gray-200"></div>
+        <span>Nguyễn Văn A</span>
+    </div>
+</header>
+
+<!-- Danh sách đề thi -->
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <!-- Đề thi mẫu - lặp lại block này cho mỗi đề -->
+    <div class="rounded-lg bg-white p-6 shadow-sm">
+        <h3 class="mb-4 text-lg font-semibold">Đề thi Toán Học</h3>
+        <ul class="mb-6 space-y-2">
+            <li class="flex justify-between">
+                <span>· Số câu hỏi</span>
+                <span>40</span>
+            </li>
+            <li class="flex justify-between">
+                <span>· Thời gian</span>
+                <span>60 phút</span>
+            </li>
+            <li class="flex justify-between">
+                <span>· Độ khó</span>
+                <span>Trung bình</span>
+            </li>
+        </ul>
+        <button class="w-full rounded-lg bg-violet-400 py-2 text-white transition hover:bg-blue-700">
+            Làm bài
+        </button>
+    </div>
+
+    <!-- Thêm các đề thi khác ở đây -->
+</div>
