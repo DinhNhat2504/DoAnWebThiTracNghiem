@@ -1,6 +1,7 @@
 using DoAnWebThiTracNghiem.Data;
 using DoAnWebThiTracNghiem.Middleware;
 using DoAnWebThiTracNghiem.Repositories;
+using DoAnWebThiTracNghiem.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, EFUserRepository>();
 builder.Services.AddScoped<ISubjectRepository, EFSubjectRepository>();
 builder.Services.AddScoped<IClassTnRepository, EFClassTnRepository>();
+builder.Services.AddScoped<IExamRepository, EFExamRepository>();
+builder.Services.AddScoped<IQuestionRepository, EFQuestionRepository>();
+
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
 });
+builder.Services.AddTransient<EmailService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.Question>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Question_Content)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Option_A)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Option_B)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Option_C)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Option_D)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Correct_Option)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Level)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Creator)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Question_Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Option_A)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Option_B)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Option_C)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Option_D)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Correct_Option)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject.Subject_Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Level.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Creator.User_Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Question_ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Question_ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Question_ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
+    
+</head>
+<body class="flex bg-gray-100">
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 left-0 z-50 flex h-full w-full max-w-screen-2xl -translate-x-full transform flex-col bg-white text-black transition-transform duration-300 ease-in-out md:w-64 md:translate-x-0">
+        <!-- Logo and Close Button -->
+        <div class="flex items-center justify-between p-4">
+            <p class="text-xl text-shadow-amber-300 text-shadow-sm">NQuiz?</p>
+            <button id="closeMenu" class="text-black focus:outline-none md:hidden">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Navigation -->
+        <nav class="flex-1">
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Dashboard
+            </a>
+            <div>
+                <a href="#" class="flex items-center px-4 py-2 hhover:bg-gray-100" id="teamDropdown">
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Team
+                    <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </a>
+                <div id="teamDropdownContent" class="hidden bg-white text-black">
+                    <a href="#" class="block px-8 py-2 hover:bg-gray-100">Team A</a>
+                    <a href="#" class="block px-8 py-2 hover:bg-gray-100">Team B</a>
+                </div>
+            </div>
+            <div>
+                <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100" id="projectDropdown">
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    Projects
+                    <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </a>
+                <div id="projectDropdownContent" class="hidden bg-white text-black">
+                    <a href="#" class="block px-8 py-2 hover:bg-gray-100">Project A</a>
+                    <a href="#" class="block px-8 py-2 hover:bg-gray-100">Project B</a>
+                </div>
+            </div>
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Documents
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Reports
+            </a>
+        </nav>
+        <!-- Log out -->
+        <div class="border-t border-black p-4">
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Log out
+            </a>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content flex w-full flex-1 flex-col md:ml-64">
+        <!-- Header -->
+        <header class="flex items-center justify-between bg-white p-4 shadow">
+            <div class="flex items-center">
+                <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" placeholder="Search" class="border-none focus:outline-none">
+            </div>
+            <div class="relative flex items-center">
+                <div class="flex items-center" id="userDropdown">
+                    <svg class="mr-4 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <div class="relative flex items-center">
+                        <img class="mr-2 h-8 w-8 rounded-full" src="https://via.placeholder.com/32" alt="User Avatar">
+                        <span>Tom Cook</span>
+                        <svg class="ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        <div id="userDropdownContent" class="absolute top-full right-0 z-10 mt-2 hidden w-48 rounded-md border border-gray-200 bg-gray-100 shadow-lg">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Fullname</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Log out</a>
+                        </div>
+                    </div>
+                </div>
+                <button id="menuToggle" class="ml-4 p-2 text-indigo-600 hover:text-indigo-800 focus:outline-none md:hidden">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        <!-- Content Area -->
+        <main class="flex-1 p-6">
+            <div class="h-full rounded-lg border border-gray-200 bg-white shadow">
+                
+                    @RenderBody()
+                
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dropdown for Team
+        document.getElementById('teamDropdown').addEventListener('click', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('teamDropdownContent');
+            content.classList.toggle('hidden');
+            // Hide other dropdowns
+            document.getElementById('projectDropdownContent').classList.add('hidden');
+        });
+
+        // Dropdown for Projects
+        document.getElementById('projectDropdown').addEventListener('click', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('projectDropdownContent');
+            content.classList.toggle('hidden');
+            // Hide other dropdowns
+            document.getElementById('teamDropdownContent').classList.add('hidden');
+        });
+
+        // Dropdown for User
+        document.getElementById('userDropdown').addEventListener('click', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('userDropdownContent');
+            content.classList.toggle('hidden');
+        });
+
+        // Toggle sidebar on mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('translate-x-0');
+            sidebar.classList.toggle('-translate-x-full');
+            mainContent.classList.toggle('hidden');
+        });
+
+        // Close sidebar on mobile
+        document.getElementById('closeMenu').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            mainContent.classList.remove('hidden');
+        });
+
+        // Handle window resize to ensure main content is visible on larger screens
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                mainContent.classList.remove('hidden');
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            const teamDropdown = document.getElementById('teamDropdownContent');
+            const projectDropdown = document.getElementById('projectDropdownContent');
+            const userDropdown = document.getElementById('userDropdownContent');
+            if (!e.target.closest('#teamDropdown') && !e.target.closest('#teamDropdownContent')) {
+                teamDropdown.classList.add('hidden');
+            }
+            if (!e.target.closest('#projectDropdown') && !e.target.closest('#projectDropdownContent')) {
+                projectDropdown.classList.add('hidden');
+            }
+            if (!e.target.closest('#userDropdown') && !e.target.closest('#userDropdownContent')) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

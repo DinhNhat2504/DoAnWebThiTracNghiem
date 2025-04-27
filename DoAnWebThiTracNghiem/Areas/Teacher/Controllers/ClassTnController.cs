@@ -28,7 +28,6 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         // Tạo lớp học mới
         public IActionResult Create()
         {
-
             ViewData["SubjectId"] = new SelectList(_context.Subjects, "Subject_Id", "Subject_Name");
             return View();
         }

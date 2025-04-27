@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
+using DoAnWebThiTracNghiem.ViewModel;
+using DoAnWebThiTracNghiem.Services;
 
 namespace DoAnWebThiTracNghiem.Controllers
 {
@@ -14,13 +16,14 @@ namespace DoAnWebThiTracNghiem.Controllers
     {
         private readonly IUserRepository _Ucontext;
         private readonly AppDBContext _Dbcontext;
+        private readonly EmailService _emailService;
 
         // Hàm khởi tạo các biến cần thiết 
-        public UsersController(IUserRepository Ucontext, AppDBContext Dbcontext)
+        public UsersController(IUserRepository Ucontext, AppDBContext Dbcontext, EmailService emailService)
         {
             _Ucontext = Ucontext;
             _Dbcontext = Dbcontext;
-           
+            _emailService = emailService;
         }
         // Trả về Index 
         public async Task<IActionResult> Index()
@@ -285,6 +288,88 @@ namespace DoAnWebThiTracNghiem.Controllers
 
             return View(user);
         }
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.Email == model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Email không tồn tại.");
+                    return View(model);
+                }
+
+                // Tạo token đặt lại mật khẩu
+                user.ResetPasswordToken = Guid.NewGuid().ToString();
+                user.ResetPasswordTokenExpiry = DateTime.Now.AddHours(1); // Token có hiệu lực trong 1 giờ
+                await _Ucontext.UpdateAsync(user);
+
+                // Gửi email chứa link đặt lại mật khẩu
+                var resetLink = Url.Action("ResetPassword", "Users", new { token = user.ResetPasswordToken }, Request.Scheme);
+                var emailBody = $"<p>Click vào link sau để đặt lại mật khẩu:</p><a href='{resetLink}'>Đặt lại mật khẩu</a>";
+
+                await _emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu", emailBody);
+
+                TempData["Message"] = "Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.";
+                return RedirectToAction("Login");
+            }
+
+            return View(model);
+        }
+
+        // Hàm gửi email
+        private async Task SendResetPasswordEmail(string email, string resetLink)
+        {
+            var subject = "Đặt lại mật khẩu";
+            var body = $"<p>Click vào link sau để đặt lại mật khẩu:</p><a href='{resetLink}'>Đặt lại mật khẩu</a>";
+
+            // Sử dụng dịch vụ email 
+            await _emailService.SendEmailAsync(email, subject, body);
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token không hợp lệ.");
+            }
+
+            return View(new ResetPasswordViewModel { Token = token });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.ResetPasswordToken == model.Token && u.ResetPasswordTokenExpiry > DateTime.Now);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Token không hợp lệ hoặc đã hết hạn.");
+                    return View(model);
+                }
+
+                // Cập nhật mật khẩu mới
+                user.Password = model.NewPassword;
+                user.ResetPasswordToken = null; // Xóa token sau khi sử dụng
+                user.ResetPasswordTokenExpiry = null;
+                await _Ucontext.UpdateAsync(user);
+
+                TempData["Message"] = "Mật khẩu đã được đặt lại thành công.";
+                return RedirectToAction("Login");
+            }
+
+            return View(model);
+        }
+
 
     }
 }

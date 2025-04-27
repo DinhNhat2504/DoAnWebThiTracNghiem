@@ -1,0 +1,70 @@
+﻿@model DoAnWebThiTracNghiem.Models.Exam
+
+@{
+    ViewData["Title"] = "Tạo bài thi và thêm câu hỏi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="CreateWithQuestions" method="post">
+    <div class="form-group">
+        <label asp-for="Exam_Name" class="control-label"></label>
+        <input asp-for="Exam_Name" class="form-control" />
+        <span asp-validation-for="Exam_Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TotalQuestions" class="control-label"></label>
+        <input asp-for="TotalQuestions" class="form-control" />
+        <span asp-validation-for="TotalQuestions" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Duration" class="control-label"></label>
+        <input asp-for="Duration" class="form-control" />
+        <span asp-validation-for="Duration" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PassScore" class="control-label"></label>
+        <input asp-for="PassScore" class="form-control" />
+        <span asp-validation-for="PassScore" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Subject_ID" class="control-label">Môn học</label>
+        <select asp-for="Subject_ID" asp-items="ViewBag.SubjectId" class="form-control"></select>
+        <span asp-validation-for="Subject_ID" class="text-danger"></span>
+    </div>
+
+    <h3>Chọn câu hỏi</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chọn</th>
+                <th>Nội dung câu hỏi</th>
+                <th>Môn học</th>
+                <th>Mức độ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var question in (List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="questionIds" value="@question.Question_ID" />
+                    </td>
+                    <td>@question.Question_Content</td>
+                    <td>@question.Subject?.Subject_Name</td>
+                    <td>@question.Level?.LevelName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Tạo bài thi</button>
+</form>

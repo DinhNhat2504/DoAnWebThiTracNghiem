@@ -1,0 +1,40 @@
+﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.Exam>
+@{
+    ViewData["Title"] = "ExamList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên bài thi</th>
+            <th>Thời gian</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            var hasTakenExam = ViewData["TakenExams"] as List<int>;
+            <tr>
+                <td>@exam.Exam_Name</td>
+                <td>@exam.Duration phút</td>
+                <td>
+                    @if (hasTakenExam != null && hasTakenExam.Contains(exam.Exam_ID))
+                    {
+                        <a href="@Url.Action("ViewResult", "StudentTakeExam", new { examId = exam.Exam_ID })" class="btn btn-info">Xem kết quả</a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("TakeExam", "StudentTakeExam", new { examId = exam.Exam_ID })" class="btn btn-primary">Làm bài</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+

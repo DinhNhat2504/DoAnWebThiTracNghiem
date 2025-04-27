@@ -1,0 +1,49 @@
+﻿@model List<DoAnWebThiTracNghiem.Models.Exam_Question>
+@{
+    ViewData["Title"] = "Danh sách câu hỏi trong đề thi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Danh sách câu hỏi trong đề thi</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Câu</th>
+            <th>Nội dung câu hỏi</th>
+            <th>Môn học</th>
+            <th>Mức độ</th>
+            <th>Đáp án A</th>
+            <th>Đáp án B</th>
+            <th>Đáp Án C</th>
+            <th>Đáp án D</th>
+            <th>Đáp án đúng</th>
+            <th>Điểm</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model)
+        {
+            <tr>
+                <td>@question.Question_Order</td>
+                <td>@question.Question.Question_Content</td>
+                <td>@question.Question.Subject?.Subject_Name</td>
+                <td>@question.Question.Level?.LevelName</td>
+                <td>@question.Question.Option_A</td>
+                <td>@question.Question.Option_B</td>
+                <td>@question.Question.Option_C</td>
+                <td>@question.Question.Option_D</td>
+                <td>@question.Question.Correct_Option</td>
+                <td>@question.Points</td>
+                <td>
+                    <form asp-action="RemoveQuestion" method="post" style="display:inline;">
+                        <input type="hidden" name="examId" value="@ViewData["ExamId"]" />
+                        <input type="hidden" name="questionId" value="@question.Question_ID" />
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

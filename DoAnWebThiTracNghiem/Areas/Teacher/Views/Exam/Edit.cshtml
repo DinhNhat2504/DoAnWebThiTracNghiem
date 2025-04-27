@@ -1,0 +1,73 @@
+﻿@model DoAnWebThiTracNghiem.Models.Exam
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Exam</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Exam_ID" />
+            <div class="form-group">
+                <label asp-for="Exam_Name" class="control-label"></label>
+                <input asp-for="Exam_Name" class="form-control" />
+                <span asp-validation-for="Exam_Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalQuestions" class="control-label"></label>
+                <input asp-for="TotalQuestions" class="form-control" />
+                <span asp-validation-for="TotalQuestions" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Duration" class="control-label"></label>
+                <input asp-for="Duration" class="form-control" />
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PassScore" class="control-label"></label>
+                <input asp-for="PassScore" class="form-control" />
+                <span asp-validation-for="PassScore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input asp-for="EndTime" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Exam_Date" class="control-label"></label>
+                <input asp-for="Exam_Date" class="form-control" />
+                <span asp-validation-for="Exam_Date" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Subject_ID" class="control-label"></label>
+                <select asp-for="Subject_ID" class="form-control" asp-items="ViewBag.SubjectId"></select>
+                <span asp-validation-for="Subject_ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

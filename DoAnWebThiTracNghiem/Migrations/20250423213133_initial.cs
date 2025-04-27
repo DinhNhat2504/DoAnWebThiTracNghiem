@@ -93,8 +93,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     ClassName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InviteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubjectId = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatorUser_Id = table.Column<int>(type: "int", nullable: true),
+                    
+                    CreatorUser_Id = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -129,8 +129,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Exam_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatorUser_Id = table.Column<int>(type: "int", nullable: true),
+                    
+                    CreatorUser_Id = table.Column<int>(type: "int", nullable: false),
                     Subject_ID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -163,8 +163,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     Correct_Option = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Subject_ID = table.Column<int>(type: "int", nullable: false),
                     Level_ID = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatorUser_Id = table.Column<int>(type: "int", nullable: true),
+                    
+                    CreatorUser_Id = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -223,10 +223,10 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    Class_ID = table.Column<int>(type: "int", nullable: false),
-                    CreatorUser_Id = table.Column<int>(type: "int", nullable: true),
-                    ClassTNClass_Id = table.Column<int>(type: "int", nullable: true)
+                    
+                    
+                    CreatorUser_Id = table.Column<int>(type: "int", nullable: false),
+                    ClassTNClass_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -250,8 +250,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     EC_ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Exam_ID = table.Column<int>(type: "int", nullable: false),
-                    Class_ID = table.Column<int>(type: "int", nullable: false),
-                    ClassTNClass_Id = table.Column<int>(type: "int", nullable: true),
+                    
+                    ClassTNClass_Id = table.Column<int>(type: "int", nullable: false),
                     AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -335,9 +335,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                 {
                     SA_ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Result_ID = table.Column<int>(type: "int", nullable: false),
+                    
                     Question_ID = table.Column<int>(type: "int", nullable: false),
-                    Result_ID1 = table.Column<int>(type: "int", nullable: true),
+                    Result_ID1 = table.Column<int>(type: "int", nullable: false),
                     Selected_Option = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Is_Correct = table.Column<bool>(type: "bit", nullable: false)
                 },

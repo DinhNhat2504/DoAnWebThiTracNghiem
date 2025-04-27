@@ -1,9 +1,87 @@
 ﻿
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
-<h2>Teacher Dashboard</h2>
-<p>Welcome to the Teacher Management Page!</p>
+<div class="flex">
+    <!-- Sidebar -->
+    <!-- Main Content -->
+    <div class="flex-1 p-6">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold">
+                Dashboard
+            </h2>
+            <div class="flex items-center">
+                <img alt="User avatar" class="mr-2 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/OMJ4nGAF0Qv3GjYxTOg1DYqGsm0aZh9Jv5rC95lxCGQ.jpg" width="40" />
+                <div>
+                    <p class="text-gray-700">
+                        Administrator
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        NV0001
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-md">
+                <div>
+                    <p class="text-gray-700">
+                        Thành viên
+                    </p>
+                    <p class="text-2xl font-bold text-blue-500">
+                        2
+                    </p>
+                </div>
+                <div class="rounded-full bg-blue-500 p-2 text-white">
+                    <i class="fas fa-users">
+                    </i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-md">
+                <div>
+                    <p class="text-gray-700">
+                        Đề thi
+                    </p>
+                    <p class="text-2xl font-bold text-red-500">
+                        4
+                    </p>
+                </div>
+                <div class="rounded-full bg-red-500 p-2 text-white">
+                    <i class="fas fa-file-alt">
+                    </i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-md">
+                <div>
+                    <p class="text-gray-700">
+                        Lớp học
+                    </p>
+                    <p class="text-2xl font-bold text-green-500">
+                        2
+                    </p>
+                </div>
+                <div class="rounded-full bg-green-500 p-2 text-white">
+                    <i class="fas fa-school">
+                    </i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-md">
+                <div>
+                    <p class="text-gray-700">
+                        Môn học
+                    </p>
+                    <p class="text-2xl font-bold text-yellow-500">
+                        4
+                    </p>
+                </div>
+                <div class="rounded-full bg-yellow-500 p-2 text-white">
+                    <i class="fas fa-book">
+                    </i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

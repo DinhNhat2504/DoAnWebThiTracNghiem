@@ -1,9 +1,26 @@
 ﻿
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
 }
 
-<h2>Admin Dashboard</h2>
-<p>Welcome to the Admin Management Page!</p>
+<div id="main-content" class="ml-0 flex-1 p-4 pl-14 transition-all duration-300 md:ml-64 md:pl-4">
+    <div class="mx-auto max-w-7xl">
+        <h1 class="mb-4 text-center text-2xl font-bold">Nội dung chính</h1>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-lg bg-white p-4 shadow">
+                <h2 class="text-lg font-semibold">Mục 1</h2>
+                <p class="text-gray-600">Nội dung mẫu cho mục 1. Đây là một đoạn văn bản ngắn để minh họa.</p>
+            </div>
+            <div class="rounded-lg bg-white p-4 shadow">
+                <h2 class="text-lg font-semibold">Mục 2</h2>
+                <p class="text-gray-600">Nội dung mẫu cho mục 2. Đây là một đoạn văn bản ngắn để minh họa.</p>
+            </div>
+            <div class="rounded-lg bg-white p-4 shadow">
+                <h2 class="text-lg font-semibold">Mục 3</h2>
+                <p class="text-gray-600">Nội dung mẫu cho mục 3. Đây là một đoạn văn bản ngắn để minh họa.</p>
+            </div>
+        </div>
+    </div>
+</div>
 

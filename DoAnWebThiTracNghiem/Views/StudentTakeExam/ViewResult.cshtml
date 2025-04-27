@@ -1,0 +1,39 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.ViewResultViewModel
+
+
+@{
+    ViewData["Title"] = "ViewResult";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Kết quả bài thi: @Model.Exam.Exam_Name</h2>
+<p>Điểm: @Model.Score</p>
+<p>Số câu đúng: @Model.CorrectAnswers</p>
+<p>Số câu sai: @Model.WrongAnswers</p>
+@foreach (var answer in Model.StudentAnswers.OrderBy(a => a.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order))
+{
+    <div class="question-block">
+        <h4>
+            Câu @answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order:
+            @answer.Question.Question_Content
+            (@answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Points điểm)
+        </h4>
+        <ul>
+            <li>A. @answer.Question.Option_A</li>
+            <li>B. @answer.Question.Option_B</li>
+            <li>C. @answer.Question.Option_C</li>
+            <li>D. @answer.Question.Option_D</li>
+        </ul>
+        <p>
+            Lựa chọn của bạn:
+            <span style="color: @(answer.Selected_Option == answer.Question.Correct_Option ? "green" : "red");">
+                @answer.Selected_Option
+            </span>
+        </p>
+        <p>
+            Đáp án đúng:
+            <span style="color: green;">@answer.Question.Correct_Option</span>
+        </p>
+    </div>
+    <hr />
+}
+

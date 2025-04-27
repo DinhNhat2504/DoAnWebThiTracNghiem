@@ -1,0 +1,41 @@
+﻿@model List<DoAnWebThiTracNghiem.Models.ClassTn>
+@{
+    ViewData["Title"] = "AssignExam";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Giao bài thi: @ViewData["ExamName"]</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên lớp học</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var classTn in Model)
+        {
+            <tr>
+                <td>@classTn.ClassName</td>
+                <td>
+                    <form asp-action="AssignExam" method="post">
+                        <input type="hidden" name="examId" value="@ViewData["ExamId"]" />
+                        <input type="hidden" name="classId" value="@classTn.Class_Id" />
+                        <button type="submit" class="btn btn-primary">Giao bài thi</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> 

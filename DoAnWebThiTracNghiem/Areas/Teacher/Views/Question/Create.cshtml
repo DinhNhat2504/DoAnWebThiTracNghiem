@@ -1,0 +1,65 @@
+﻿@model DoAnWebThiTracNghiem.Models.Question
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>Question</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Question_Content" class="control-label"></label>
+                <input asp-for="Question_Content" class="form-control" />
+                <span asp-validation-for="Question_Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Option_A" class="control-label"></label>
+                <input asp-for="Option_A" class="form-control" />
+                <span asp-validation-for="Option_A" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Option_B" class="control-label"></label>
+                <input asp-for="Option_B" class="form-control" />
+                <span asp-validation-for="Option_B" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Option_C" class="control-label"></label>
+                <input asp-for="Option_C" class="form-control" />
+                <span asp-validation-for="Option_C" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Option_D" class="control-label"></label>
+                <input asp-for="Option_D" class="form-control" />
+                <span asp-validation-for="Option_D" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Correct_Option" class="control-label"></label>
+                <input asp-for="Correct_Option" class="form-control" />
+                <span asp-validation-for="Correct_Option" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Subject_ID" class="control-label"></label>
+                <select asp-for="Subject_ID" class ="form-control" asp-items="ViewBag.SubjectId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Level_ID" class="control-label"></label>
+                <select asp-for="Level_ID" class ="form-control" asp-items="ViewBag.LevelId"></select>
+            </div>
+           
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

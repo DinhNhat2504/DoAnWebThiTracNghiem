@@ -21,7 +21,7 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task AddAsync(Subject subject)
         {
-            _context.Subjects.Add(subject);
+           _context.Subjects.Add(subject);
             await _context.SaveChangesAsync();
         }
         public async Task UpdateAsync(Subject subject)

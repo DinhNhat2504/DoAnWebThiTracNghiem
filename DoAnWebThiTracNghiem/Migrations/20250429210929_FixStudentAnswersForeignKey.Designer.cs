@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DoAnWebThiTracNghiem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250427015149_UpdateStudentClass")]
-    partial class UpdateStudentClass
+    [Migration("20250429210929_FixStudentAnswersForeignKey")]
+    partial class FixStudentAnswersForeignKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -325,13 +325,13 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Property<bool>("Is_Correct")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Question_ID1")
+                    b.Property<int>("Question_ID")
                         .HasColumnType("int");
 
-                    b.Property<int>("Result_ID")
+                    b.Property<int?>("Result_ID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Result_ID1")
+                    b.Property<int>("Result_ID1")
                         .HasColumnType("int");
 
                     b.Property<string>("Selected_Option")
@@ -339,9 +339,9 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     b.HasKey("SA_ID");
 
-                    b.HasIndex("Question_ID1");
+                    b.HasIndex("Question_ID");
 
-                    b.HasIndex("Result_ID1");
+                    b.HasIndex("Result_ID");
 
                     b.ToTable("Answers");
                 });
@@ -360,14 +360,11 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Property<int>("User_ID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("User_Id")
-                        .HasColumnType("int");
-
                     b.HasKey("SC_ID");
 
                     b.HasIndex("Class_ID");
 
-                    b.HasIndex("User_Id");
+                    b.HasIndex("User_ID");
 
                     b.ToTable("ClassStudents");
                 });
@@ -580,13 +577,13 @@ namespace DoAnWebThiTracNghiem.Migrations
                 {
                     b.HasOne("DoAnWebThiTracNghiem.Models.Question", "Question")
                         .WithMany("Student_Answers")
-                        .HasForeignKey("Question_ID1")
+                        .HasForeignKey("Question_ID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DoAnWebThiTracNghiem.Models.Exam_Result", "Result")
                         .WithMany("Student_Answers")
-                        .HasForeignKey("Result_ID1");
+                        .HasForeignKey("Result_ID");
 
                     b.Navigation("Question");
 
@@ -603,7 +600,9 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     b.HasOne("DoAnWebThiTracNghiem.Models.Users", "User")
                         .WithMany("Student_Class")
-                        .HasForeignKey("User_Id");
+                        .HasForeignKey("User_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ClassTn");
 

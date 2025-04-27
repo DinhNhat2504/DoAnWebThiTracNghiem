@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar with Responsive Main Content</title>
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="flex min-h-screen bg-gray-100">
+    <!-- Icon to open sidebar when closed -->
+    <button id="openSidebar" class="fixed top-4 left-4 z-50 hidden text-2xl text-gray-500">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 left-0 z-40 h-full w-64 bg-white shadow-lg transition-transform duration-300 md:translate-x-0">
+        <div id="sidebar-content" class="flex h-full flex-col">
+            <!-- Header -->
+            <div class="flex items-center border-b p-4">
+                <button id="menuToggle" class="mr-2 text-gray-500">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex items-center">
+                    
+                    <span class="font-semibold text-gray-800">Lớp học</span>
+                </div>
+            </div>
+
+            <!-- Menu -->
+            <div class="mt-2 flex-1">
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                    <i class="fas fa-home mr-3"></i>
+                    <span>Màn hình chính</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                    <i class="fas fa-calendar-alt mr-3"></i>
+                    <span>Lịch</span>
+                </a>
+                <div class="mt-1">
+                    <button class="dropdown-toggle flex w-full items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                        <i class="fas fa-chalkboard-teacher mr-3"></i>
+                        <span>Giảng dạy</span>
+                        <i class="fas fa-chevron-down ml-auto transition-transform"></i>
+                    </button>
+                    <div class="dropdown-menu hidden overflow-hidden pl-8">
+                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">Cần xét</a>
+                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">đề</a>
+                    </div>
+                </div>
+                <div class="mt-1">
+                    <button class="dropdown-toggle flex w-full items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span>Đã đăng ký</span>
+                        <i class="fas fa-chevron-down ml-auto transition-transform"></i>
+                    </button>
+                    <div class="dropdown-menu hidden overflow-hidden pl-8">
+                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">Việc cần làm</a>
+                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">KTCT CNTT N06</a>
+                    </div>
+                </div>
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                    <i class="fas fa-archive mr-3"></i>
+                    <span>Lớp học đã lưu trữ</span>4
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+   @RenderBody()
+
+    <script>
+        // Toggle sidebar
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const menuToggle = document.getElementById('menuToggle');
+        const openSidebar = document.getElementById('openSidebar');
+        let isSidebarOpen = true;
+
+        // Check screen size to set initial sidebar state
+        const checkScreenSize = () => {
+            if (window.innerWidth < 768) { // md breakpoint in Tailwind
+                if (!isSidebarOpen) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    openSidebar.classList.remove('hidden');
+                    mainContent.classList.remove('md:ml-64');
+                    mainContent.classList.add('ml-0', 'pl-14');
+                }
+            } else {
+                isSidebarOpen = true;
+                sidebar.style.transform = 'translateX(0)';
+                openSidebar.classList.add('hidden');
+                mainContent.classList.add('md:ml-64');
+                mainContent.classList.remove('ml-0', 'pl-14');
+            }
+        };
+
+        // Run on page load
+        checkScreenSize();
+
+        // Run on window resize
+        window.addEventListener('resize', checkScreenSize);
+
+        menuToggle.addEventListener('click', () => {
+            isSidebarOpen = false;
+            sidebar.style.transform = 'translateX(-100%)';
+            openSidebar.classList.remove('hidden');
+            mainContent.classList.remove('md:ml-64');
+            mainContent.classList.add('ml-0', 'pl-14');
+        });
+
+        openSidebar.addEventListener('click', () => {
+            isSidebarOpen = true;
+            sidebar.style.transform = 'translateX(0)';
+            openSidebar.classList.add('hidden');
+            if (window.innerWidth >= 768) {
+                mainContent.classList.add('md:ml-64');
+                mainContent.classList.remove('pl-14');
+            }
+            mainContent.classList.remove('ml-0');
+        });
+
+        // Toggle dropdown
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                if (isSidebarOpen) {
+                    const dropdownMenu = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('.fa-chevron-down');
+                    dropdownMenu.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
