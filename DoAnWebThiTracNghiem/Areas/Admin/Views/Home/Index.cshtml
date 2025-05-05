@@ -4,23 +4,83 @@
     Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
 }
 
-<div id="main-content" class="ml-0 flex-1 p-4 pl-14 transition-all duration-300 md:ml-64 md:pl-4">
-    <div class="mx-auto max-w-7xl">
-        <h1 class="mb-4 text-center text-2xl font-bold">Nội dung chính</h1>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="rounded-lg bg-white p-4 shadow">
-                <h2 class="text-lg font-semibold">Mục 1</h2>
-                <p class="text-gray-600">Nội dung mẫu cho mục 1. Đây là một đoạn văn bản ngắn để minh họa.</p>
+<div id="content-thong-ke" class="content-section">
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 sm:mb-8 xl:grid-cols-4">
+        <div class="bg-gradient-to-r transform rounded-xl from-blue-500 to-blue-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
+            <div class="flex items-start justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Tổng Người Dùng</p>
+                    <p class="text-2xl font-bold sm:text-3xl">1,250</p>
+                </div>
+                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
+                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <!-- Icon: users -->
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.02 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                    </svg>
+                </div>
             </div>
-            <div class="rounded-lg bg-white p-4 shadow">
-                <h2 class="text-lg font-semibold">Mục 2</h2>
-                <p class="text-gray-600">Nội dung mẫu cho mục 2. Đây là một đoạn văn bản ngắn để minh họa.</p>
+        </div>
+        <div class="bg-gradient-to-r transform rounded-xl from-green-500 to-green-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
+            <div class="flex items-start justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Tổng Bài Thi</p>
+                    <p class="text-2xl font-bold sm:text-3xl">320</p>
+                </div>
+                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
+                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <!-- Icon: file-alt -->
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h6v6h6v10H6z" />
+                    </svg>
+                </div>
             </div>
-            <div class="rounded-lg bg-white p-4 shadow">
-                <h2 class="text-lg font-semibold">Mục 3</h2>
-                <p class="text-gray-600">Nội dung mẫu cho mục 3. Đây là một đoạn văn bản ngắn để minh họa.</p>
+        </div>
+        <div class="bg-gradient-to-r transform rounded-xl from-yellow-500 to-yellow-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
+            <div class="flex items-start justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Lớp Học</p>
+                    <p class="text-2xl font-bold sm:text-3xl">45</p>
+                </div>
+                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
+                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <!-- Icon: school -->
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm-1 12.91L5.09 13 3 14.09 12 19l9-5v-1.09L12 17.91zM12 6.09v5.82l6-3.27V5.82L12 3v3.09z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-r transform rounded-xl from-purple-500 to-purple-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
+            <div class="flex items-start justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Môn Học</p>
+                    <p class="text-2xl font-bold sm:text-3xl">80</p>
+                </div>
+                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
+                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <!-- Icon: book -->
+                        <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm12 16H6v-6h12v6zm0-8h-7V4h7v8z" />
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
+        <h3 class="mb-4 border-b pb-2 text-lg font-semibold text-gray-700 sm:text-xl">Hoạt động gần đây</h3>
+        <ul class="space-y-4">
+            <li class="flex flex-col items-start rounded-md bg-gray-50 p-3 transition duration-150 ease-in-out hover:bg-gray-100 sm:items-center sm:flex-row">
+                <img class="mr-0 mb-2 h-8 w-8 rounded-full border border-gray-200 object-cover sm:h-10 sm:w-10 sm:mr-4 sm:mb-0" src="https://i.pravatar.cc/50?u=a" alt="User Avatar">
+                <div class="flex-grow">
+                    <span class="text-sm text-gray-700"><strong>Nguyễn Văn A</strong> đã thêm bài thi mới: "Kiểm tra giữa kỳ Toán 10".</span>
+                </div>
+                <span class="mt-1 ml-0 text-xs text-gray-400 sm:ml-auto sm:mt-0">2 phút trước</span>
+            </li>
+            <li class="flex flex-col items-start rounded-md bg-gray-50 p-3 transition duration-150 ease-in-out hover:bg-gray-100 sm:items-center sm:flex-row">
+                <img class="mr-0 mb-2 h-8 w-8 rounded-full border border-gray-200 object-cover sm:h-10 sm:w-10 sm:mr-4 sm:mb-0" src="https://i.pravatar.cc/50?u=b" alt="User Avatar">
+                <div class="flex-grow">
+                    <span class="text-sm text-gray-700"><strong>Trần Thị B</strong> đã cập nhật thông tin lớp 11A1.</span>
+                </div>
+                <span class="mt-1 ml-0 text-xs text-gray-400 sm:ml-auto sm:mt-0">15 phút trước</span>
+            </li>
+        </ul>
+    </div>
+</div>

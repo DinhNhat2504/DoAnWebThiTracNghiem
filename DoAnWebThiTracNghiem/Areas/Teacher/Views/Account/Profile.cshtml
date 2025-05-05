@@ -1,0 +1,136 @@
+﻿@model DoAnWebThiTracNghiem.Models.Users
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+    var isEdit = Context.Request.Query["edit"] == "true";
+}
+
+<div class="mx-auto h-full w-full rounded-xl border border-blue-200 from-blue-100 to-white p-8 shadow-lg">
+    <form asp-action="Profile" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="User_Id" />
+        <div class="mb-6 flex items-center gap-6 border-b pb-6">
+            <div class="group relative">
+                <label for="avatarInput" class="cursor-pointer">
+                    <img id="avatarPreview"
+                         src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/images/default-avatar.png" : Model.AvatarUrl)"
+                         alt="Avatar"
+                         class="border-4 h-24 w-24 rounded-full border-blue-400 object-cover shadow transition group-hover:opacity-70" />
+                    @if (isEdit)
+                    {
+                        <div class="bg-opacity-30 absolute inset-0 flex items-center justify-center rounded-full bg-black opacity-0 transition group-hover:opacity-100">
+                            <span class="font-semibold text-white">Chọn ảnh</span>
+                        </div>
+                    }
+                </label>
+                @if (isEdit)
+                {
+                    <input type="file" name="AvatarFile" id="avatarInput" accept="image/*" class="hidden" onchange="previewAvatar(event)" />
+                }
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-blue-700">@Model.FullName</h1>
+                <p class="mt-1 text-xs text-purple-600"><span class="font-bold">@Model.Role?.Name</span></p>
+            </div>
+        </div>
+
+        <section class="mb-8">
+            <h2 class="mb-4 font-bold text-blue-700">Account</h2>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="text-purple-700">Email</label>
+                    @if (isEdit)
+                    {
+                        <input asp-for="Email" class="form-input w-full border-blue-300 focus:border-blue-500" />
+                    }
+                    else
+                    {
+                        <p class="text-black">@Model.Email</p>
+                    }
+                </div>
+                <div>
+                    <label class="text-purple-700">Phone</label>
+                    @if (isEdit)
+                    {
+                        <input asp-for="PhoneNumber" class="form-input w-full border-blue-300 focus:border-blue-500" />
+                    }
+                    else
+                    {
+                        <p class="text-black">@Model.PhoneNumber</p>
+                    }
+                </div>
+                <div>
+                    <label class="text-purple-700">Password</label>
+                    <div class="flex items-center gap-2">
+                        <input type="password" value="@Model.Password" readonly class="form-input w-full border-blue-300" id="passwordField" style="letter-spacing: 3px;" />
+                        <button type="button" onclick="togglePassword()" class="text-xs text-blue-600 underline">Xem</button>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400">Created: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="text-xs text-gray-400">Last updated: @Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+        </section>
+        <hr class="my-8 border-blue-200" />
+        <section>
+            <h2 class="mb-4 font-bold text-blue-700">Contact Information</h2>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="text-purple-700">Full Name</label>
+                    @if (isEdit)
+                    {
+                        <input asp-for="FullName" class="form-input w-full border-blue-300 focus:border-blue-500" />
+                    }
+                    else
+                    {
+                        <p class="text-black">@Model.FullName</p>
+                    }
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="text-purple-700">Address</label>
+                    @if (isEdit)
+                    {
+                        <input asp-for="Address" class="form-input w-full border-blue-300 focus:border-blue-500" />
+                    }
+                    else
+                    {
+                        <p class="text-black">@Model.Address</p>
+                    }
+                </div>
+            </div>
+        </section>
+        <div class="mt-8 flex justify-end gap-4">
+            @if (isEdit)
+            {
+                <button type="submit" class="rounded bg-blue-500 px-6 py-2 font-semibold text-white shadow transition hover:from-blue-600 hover:to-purple-600">Lưu</button>
+                <a href="?edit=false" class="rounded bg-gray-200 px-4 py-2 text-gray-700 transition hover:bg-gray-300">Hủy</a>
+            }
+            else
+            {
+                <a href="?edit=true" class="rounded bg-blue-500 px-6 py-2 font-semibold text-white shadow transition hover:from-blue-600 hover:to-purple-600">Sửa</a>
+                <a asp-action="Index" class="rounded bg-red-500 px-4 py-2 text-gray-700 transition hover:bg-gray-300">Xóa tài khoản</a>
+            }
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            var field = document.getElementById('passwordField');
+            if (field.type === 'password') {
+                field.type = 'text';
+            } else {
+                field.type = 'password';
+            }
+        }
+        // function previewAvatar(event) {
+        //     var reader = new FileReader();
+        //     reader.onload = function(){
+        //         var output = document.getElementById('avatarPreview');
+        //         output.src = reader.result;
+        //     };
+        //     reader.readAsDataURL(event.target.files[0]);
+        // }
+    </script>
+}

@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NQUIZ?</title>
+    <title>NQuiz - Hệ thống thi trực tuyến</title>
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.querySelector('#menu-btn');
+            const menuOverlay = document.querySelector('#menu-overlay');
+            const closeBtn = document.querySelector('#close-btn');
+            const usernameSpan = document.querySelector('#username-span');
+
+            // Hàm kiểm tra kích thước màn hình và điều chỉnh trạng thái menu
+            function adjustMenuForScreenSize() {
+                if (window.innerWidth >= 768) { // md: breakpoint của Tailwind
+                    menuOverlay.classList.add('hidden');
+                    menuOverlay.classList.remove('block');
+                    menuBtn.classList.add('hidden');
+                    usernameSpan.classList.remove('hidden');
+                } else {
+                    menuBtn.classList.remove('hidden');
+                    usernameSpan.classList.add('hidden');
+                }
+            }
+
+            // Xử lý sự kiện click nút menu
+            menuBtn.addEventListener('click', function() {
+                menuOverlay.classList.toggle('hidden');
+                menuOverlay.classList.toggle('block');
+                menuBtn.classList.toggle('active');
+            });
+
+            // Xử lý sự kiện click nút đóng (X)
+            closeBtn.addEventListener('click', function() {
+                menuOverlay.classList.add('hidden');
+                menuOverlay.classList.remove('block');
+                menuBtn.classList.remove('active');
+            });
+
+            // Đóng menu khi nhấn vào liên kết
+            const menuLinks = document.querySelectorAll('#menu-overlay a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuOverlay.classList.add('hidden');
+                    menuOverlay.classList.remove('block');
+                    menuBtn.classList.remove('active');
+                });
+            });
+
+            // Theo dõi sự kiện thay đổi kích thước màn hình
+            window.addEventListener('resize', adjustMenuForScreenSize);
+
+            // Gọi hàm kiểm tra ngay khi tải trang
+            adjustMenuForScreenSize();
+        });
+    </script>
+</head>
+<body class="flex min-h-screen flex-col bg-gray-50 font-sans">
+    <!-- Đầu trang (Header) -->
+    <header class="bg-indigo-600 py-4 text-white shadow-lg">
+        <nav class="container mx-auto flex items-center justify-between px-4">
+            <div class="mr-6 text-2xl font-bold">NQUIZ?</div>
+            <ul class="hidden md:flex md:space-x-6">
+                <li><a asp-action="Index" asp-controller="Home" class="text-white transition-colors duration-300 hover:text-yellow-300">Trang chủ</a></li>
+                <li><a asp-action="Index" asp-controller="StudentClass" class="text-white transition-colors duration-300 hover:text-yellow-300">Lớp học</a></li>
+                <li><a href="#" class="text-white transition-colors duration-300 hover:text-yellow-300">Giới thiệu</a></li>
+                <li><a href="#" class="text-white transition-colors duration-300 hover:text-yellow-300">Về chúng tôi</a></li>
+                <li><a href="#" class="text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
+            </ul>
+            <div class="relative flex items-center space-x-2">
+                <img src="" alt="User Avatar" class="border-2 h-10 w-10 rounded-full border-yellow-300">
+                <span id="username-span" class="text-yellow-300">Username</span>
+                <div id="menu-btn" class="menu-icon hidden cursor-pointer rounded-full p-1 transition-transform duration-300 hover:scale-105 md:hidden">☰</div>
+            </div>
+        </nav>
+        <div id="menu-overlay" class="fixed inset-0 z-50 flex hidden flex-col justify-between bg-indigo-600 pt-16 pb-16 transition-all duration-300">
+            <div>
+                <button id="close-btn" class="absolute top-4 right-4 text-3xl text-white transition-colors duration-300 hover:text-yellow-300">×</button>
+                <ul class="list-none text-center">
+                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Trang chủ</a></li>
+                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Lớp học</a></li>
+                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Giới thiệu</a></li>
+                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Về chúng tôi</a></li>
+                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
+                </ul>
+            </div>
+            <div class="text-center">
+                <a asp-action="Logout" asp-controller="Home" class="border-2 rounded border-yellow-300 px-4 py-2 text-xl text-white transition-colors duration-300 hover:text-yellow-300">Đăng xuất</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Thân trang (Main Content) -->
+    <main class="container mx-auto flex-grow px-4 py-6 text-indigo-600 md:py-10 md:px-6">
+        <a asp-action="Logout" asp-controller="Home">Đăng xuất</a>
+        @RenderBody()
+    </main>
+
+    <!-- Cuối trang (Footer) -->
+    <footer class="bg-indigo-600 py-4 text-white md:py-6">
+        <div class="container mx-auto text-center">
+            <p class="text-sm md:text-lg">Footer</p>
+        </div>
+    </footer>
+</body>
+</html>

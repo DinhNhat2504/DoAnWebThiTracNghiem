@@ -11,7 +11,6 @@ namespace DoAnWebThiTracNghiem.Middleware
         {
             _next = next;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
             // Kiểm tra nếu URL thuộc khu vực Teacher

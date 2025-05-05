@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Thêm câu hỏi vào đề thi"; 
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
 <h2>Thêm câu hỏi vào đề thi</h2>
@@ -23,10 +23,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Câu</th>
+               
                 <th>Chọn</th>
                 <th>Nội dung câu hỏi</th>
-                <th>Môn học</th>
+                <th>Loại câu hỏi</th>
                 <th>Mức độ</th>
             </tr>
         </thead>
@@ -38,7 +38,7 @@
                         <input type="checkbox" name="questionIds" value="@question.Question_ID" />
                     </td>
                     <td>@question.Question_Content</td>
-                    <td>@question.Subject?.Subject_Name</td>
+                    <td>@question.QuestionType?.Name</td>
                     <td>@question.Level?.LevelName</td>
                 </tr>
             }

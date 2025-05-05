@@ -1,90 +1,398 @@
-﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.Question>
+﻿@model X.PagedList.IPagedList<DoAnWebThiTracNghiem.Models.Question>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Danh sách câu hỏi";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+    var singleAnswerQuestions = ViewData["SingleAnswerQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
+    var trueFalseQuestions = ViewData["TrueFalseQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
+    var fillInTheBlankQuestions = ViewData["FillInTheBlankQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
 }
 
-<h1>Index</h1>
+<form asp-action="Index" method="get" class="mb-4 flex gap-2">
+    <input type="text" name="searchString" value="@(ViewContext.HttpContext.Request.Query["searchString"])" placeholder="Tìm theo nội dung câu hỏi..." class="rounded border px-2 py-1" />
+    <select name="subjectId" class="rounded border px-2 py-1" asp-items="ViewBag.Subjects">
+        <option value="">-- Môn học --</option>
+    </select>
+    <button type="submit" class="rounded bg-blue-500 px-4 py-1 text-white">Tìm kiếm</button>
+    <a href="@Url.Action("Create")" class="ml-2 rounded bg-green-500 px-4 py-1 text-white">+ Thêm câu hỏi</a>
+</form>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Question_Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Option_A)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Option_B)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Option_C)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Option_D)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Correct_Option)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Subject)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Level)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Creator)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Question_Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Option_A)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Option_B)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Option_C)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Option_D)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Correct_Option)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject.Subject_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Level.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator.User_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Question_ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Question_ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Question_ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<h1 class="mb-4 text-2xl font-bold">Danh sách câu hỏi</h1>
+
+<!-- Câu hỏi 1 đáp án -->
+<div class="mb-8">
+    <h2 class="mb-2 text-xl font-semibold">Câu hỏi 1 đáp án</h2>
+    <table class="w-full table-auto border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án A</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án B</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án C</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án D</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án Đúng</th>
+                
+                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in singleAnswerQuestions)
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Options?[0]</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Options?[1]</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Options?[2]</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Options?[3]</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
+                    
+                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        @{
+                            var editObj = new
+                            {
+                                Question_ID = item.Question_ID,
+                                Question_Content = item.Question_Content,
+                                Options = item.Options,
+                                Correct_Option = item.Correct_Option,
+                                Subject_ID = item.Subject_ID,
+                                Level_ID = item.Level_ID,
+                                QuestionTypeId = item.QuestionTypeId
+                            };
+                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
+                        }
+                        <button type="button" class="mr-2 text-blue-500 hover:underline"
+                                onclick='openEditModal(@Html.Raw(editJson))'>
+                            Sửa
+                        </button>
+
+
+                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
+                        </form>
+                    </td>
+
+                </tr>
+               
+            }
+        </tbody>
+    </table>
+    <div class="mt-4 flex justify-center">
+        <ul class="flex space-x-2">
+            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
+            {
+                if (i == singleAnswerQuestions.PageNumber)
+                {
+                    <li class="inline-block">
+                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="inline-block">
+                        <a href="@Url.Action("Index", new { page1 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+</div>
+
+<!-- Câu hỏi đúng sai -->
+<div class="mb-8">
+    <h2 class="mb-2 text-xl font-semibold">Câu hỏi đúng sai</h2>
+    <table class="w-full table-auto border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án</th>
+                <th class="border border-gray-300 px-4 py-2">Môn học</th>
+                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in trueFalseQuestions)
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Subject?.Subject_Name</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        @{
+                            var editObj = new
+                            {
+                                Question_ID = item.Question_ID,
+                                Question_Content = item.Question_Content,
+                                Options = item.Options,
+                                Correct_Option = item.Correct_Option,
+                                Subject_ID = item.Subject_ID,
+                                Level_ID = item.Level_ID,
+                                QuestionTypeId = item.QuestionTypeId
+                            };
+                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
+                        }
+                        <button type="button" class="mr-2 text-blue-500 hover:underline"
+                                onclick='openEditModal(@Html.Raw(editJson))'>
+                            Sửa
+                        </button>
+
+
+
+
+                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                
+            }
+        </tbody>
+    </table>
+    <div class="mt-4 flex justify-center">
+        <ul class="flex space-x-2">
+            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
+            {
+                if (i == singleAnswerQuestions.PageNumber)
+                {
+                    <li class="inline-block">
+                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="inline-block">
+                        <a href="@Url.Action("Index", new { page2 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+</div>
+
+<!-- Câu hỏi điền từ -->
+<div class="mb-8">
+    <h2 class="mb-2 text-xl font-semibold">Câu hỏi điền từ</h2>
+    <table class="w-full table-auto border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
+                <th class="border border-gray-300 px-4 py-2">Đáp án</th>
+                <th class="border border-gray-300 px-4 py-2">Môn học</th>
+                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in fillInTheBlankQuestions)
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Subject?.Subject_Name</td>
+                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        @{
+                            var editObj = new
+                            {
+                                Question_ID = item.Question_ID,
+                                Question_Content = item.Question_Content,
+                                Options = item.Options,
+                                Correct_Option = item.Correct_Option,
+                                Subject_ID = item.Subject_ID,
+                                Level_ID = item.Level_ID,
+                                QuestionTypeId = item.QuestionTypeId
+                            };
+                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
+                        }
+                        <button type="button" class="mr-2 text-blue-500 hover:underline"
+                                onclick='openEditModal(@Html.Raw(editJson))'>
+                            Sửa
+                        </button>
+
+
+
+                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                
+            }
+        </tbody>
+    </table>
+    <div class="mt-4 flex justify-center">
+        <ul class="flex space-x-2">
+            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
+            {
+                if (i == singleAnswerQuestions.PageNumber)
+                {
+                    <li class="inline-block">
+                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="inline-block">
+                        <a href="@Url.Action("Index", new { page3 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000;">
+        <div style="background:white; min-width:400px; max-width:600px; margin:5% auto; padding:32px 24px; border-radius:12px; position:relative; box-shadow:0 2px 16px #0002;">
+            <form id="editModalForm" onsubmit="return submitEditModalForm(event)">
+                <input type="hidden" name="Question_ID" id="editModal_Question_ID" />
+                <div class="mb-2">
+                    <label class="font-semibold">Nội dung:</label>
+                    <input type="text" name="Question_Content" id="editModal_Question_Content" class="w-full rounded border px-2 py-1" />
+                </div>
+                <div class="mb-2" id="editModalOptions">
+                    <div class="mb-2">
+                        <label class="font-semibold">Đáp án A:</label>
+                        <input type="text" name="Options[0]" class="w-full rounded border px-2 py-1" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="font-semibold">Đáp án B:</label>
+                        <input type="text" name="Options[1]" class="w-full rounded border px-2 py-1" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="font-semibold">Đáp án C:</label>
+                        <input type="text" name="Options[2]" class="w-full rounded border px-2 py-1" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="font-semibold">Đáp án D:</label>
+                        <input type="text" name="Options[3]" class="w-full rounded border px-2 py-1" />
+                    </div>
+                </div>
+                <div class="mb-2" id="editModalCorrectOption">
+                    <label class="font-semibold">Đáp án đúng:</label>
+                    <input type="text" name="Correct_Option" class="w-full rounded border px-2 py-1" />
+                </div>
+                <div class="mb-2">
+                    <label class="font-semibold">Môn học:</label>
+                    <select name="Subject_ID" id="editModal_Subject_ID" class="rounded border px-2 py-1">
+                        @foreach (var subject in (SelectList)ViewData["Subjects"])
+                        {
+                            <option value="@subject.Value">@subject.Text</option>
+                        }
+                    </select>
+                    <label class="ml-2 font-semibold">Độ khó:</label>
+                    <select name="Level_ID" id="editModal_Level_ID" class="rounded border px-2 py-1">
+                        @foreach (var level in (SelectList)ViewData["Levels"])
+                        {
+                            <option value="@level.Value">@level.Text</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="rounded bg-blue-500 px-2 py-1 text-white">Lưu</button>
+                <button type="button" onclick="closeEditModal()" class="ml-2 rounded border px-2 py-1">Hủy</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="edit-success-message" style="display:none;" class="mb-4 rounded bg-green-100 p-2 text-green-700"></div>
+</div>
+
+<script>
+      let currentEditType = 1; // 1: 1 đáp án, 2: Đúng/Sai, 3: Điền từ
+
+            function openEditModal(item) {
+        $('#editModal').show();
+        $('#editModal_Question_ID').val(item.Question_ID);
+        $('#editModal_Question_Content').val(item.Question_Content);
+        $('#editModal_Subject_ID').val(item.Subject_ID);
+        $('#editModal_Level_ID').val(item.Level_ID);
+
+        currentEditType = item.QuestionTypeId;
+        let optionsHtml = '';
+        let correctHtml = '';
+        if (item.QuestionTypeId === 1) {
+            optionsHtml = `
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án A:</label>
+                    <input type="text" name="Options[0]" value="${item.Options && item.Options[0] ? item.Options[0] : ''}" class="w-full rounded border px-2 py-1" />
+                </div>
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án B:</label>
+                    <input type="text" name="Options[1]" value="${item.Options && item.Options[1] ? item.Options[1] : ''}" class="w-full rounded border px-2 py-1" />
+                </div>
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án C:</label>
+                    <input type="text" name="Options[2]" value="${item.Options && item.Options[2] ? item.Options[2] : ''}" class="w-full rounded border px-2 py-1" />
+                </div>
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án D:</label>
+                    <input type="text" name="Options[3]" value="${item.Options && item.Options[3] ? item.Options[3] : ''}" class="w-full rounded border px-2 py-1" />
+                </div>`;
+            correctHtml = `
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án đúng:</label>
+                    <input type="text" name="Correct_Option" value="${item.Correct_Option || ''}" class="w-full rounded border px-2 py-1" />
+                </div>`;
+        } else if (item.QuestionTypeId === 2) {
+            correctHtml = `
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án đúng:</label>
+                    <input type="text" name="Correct_Option" value="${item.Correct_Option || ''}" class="w-full rounded border px-2 py-1" placeholder="Nhập Đúng hoặc Sai" />
+                </div>`;
+        } else if (item.QuestionTypeId === 3) {
+            correctHtml = `
+                <div class="mb-2">
+                    <label class="font-semibold">Đáp án đúng:</label>
+                    <input type="text" name="Correct_Option" value="${item.Correct_Option || ''}" class="w-full rounded border px-2 py-1" />
+                </div>`;
+        }
+        $('#editModalOptions').html(optionsHtml);
+        $('#editModalCorrectOption').html(correctHtml);
+    }
+
+
+
+    function closeEditModal() {
+        $('#editModal').hide();
+    }
+
+    async function submitEditModalForm(event) {
+        event.preventDefault();
+        const form = document.getElementById('editModalForm');
+        const formData = new FormData(form);
+
+        // Xử lý options cho câu hỏi 1 đáp án
+        let options = [];
+        if (currentEditType === 1) {
+            for (let i = 0; i < 4; i++) {
+                options.push(formData.get(`Options[${i}]`) || "");
+                formData.delete(`Options[${i}]`);
+            }
+            formData.append('Options', JSON.stringify(options));
+        }
+
+        const data = {};
+        formData.forEach((value, key) => { data[key] = value; });
+
+        try {
+            const response = await fetch('/Teacher/Question/Edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                closeEditModal();
+                alert('Sửa câu hỏi thành công!');
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi sửa câu hỏi.');
+            }
+        } catch (err) {
+            alert('Có lỗi xảy ra khi sửa câu hỏi.');
+        }
+        return false;
+    }
+
+</script>

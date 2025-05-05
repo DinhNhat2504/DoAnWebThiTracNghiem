@@ -263,20 +263,17 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Property<int>("CreatorUser_Id")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("IsTrueFalse")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Level_ID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Option_A")
+                    b.Property<string>("Options")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Option_B")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Option_C")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Option_D")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("QuestionTypeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Question_Content")
                         .HasColumnType("nvarchar(max)");
@@ -290,9 +287,31 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     b.HasIndex("Level_ID");
 
+                    b.HasIndex("QuestionTypeId");
+
                     b.HasIndex("Subject_ID");
 
                     b.ToTable("Question");
+                });
+
+            modelBuilder.Entity("DoAnWebThiTracNghiem.Models.QuestionType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuestionType");
                 });
 
             modelBuilder.Entity("DoAnWebThiTracNghiem.Models.Roles", b =>
@@ -412,6 +431,12 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResetPasswordToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResetPasswordTokenExpiry")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -554,6 +579,12 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DoAnWebThiTracNghiem.Models.QuestionType", "QuestionType")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuestionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DoAnWebThiTracNghiem.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("Subject_ID")
@@ -563,6 +594,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Level");
+
+                    b.Navigation("QuestionType");
 
                     b.Navigation("Subject");
                 });
@@ -653,6 +686,11 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Navigation("Exam_Questions");
 
                     b.Navigation("Student_Answers");
+                });
+
+            modelBuilder.Entity("DoAnWebThiTracNghiem.Models.QuestionType", b =>
+                {
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("DoAnWebThiTracNghiem.Models.Users", b =>

@@ -1,7 +1,7 @@
 ﻿@model List<DoAnWebThiTracNghiem.Models.Exam_Question>
 @{
     ViewData["Title"] = "Danh sách câu hỏi trong đề thi";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
 <h2>Danh sách câu hỏi trong đề thi</h2>
@@ -13,10 +13,7 @@
             <th>Nội dung câu hỏi</th>
             <th>Môn học</th>
             <th>Mức độ</th>
-            <th>Đáp án A</th>
-            <th>Đáp án B</th>
-            <th>Đáp Án C</th>
-            <th>Đáp án D</th>
+            <th>Loại câu hỏi</th>
             <th>Đáp án đúng</th>
             <th>Điểm</th>
         </tr>
@@ -29,10 +26,7 @@
                 <td>@question.Question.Question_Content</td>
                 <td>@question.Question.Subject?.Subject_Name</td>
                 <td>@question.Question.Level?.LevelName</td>
-                <td>@question.Question.Option_A</td>
-                <td>@question.Question.Option_B</td>
-                <td>@question.Question.Option_C</td>
-                <td>@question.Question.Option_D</td>
+                <td>@question.Question.QuestionType?.Name</td>
                 <td>@question.Question.Correct_Option</td>
                 <td>@question.Points</td>
                 <td>

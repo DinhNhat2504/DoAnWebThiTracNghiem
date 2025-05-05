@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "Chi tiết lớp học";
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    var classTn = (DoAnWebThiTracNghiem.Models.ClassTn)ViewData["Class"];
+    var notifications = (List<DoAnWebThiTracNghiem.Models.Notification>)ViewData["Notifications"];
+    var exams = (List<DoAnWebThiTracNghiem.Models.Exam_Class>)ViewData["Exams"];
+    
+}
+
+<div class="container mx-auto p-6">
+    <!-- Thông tin lớp học -->
+    <div class="mb-6 rounded-lg bg-blue-100 p-4 shadow-md">
+        <h1 class="text-2xl font-bold text-blue-800">Thông tin lớp học: @classTn.ClassName</h1>
+        <p class="mt-2 text-gray-700">Mã lớp: @classTn.InviteCode</p>
+        <p class="text-gray-700">Môn học: @classTn.Subject?.Subject_Name</p>
+        <p class="text-gray-700">Người tạo: @classTn.Creator?.FullName</p>
+        <form method="post" asp-action="LeaveClass" asp-route-id="@classTn.Class_Id" class="mt-4">
+            <button type="submit" class="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-700">
+                Rời lớp
+            </button>
+        </form>
+    </div>
+
+    <!-- Danh sách thông báo -->
+    <div class="mb-6 rounded-lg bg-white p-4 shadow-md">
+        <h2 class="text-xl font-bold text-gray-800">Thông báo của giáo viên</h2>
+        <ul>
+            @if (notifications.Count == 0)
+            {
+                <li class="text-gray-500">Không có thông báo nào.</li>
+            }
+            else
+            {
+                @foreach (var notification in notifications)
+                {
+                    <li class="mb-4 border-b pb-2">
+                        <p class="text-gray-800">@notification.Content</p>
+                        <p class="text-sm text-gray-500">Gửi lúc: @notification.Timestamp.ToString("dd/MM/yyyy HH:mm")</p>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <!-- Danh sách bài thi -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @if (ViewData["Exams"] is List<DoAnWebThiTracNghiem.Models.Exam_Class> examList && examList.Count > 0)
+        {
+            @foreach (var examClass in examList)
+            {
+                var exam = examClass.Exam;
+                if (exam != null)
+                {
+                    var now = DateTime.Now;
+
+                    <div class="rounded-lg border p-4 shadow-md">
+                        <h3 class="mb-2 text-lg font-bold text-purple-800">@exam.Exam_Name</h3>
+                        <p class="text-gray-700">Môn học: @exam.Subject?.Subject_Name</p>
+                        <p class="text-gray-700">Thời gian làm bài: @exam.Duration phút</p>
+                        <p class="text-gray-700">Ngày thi: @exam.Exam_Date.ToString("dd/MM/yyyy")</p>
+                        <p class="text-gray-700">Thời gian bắt đầu: @exam.StartTime.ToString("HH:mm")</p>
+                        <p class="text-gray-700">Thời gian kết thúc: @exam.EndTime.ToString("HH:mm")</p>
+
+                        @{
+                            // Kiểm tra nếu sinh viên đã làm bài thi
+                            var studentId = ViewData["UserId"]?.ToString();
+                            var hasTakenExam = ViewData["ExamResults"] is List<DoAnWebThiTracNghiem.Models.Exam_Result> results &&
+                            results.Any(r => r.Exam_ID == exam.Exam_ID && r.User_ID == int.Parse(studentId));
+                        }
+
+                        @if (hasTakenExam)
+                        {
+                            <!-- Xem kết quả -->
+                            <a href="@Url.Action("ViewResult", "StudentTakeExam", new { area = "Student", examId = exam.Exam_ID })"
+                               class="mt-4 block w-full rounded bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600">
+                                Xem kết quả
+                            </a>
+                        }
+                        else if (now.Date > exam.Exam_Date || (now.Date == exam.Exam_Date && now > exam.EndTime))
+                        {
+                            <!-- Hết hạn làm bài -->
+                            <button class="mt-4 block w-full cursor-not-allowed rounded bg-gray-500 px-4 py-2 text-center text-white">
+                                Hết hạn làm bài
+                            </button>
+                        }
+                        else if (now.Date < exam.Exam_Date || (now.Date == exam.Exam_Date && now < exam.StartTime))
+                        {
+                            <!-- Chờ thi -->
+                            <button class="mt-4 block w-full rounded bg-yellow-500 px-4 py-2 text-center text-white hover:bg-yellow-600">
+                                Chờ thi
+                            </button>
+                        }
+                        else
+                        {
+                            <!-- Làm bài -->
+                            <a href="@Url.Action("TakeExam", "StudentTakeExam", new { area = "Student", examId = exam.Exam_ID })"
+                               class="mt-4 block w-full rounded bg-green-500 px-4 py-2 text-center text-white hover:bg-green-600">
+                                Làm bài
+                            </a>
+                        }
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <p class="col-span-3 text-gray-500">Không có bài thi nào được giao.</p>
+        }
+    </div>
+</div>
+
+

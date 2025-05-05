@@ -1,0 +1,107 @@
+﻿@model List<DoAnWebThiTracNghiem.Models.ClassTn>
+@{
+    ViewData["Title"] = "Danh sách lớp học";
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto p-6">
+    <!-- Tiêu đề và thanh tìm kiếm -->
+    <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 class="text-2xl font-bold text-blue-800">Danh sách lớp học của bạn</h1>
+        <div class="flex w-full sm:w-1/2">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, môn học, tên giáo viên..."
+                   class="w-full rounded border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            <button onclick="searchClasses()"
+                    class="ml-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+                Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Nút tham gia lớp học -->
+    <div class="mb-6">
+        <button onclick="openJoinClassForm()"
+                class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">
+            Tham gia lớp học
+        </button>
+    </div>
+
+    <!-- Form tham gia lớp học (ẩn mặc định) -->
+    <div id="joinClassForm" class="bg-opacity-50 fixed inset-0 z-50 flex hidden items-center justify-center">
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h2 class="mb-4 text-xl font-bold text-gray-800">Tham gia lớp học</h2>
+            <form method="post" asp-action="JoinClass">
+                <div class="mb-4">
+                    <label for="inviteCode" class="block text-sm font-medium text-gray-700">Mã lớp học</label>
+                    <input type="text" id="inviteCode" name="inviteCode"
+                           class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           required />
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeJoinClassForm()"
+                            class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">
+                        Hủy
+                    </button>
+                    <button type="submit"
+                            class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+                        Tham gia
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách lớp học -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="rounded-lg bg-gray-100 p-6 text-center shadow-md">
+            <p class="text-lg text-gray-700">Bạn chưa tham gia lớp học nào.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            @foreach (var classTn in Model)
+            {
+                <div class="rounded-lg bg-white p-4 shadow-md hover:shadow-lg">
+                    <h2 class="text-xl font-semibold text-gray-800">@classTn.ClassName</h2>
+                    <p class="text-gray-600">Môn học: @(classTn.Subject?.Subject_Name ?? "Không có thông tin")</p>
+                    <p class="text-gray-600">Giáo viên: @(classTn.Creator?.FullName ?? "Không có thông tin")</p>
+                    <p class="text-gray-600">Ngày tạo: @classTn.CreatedAt.ToString("dd/MM/yyyy")</p>
+                    <a asp-action="Details" asp-route-id="@classTn.Class_Id"
+                       class="mt-4 inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+                        Chi tiết
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+
+<script>
+    function openJoinClassForm() {
+        document.getElementById('joinClassForm').classList.remove('hidden');
+    }
+
+    function closeJoinClassForm() {
+        document.getElementById('joinClassForm').classList.add('hidden');
+    }
+
+    function searchClasses() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const classCards = document.querySelectorAll('.grid > div');
+
+        classCards.forEach(card => {
+            const className = card.querySelector('h2').textContent.toLowerCase();
+            const subjectName = card.querySelector('p:nth-child(2)').textContent.toLowerCase();
+            const creatorName = card.querySelector('p:nth-child(3)').textContent.toLowerCase();
+
+            if (className.includes(searchInput) || subjectName.includes(searchInput) || creatorName.includes(searchInput)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>

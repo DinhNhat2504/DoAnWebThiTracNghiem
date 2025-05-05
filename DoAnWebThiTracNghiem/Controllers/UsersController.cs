@@ -31,6 +31,7 @@ namespace DoAnWebThiTracNghiem.Controllers
             var users = await _Ucontext.GetAllAsync();
             return View(users);
         }
+      
         // Trả về trang chi tiết người dùng
         public async Task<IActionResult> Details(int id)
         {
@@ -143,6 +144,7 @@ namespace DoAnWebThiTracNghiem.Controllers
             // Lưu thông tin người dùng vào Session
             HttpContext.Session.SetString("UserId", user.User_Id.ToString());
             HttpContext.Session.SetString("UserName", user.FullName);
+            HttpContext.Session.SetString("RoleId", user.RoleId.ToString());
 
             // Lưu quyền vào Session
             var role = _Dbcontext.Roles.FirstOrDefault(r => r.Id == user.RoleId);
@@ -157,6 +159,10 @@ namespace DoAnWebThiTracNghiem.Controllers
                 else if (role.Name == "Teacher")
                 {
                     return RedirectToAction("Index", "Home", new { area = "Teacher" });
+                }
+                else if (role.Name == "Student")
+                {
+                    return RedirectToAction("Index", "Home", new { area = "Student" });
                 }
             }
 
@@ -324,15 +330,7 @@ namespace DoAnWebThiTracNghiem.Controllers
             return View(model);
         }
 
-        // Hàm gửi email
-        private async Task SendResetPasswordEmail(string email, string resetLink)
-        {
-            var subject = "Đặt lại mật khẩu";
-            var body = $"<p>Click vào link sau để đặt lại mật khẩu:</p><a href='{resetLink}'>Đặt lại mật khẩu</a>";
-
-            // Sử dụng dịch vụ email 
-            await _emailService.SendEmailAsync(email, subject, body);
-        }
+        
 
         [HttpGet]
         public IActionResult ResetPassword(string token)

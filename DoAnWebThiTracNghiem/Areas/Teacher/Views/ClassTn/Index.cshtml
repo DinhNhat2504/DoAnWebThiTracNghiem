@@ -1,75 +1,124 @@
 ﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.ClassTn>
-
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Danh sách lớp học";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="mx-auto max-w-7xl py-8">
+    <h2 class="mb-6 text-center text-2xl font-bold">Danh sách lớp học</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ClassName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InviteCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Subject)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Creator)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ClassName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InviteCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject.Subject_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator.User_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-                <td>
-                    <a asp-area="Teacher" asp-controller="StudentClass" asp-action="Index" asp-route-classId="@item.Class_Id" class="btn btn-info">Xem danh sách</a>
-                </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Class_Id">Edit</a> |
-               
-                <a asp-action="Delete" asp-route-id="@item.Class_Id">Delete</a>
-            </td>
-        </tr>
+    <div class="mb-6 flex flex-col items-center gap-4 md:flex-row md:justify-between">
+        <button onclick="openModal('addModal')" class="rounded bg-green-500 px-6 py-2 font-semibold text-white shadow transition hover:bg-green-600">
+            Thêm mới
+        </button>
+        <form asp-action="Index" method="get" class="flex w-full gap-2 md:w-auto">
+            <input type="text" name="search" class="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 md:w-64" placeholder="Tìm kiếm lớp hoặc môn học..." value="@ViewData["Search"]" />
+            <button type="submit" class="rounded bg-orange-500 px-4 py-2 font-semibold text-white transition hover:bg-orange-600">Tìm</button>
+        </form>
+    </div>
+
+    <!-- Modal for Adding -->
+    <div id="addModal" class="absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center">
+        <div class="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+            <h3 class="mb-4 text-xl font-bold">Thêm mới lớp học</h3>
+            <form asp-action="Create" method="post">
+                <div class="mb-4">
+                    <label for="ClassName" class="block text-sm font-medium text-gray-700">Tên lớp</label>
+                    <input type="text" id="ClassName" name="ClassName" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                </div>
+                <div class="mb-4">
+                    <label for="SubjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
+                    <select id="SubjectId" name="SubjectId" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <option value="">Chọn môn học</option>
+                        @foreach (var subject in (IEnumerable<DoAnWebThiTracNghiem.Models.Subject>)ViewData["Subjects"])
+                        {
+                            <option value="@subject.Subject_Id">@subject.Subject_Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('addModal')" class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Hủy</button>
+                    <button type="submit" class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+   
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-4 rounded bg-green-100 p-3 text-green-700 shadow">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        @foreach (var cls in Model)
+        {
+            var studentCount = cls.Student_Classes?.Count() ?? 0;
+            <div class="border-2 flex flex-col rounded-lg border-green-400 bg-white shadow-lg transition hover:shadow-2xl">
+                <div class="rounded-t-lg border-b-2 border-purple-400 bg-purple-100 p-3 text-center text-lg font-bold">
+                    @cls.ClassName
+                </div>
+                <div class="flex-1 p-4">
+                    <ul class="mb-4 space-y-1 text-gray-700">
+                        <li>- Mã mời: <span class="font-semibold">@cls.InviteCode</span></li>
+                        <li>- Môn học: <span class="font-semibold">@cls.Subject?.Subject_Name</span></li>
+                        <li>- Người tạo: <span class="font-semibold">@cls.Creator?.FullName</span></li>
+                        <li>- Sĩ số: <span class="font-semibold">@studentCount</span></li>
+                        
+                        <li>
+                            - Trạng thái:
+                            <span class="inline-block rounded px-2 py-1 text-xs font-bold @(cls.IsActive ? "bg-green-200 text-green-800" : "bg-gray-200 text-gray-600")">
+                                @(cls.IsActive ? "Đang hoạt động" : "Không hoạt động")
+                            </span>
+                        </li>
+                    </ul>
+                    <div class="flex flex-wrap justify-center gap-2">
+
+                        <a asp-action="Details" asp-route-classId="@cls.Class_Id"
+                           class="rounded-full bg-green-200 p-2 text-green-900 shadow transition hover:bg-green-400"
+                           title="Chi tiết">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </a>
+                        <button type="button"
+                                class="rounded-full bg-orange-200 p-2 text-orange-900 shadow transition hover:bg-orange-400"
+                                onclick="confirmDelete('@cls.Class_Id', '@cls.ClassName')"
+                                title="Xóa">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <form id="deleteForm" method="post" asp-action="Delete">
+        <input type="hidden" name="id" id="deleteClassId" />
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(classId, className) {
+            if (confirm('Bạn có muốn xóa lớp "' + className + '" không?')) {
+                document.getElementById('deleteClassId').value = classId;
+                document.getElementById('deleteForm').submit();
+            }
+        }
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+      
+    </script>
 }
-    </tbody>
-</table>

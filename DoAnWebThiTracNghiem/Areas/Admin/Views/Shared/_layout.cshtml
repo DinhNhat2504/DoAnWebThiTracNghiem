@@ -1,143 +1,176 @@
 ﻿<!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sidebar with Responsive Main Content</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="flex min-h-screen bg-gray-100">
-    <!-- Icon to open sidebar when closed -->
-    <button id="openSidebar" class="fixed top-4 left-4 z-50 hidden text-2xl text-gray-500">
-        <i class="fas fa-bars"></i>
-    </button>
-
+<body class="flex bg-gray-100">
     <!-- Sidebar -->
-    <div id="sidebar" class="fixed top-0 left-0 z-40 h-full w-64 bg-white shadow-lg transition-transform duration-300 md:translate-x-0">
-        <div id="sidebar-content" class="flex h-full flex-col">
-            <!-- Header -->
-            <div class="flex items-center border-b p-4">
-                <button id="menuToggle" class="mr-2 text-gray-500">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="flex items-center">
+    <div id="sidebar" class="fixed top-0 left-0 z-50 flex h-full w-full max-w-screen-2xl -translate-x-full transform flex-col bg-white text-black transition-transform duration-300 ease-in-out md:w-64 md:translate-x-0">
+        <!-- Logo and Close Button -->
+        <div class="flex items-center justify-between p-4">
+            <p class="text-xl text-shadow-amber-300 text-shadow-sm">NQuiz?</p>
+            <button id="closeMenu" class="text-black focus:outline-none md:hidden">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Navigation -->
+        <nav class="flex-1">
+            <a asp-action="Index" asp-controller="Home" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Trang chủ
+            </a>
+            <details class="group" id="quizDetails">
+                <summary class="flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100" id="quizDropdown">
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Trắc nghiệm
+                    <svg class="ml-2 h-5 w-5 transition-transform duration-300 group-open:-rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </summary>
+                <div class="bg-white text-black">
+                    <a href="/Admin/Exams/Index"  class="quiz-item block px-8 py-2 text-black hover:bg-gray-100" data-controller="Exam" data-action="Index" data-active="false" >Đề thi</a>
+                    <a href="/Teacher/Question/Index" class="quiz-item block px-8 py-2 text-black hover:bg-gray-100"  data-controller="Question" data-action="Index" data-active="false">Câu hỏi</a>
+                </div/>
+            </details>
+            <div>
+                <a asp-action="Index" asp-controller="ClassTn" class="flex items-center px-4 py-2 hover:bg-gray-100" >
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    Lớp học 
                     
-                    <span class="font-semibold text-gray-800">Lớp học</span>
-                </div>
-            </div>
+                </a>
 
-            <!-- Menu -->
-            <div class="mt-2 flex-1">
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                    <i class="fas fa-home mr-3"></i>
-                    <span>Màn hình chính</span>
-                </a>
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                    <i class="fas fa-calendar-alt mr-3"></i>
-                    <span>Lịch</span>
-                </a>
-                <div class="mt-1">
-                    <button class="dropdown-toggle flex w-full items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                        <i class="fas fa-chalkboard-teacher mr-3"></i>
-                        <span>Giảng dạy</span>
-                        <i class="fas fa-chevron-down ml-auto transition-transform"></i>
-                    </button>
-                    <div class="dropdown-menu hidden overflow-hidden pl-8">
-                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">Cần xét</a>
-                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">đề</a>
-                    </div>
-                </div>
-                <div class="mt-1">
-                    <button class="dropdown-toggle flex w-full items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                        <i class="fas fa-graduation-cap mr-3"></i>
-                        <span>Đã đăng ký</span>
-                        <i class="fas fa-chevron-down ml-auto transition-transform"></i>
-                    </button>
-                    <div class="dropdown-menu hidden overflow-hidden pl-8">
-                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">Việc cần làm</a>
-                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600">KTCT CNTT N06</a>
-                    </div>
-                </div>
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                    <i class="fas fa-archive mr-3"></i>
-                    <span>Lớp học đã lưu trữ</span>4
-                </a>
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                    <i class="fas fa-cog mr-3"></i>
-                    <span>Cài đặt</span>
-                </a>
             </div>
+            <a asp-action="Index" asp-controller="Subjects" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Môn học
+            </a>
+            <a asp-action="Index" asp-controller="Statistics" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Thống kê
+            </a>
+        </nav>
+        <!-- Log out -->
+        <div class="border-t border-black p-4">
+            <a asp-action="Logout" asp-controller="Home" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Log out
+            </a>
         </div>
     </div>
-
     <!-- Main Content -->
-   @RenderBody()
+    <div class="main-content flex w-full flex-1 flex-col md:ml-64">
+        <!-- Header -->
+        @await Component.InvokeAsync("AvatarDropDown")
+        <!-- Content Area -->
+        <main class="flex-1 p-6">
+            <div class="h-full rounded-lg border border-gray-200 bg-white shadow">
+                
+                    @RenderBody()
+                
+            </div>
+        </main>
+    </div>
 
     <script>
-        // Toggle sidebar
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('main-content');
-        const menuToggle = document.getElementById('menuToggle');
-        const openSidebar = document.getElementById('openSidebar');
-        let isSidebarOpen = true;
+document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.getElementById('userDropdownToggle');
+    var content = document.getElementById('userDropdownContent');
 
-        // Check screen size to set initial sidebar state
-        const checkScreenSize = () => {
-            if (window.innerWidth < 768) { // md breakpoint in Tailwind
-                if (!isSidebarOpen) {
-                    sidebar.style.transform = 'translateX(-100%)';
-                    openSidebar.classList.remove('hidden');
-                    mainContent.classList.remove('md:ml-64');
-                    mainContent.classList.add('ml-0', 'pl-14');
-                }
-            } else {
-                isSidebarOpen = true;
-                sidebar.style.transform = 'translateX(0)';
-                openSidebar.classList.add('hidden');
-                mainContent.classList.add('md:ml-64');
-                mainContent.classList.remove('ml-0', 'pl-14');
-            }
-        };
-
-        // Run on page load
-        checkScreenSize();
-
-        // Run on window resize
-        window.addEventListener('resize', checkScreenSize);
-
-        menuToggle.addEventListener('click', () => {
-            isSidebarOpen = false;
-            sidebar.style.transform = 'translateX(-100%)';
-            openSidebar.classList.remove('hidden');
-            mainContent.classList.remove('md:ml-64');
-            mainContent.classList.add('ml-0', 'pl-14');
+    if (toggle && content) {
+        // Toggle dropdown khi nhấn vào toggle
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            content.classList.toggle('hidden');
         });
 
-        openSidebar.addEventListener('click', () => {
-            isSidebarOpen = true;
-            sidebar.style.transform = 'translateX(0)';
-            openSidebar.classList.add('hidden');
+        // Ngăn sự kiện click lan ra ngoài khi nhấn vào dropdown content (bao gồm các thẻ <a>)
+        content.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener('click', function () {
+            content.classList.add('hidden');
+        });
+    }
+});
+
+
+
+       // Set details state and active item based on URL
+        window.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname.toLowerCase();
+            const quizDetails = document.getElementById('quizDetails');
+            const quizItems = document.querySelectorAll('.quiz-item');
+
+            if (path.includes('/teacher/exam/') || path.includes('/teacher/question/')) {
+                quizDetails.setAttribute('open', '');
+                quizItems.forEach(item => {
+                    const controller = item.getAttribute('data-controller').toLowerCase();
+                    const action = item.getAttribute('data-action').toLowerCase();
+                    const itemUrl = `/${controller}/${action}`.toLowerCase();
+                    if (path.includes(itemUrl)) {
+                        item.classList.add('bg-gray-100');
+                    } else {
+                        item.classList.remove('bg-gray-100');
+                    }
+                });
+            }
+        });
+
+        // Toggle sidebar on mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('translate-x-0');
+            sidebar.classList.toggle('-translate-x-full');
+            mainContent.classList.toggle('hidden');
+        });
+
+        // Close sidebar on mobile
+        document.getElementById('closeMenu').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            mainContent.classList.remove('hidden');
+        });
+
+        // Handle window resize to ensure main content is visible on larger screens
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
             if (window.innerWidth >= 768) {
-                mainContent.classList.add('md:ml-64');
-                mainContent.classList.remove('pl-14');
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                mainContent.classList.remove('hidden');
             }
-            mainContent.classList.remove('ml-0');
         });
 
-        // Toggle dropdown
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                if (isSidebarOpen) {
-                    const dropdownMenu = toggle.nextElementSibling;
-                    const icon = toggle.querySelector('.fa-chevron-down');
-                    dropdownMenu.classList.toggle('hidden');
-                    icon.classList.toggle('rotate-180');
-                }
-            });
-        });
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

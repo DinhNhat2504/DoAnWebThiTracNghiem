@@ -1,0 +1,38 @@
+﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.Exam_Result>
+@{
+    ViewData["Title"] = "ExamResults";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+
+<h2>@ViewBag.ExamName - Student Results</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Score</th>
+            <th>Correct Answers</th>
+            <th>Wrong Answers</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Chi tiết</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var result in Model)
+        {
+            <tr>
+                <td>@result.User?.FullName</td>
+                <td>@result.Score</td>
+                <td>@result.CorrectAnswers</td>
+                <td>@result.WrongAnswers</td>
+                <td>@result.Start_Time.ToString("g")</td>
+                <td>@result.End_Time.ToString("g")</td>
+                <a asp-area="Teacher" asp-controller="StudentClass" asp-action="ExamResultDetail" asp-route-resultId="@result.Result_ID"
+                   class="text-blue-600 hover:underline">Xem chi tiết</a>
+            </tr>
+
+        }
+    </tbody>
+</table>

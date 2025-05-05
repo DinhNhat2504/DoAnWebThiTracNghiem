@@ -10,6 +10,7 @@ namespace DoAnWebThiTracNghiem.Models
 
         public int User_ID { get; set; } // FK đến bảng Users
         public int Class_ID { get; set; } // FK đến bảng ClassTn
+        public DateTime Timestamp { get; set; } // Ngày tham gia lớp học
 
         [ForeignKey("User_ID")]
         public Users? User { get; set; }

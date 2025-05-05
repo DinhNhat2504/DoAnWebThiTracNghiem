@@ -1,0 +1,206 @@
+﻿@using DoAnWebThiTracNghiem.ViewModel
+@model PagedResult<DoAnWebThiTracNghiem.Models.Users>
+
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
+}
+
+<div id="content-nguoi-dung" class="content-section">
+    <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
+        <div class="mb-6 flex flex-col items-start justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách Người dùng</h3>
+            <a asp-action="Create"
+               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Thêm Người Dùng</span>
+            </a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Ảnh</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Họ Tên</th>
+                        <th class="hidden px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase md:table-cell">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Vai Trò</th>
+                        <th class="hidden px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase sm:table-cell">Trạng Thái</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <img class="h-10 w-10 rounded-full border object-cover"
+                                     src="@(string.IsNullOrEmpty(item.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + item.Email : item.AvatarUrl)"
+                                     alt="@item.FullName" />
+                            </td>
+                            <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-800">@item.FullName</td>
+                            <td class="hidden px-4 py-3 text-sm whitespace-nowrap text-gray-600 md:table-cell">@item.Email</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Role?.Name</td>
+                            <td class="hidden px-4 py-3 whitespace-nowrap sm:table-cell">
+                                @if (item.ResetPasswordTokenExpiry == null || item.ResetPasswordTokenExpiry > DateTime.Now)
+                                {
+                                    <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs leading-5 font-semibold text-green-800">Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex rounded-full bg-gray-200 px-2 py-1 text-xs leading-5 font-semibold text-gray-600">Không hoạt động</span>
+                                }
+                            </td>
+                            <td class="space-x-2 px-4 py-3 text-center text-sm font-medium whitespace-nowrap">
+                                <button type="button" onclick="openEditModal(@item.User_Id)" class="p-1 text-blue-600 transition duration-150 ease-in-out hover:text-blue-800" title="Sửa">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                    </svg>
+                                </button>
+                                <a asp-action="Details" asp-route-id="@item.User_Id" class="p-1 text-green-600 transition duration-150 ease-in-out hover:text-green-800" title="Chi tiết">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </a>
+                                <button type="button" onclick="deleteUser(@item.User_Id, '@item.Role?.Name')" class="p-1 text-red-600 transition duration-150 ease-in-out hover:text-red-800" title="Xóa">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination and summary (static example, replace with dynamic as needed) -->
+        <div class="mt-6 flex flex-col items-center justify-between space-y-3 sm:flex-row sm:space-y-0">
+            <span class="text-sm text-gray-600">
+                Hiển thị trang @Model.PageNumber trên tổng @Model.TotalPages, tổng @Model.TotalItems người dùng
+            </span>
+            <div class="flex space-x-1">
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a asp-action="Index" asp-route-page="@i"
+                       class="rounded-md border px-3 py-1 text-sm @(i == Model.PageNumber ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50")">
+                        @i
+                    </a>
+                }
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
+            </div>
+        </div>
+
+    </div>
+    <!-- Modal sửa người dùng -->
+    <div id="editUserModal" class="bg-opacity-40 fixed inset-0 z-50 flex hidden items-center justify-center">
+        <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+            <button type="button" onclick="closeEditModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <form id="editUserForm" enctype="multipart/form-data">
+                <input type="hidden" name="User_Id" id="editUserId" />
+                <div class="mb-4 flex flex-col items-center">
+                    <label for="editAvatar" class="cursor-pointer">
+                        <img id="editAvatarImg" src="" class="border-2 h-20 w-20 rounded-full border-blue-400 object-cover" />
+                        <input type="file" id="editAvatar" name="AvatarFile" class="hidden" accept="image/*" />
+                    </label>
+                    <span class="mt-1 text-xs text-gray-500">Nhấp vào ảnh để thay đổi</span>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Họ tên</label>
+                    <input type="text" name="FullName" id="editFullName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="Email" id="editEmail" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Mật khẩu (để trống nếu không đổi)</label>
+                    <input type="password" name="Password" id="editPassword" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                    <input type="text" name="PhoneNumber" id="editPhoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Địa chỉ</label>
+                    <input type="text" name="Address" id="editAddress" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeEditModal()" class="mr-2 rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300">Hủy</button>
+                    <button type="submit" class="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<!-- Include any necessary scripts here -->
+
+<script>
+    function openEditModal(userId) {
+        fetch(`/Admin/Users/GetUser/${userId}`)
+            .then(res => res.json())
+            .then(user => {
+                document.getElementById('editUserId').value = user.user_Id;
+                document.getElementById('editFullName').value = user.fullName || '';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editPhoneNumber').value = user.phoneNumber || '';
+                document.getElementById('editAddress').value = user.address || '';
+                document.getElementById('editAvatarImg').src = user.avatarUrl || `https://i.pravatar.cc/40?u=${user.email}`;
+                document.getElementById('editUserModal').classList.remove('hidden');
+            });
+    }
+
+    function closeEditModal() {
+        document.getElementById('editUserModal').classList.add('hidden');
+    }
+
+    document.getElementById('editAvatar').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                document.getElementById('editAvatarImg').src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    document.getElementById('editUserForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch('/Admin/Users/EditInline', {
+            method: 'POST',
+            body: formData
+        }).then(res => {
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi cập nhật!');
+            }
+        });
+    });
+
+
+    function deleteUser(userId, roleName) {
+        if (roleName.toLowerCase() === 'admin') {
+            alert('Không thể xóa admin!');
+            return;
+        }
+        if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+            fetch(`/Admin/Users/DeleteInline?id=${userId}`, { method: 'POST' })
+                .then(res => {
+                    if (res.ok) location.reload();
+                    else alert('Có lỗi xảy ra khi xóa!');
+                });
+        }
+    }
+</script>

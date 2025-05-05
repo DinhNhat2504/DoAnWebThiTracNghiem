@@ -1,0 +1,164 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.ManageExamViewModel
+
+@{
+    ViewData["Title"] = "Quản lý bài thi";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+<div class="mx-auto max-w-6xl px-4 py-8">
+    <h1 class="mb-6 text-3xl font-bold text-blue-700">Quản lý bài thi</h1>
+
+    <!-- Thông báo -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Form chỉnh sửa thông tin bài thi -->
+    <form asp-action="ManageExam" method="post" class="mb-8 space-y-6 rounded-lg bg-white p-6 shadow">
+        <input type="hidden" asp-for="Exam.Exam_ID" />
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block font-semibold">Tên bài thi</label>
+                <input asp-for="Exam.Exam_Name" class="w-full rounded border px-3 py-2" />
+                <span asp-validation-for="Exam.Exam_Name" class="text-sm text-red-500"></span>
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Số lượng câu hỏi</label>
+                <input asp-for="Exam.TotalQuestions" class="w-full rounded border px-3 py-2" />
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Thời lượng (phút)</label>
+                <input asp-for="Exam.Duration" class="w-full rounded border px-3 py-2" />
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Điểm đạt</label>
+                <input asp-for="Exam.PassScore" class="w-full rounded border px-3 py-2" />
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Ngày thi</label>
+                <input asp-for="Exam.Exam_Date" type="date" class="w-full rounded border px-3 py-2" />
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Thời gian bắt đầu</label>
+                <input asp-for="Exam.StartTime" type="time" class="w-full rounded border px-3 py-2" />
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold">Thời gian kết thúc</label>
+                <input asp-for="Exam.EndTime" type="time" class="w-full rounded border px-3 py-2" />
+            </div>
+            
+        </div>
+        <button type="submit" name="actionType" value="Edit" class="mt-4 rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700">Lưu thông tin</button>
+    </form>
+
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <!-- Danh sách câu hỏi đã có trong bài thi -->
+        <div>
+            <h2 class="mb-4 text-xl font-bold text-gray-700">Câu hỏi trong bài thi</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full rounded-lg bg-white shadow">
+                    <thead>
+                        <tr class="bg-blue-100">
+                            <th class="px-4 py-2">STT</th>
+                            <th class="px-4 py-2">Nội dung</th>
+                            <th class="px-4 py-2">Loại</th>
+                            <th class="px-4 py-2">Độ khó</th>
+                            <th class="px-4 py-2">Điểm</th>
+                            <th class="px-4 py-2">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ExamQuestions != null && Model.ExamQuestions.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var eq in Model.ExamQuestions)
+                            {
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2">@stt</td>
+                                    <td class="border px-4 py-2">@eq.Question?.Question_Content</td>
+                                    <td class="border px-4 py-2">@eq.Question?.QuestionType?.Name</td>
+                                    <td class="border px-4 py-2">@eq.Question?.Level?.LevelName</td>
+                                    <td class="border px-4 py-2">@eq.Points</td>
+                                    <td class="border px-4 py-2 text-center">
+                                        <form asp-action="ManageExam" method="post" class="inline">
+                                            <input type="hidden" name="Exam.Exam_ID" value="@Model.Exam.Exam_ID" />
+                                            <input type="hidden" name="questionId" value="@eq.Question_ID" />
+                                            <button type="submit" name="actionType" value="RemoveQuestion" class="font-bold text-red-600 hover:text-red-800" title="Xóa">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="py-4 text-center text-gray-500">Chưa có câu hỏi nào trong bài thi.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Danh sách câu hỏi có thể thêm vào bài thi -->
+        <div>
+            <h2 class="mb-4 text-xl font-bold text-gray-700">Thêm câu hỏi vào bài thi</h2>
+            <form asp-action="ManageExam" method="post">
+                <input type="hidden" name="Exam.Exam_ID" value="@Model.Exam.Exam_ID" />
+                <div class="overflow-x-auto">
+                    <table class="min-w-full rounded-lg bg-white shadow">
+                        <thead>
+                            <tr class="bg-green-100">
+                                <th class="px-4 py-2">Chọn</th>
+                                <th class="px-4 py-2">Nội dung</th>
+                                <th class="px-4 py-2">Loại</th>
+                                <th class="px-4 py-2">Độ khó</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.AvailableQuestions != null && Model.AvailableQuestions.Count > 0)
+                            {
+                                foreach (var q in Model.AvailableQuestions)
+                                {
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border px-4 py-2 text-center">
+                                            <input type="checkbox" name="questionIds" value="@q.Question_ID" class="accent-blue-600" />
+                                        </td>
+                                        <td class="border px-4 py-2">@q.Question_Content</td>
+                                        <td class="border px-4 py-2">@q.QuestionType?.Name</td>
+                                        <td class="border px-4 py-2">@q.Level?.LevelName</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="py-4 text-center text-gray-500">Không còn câu hỏi nào để thêm.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <button type="submit" name="actionType" value="AddQuestion" class="mt-4 rounded bg-green-600 px-6 py-2 text-white transition hover:bg-green-700">Thêm câu hỏi đã chọn</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

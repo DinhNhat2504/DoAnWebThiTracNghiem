@@ -37,5 +37,19 @@ namespace DoAnWebThiTracNghiem.Repositories
                 await _context.SaveChangesAsync();
             
         }
+        public async Task<IEnumerable<Users>> GetPagedAsync(int page, int pageSize)
+        {
+            return await _context.Users
+                .OrderBy(u => u.User_Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Include(u => u.Role)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Users.CountAsync();
+        }
     }
 }

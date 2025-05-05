@@ -9,5 +9,7 @@ namespace DoAnWebThiTracNghiem.Repositories
         Task AddAsync(Users user);
         Task UpdateAsync(Users user);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Users>> GetPagedAsync(int page, int pageSize);
+        Task<int> CountAsync();
     }
 }

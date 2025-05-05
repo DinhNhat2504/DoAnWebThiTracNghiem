@@ -8,6 +8,6 @@ namespace DoAnWebThiTracNghiem.Repositories
         Task<Subject> GetByIdAsync(int id);
         Task AddAsync(Subject subject);
         Task UpdateAsync(Subject subject);
-        //Task DeleteAsync(int id);
+        Task DeleteAsync(int id);
     }
 }

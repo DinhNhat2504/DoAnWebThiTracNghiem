@@ -1,65 +1,347 @@
 ﻿@model DoAnWebThiTracNghiem.Models.Question
 
 @{
-    ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thêm nhiều câu hỏi";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
-<h1>Create</h1>
+<h2 class="mb-6 text-2xl font-bold text-gray-800">Thêm nhiều câu hỏi</h2>
 
-<h4>Question</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Question_Content" class="control-label"></label>
-                <input asp-for="Question_Content" class="form-control" />
-                <span asp-validation-for="Question_Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Option_A" class="control-label"></label>
-                <input asp-for="Option_A" class="form-control" />
-                <span asp-validation-for="Option_A" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Option_B" class="control-label"></label>
-                <input asp-for="Option_B" class="form-control" />
-                <span asp-validation-for="Option_B" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Option_C" class="control-label"></label>
-                <input asp-for="Option_C" class="form-control" />
-                <span asp-validation-for="Option_C" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Option_D" class="control-label"></label>
-                <input asp-for="Option_D" class="form-control" />
-                <span asp-validation-for="Option_D" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correct_Option" class="control-label"></label>
-                <input asp-for="Correct_Option" class="form-control" />
-                <span asp-validation-for="Correct_Option" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Subject_ID" class="control-label"></label>
-                <select asp-for="Subject_ID" class ="form-control" asp-items="ViewBag.SubjectId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Level_ID" class="control-label"></label>
-                <select asp-for="Level_ID" class ="form-control" asp-items="ViewBag.LevelId"></select>
-            </div>
-           
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container mx-auto p-4">
+    <!-- Phần tạo câu hỏi với AI -->
+    <div class="mb-6 rounded-lg bg-gray-100 p-6 shadow-md">
+        <h2 class="mb-4 text-2xl font-bold text-gray-800">Tạo câu hỏi với AI</h2>
+        <button id="btnGenerateWithAI" data-controller="question" data-action="generatewithai" class="rounded-lg bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600">
+            Tạo với AI
+        </button>
+
+        <div id="aiForm" class="mt-6 hidden">
+            <form id="generateQuestionsForm" class="space-y-4">
+                <div>
+                    <label for="numberOfQuestions" class="block text-sm font-medium text-gray-700">Số câu hỏi</label>
+                    <input type="number" id="numberOfQuestions" name="numberOfQuestions" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" min="1" required>
+                </div>
+                <div>
+                    <label for="subjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
+                    <select id="subjectId" name="subjectId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.SubjectId" required>
+                        <option value="">-- Chọn môn học --</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="levelId" class="block text-sm font-medium text-gray-700">Độ khó</label>
+                    <select id="levelId" name="levelId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.LevelId" required>
+                        <option value="">-- Chọn độ khó --</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="questionTypeId" class="block text-sm font-medium text-gray-700">Loại câu hỏi</label>
+                    <select id="questionTypeId" name="questionTypeId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.QuestionTypes" required>
+                        <option value="">-- Chọn loại câu hỏi --</option>
+                    </select>
+                </div>
+                <button type="button" id="generateQuestions" class="w-full rounded-lg bg-green-500 px-4 py-2 text-white transition hover:bg-green-600">
+                    Tạo câu hỏi
+                </button>
+            </form>
+        </div>
+
+        <div id="generatedQuestions" class="mt-6">
+            <!-- Hiển thị danh sách câu hỏi được tạo -->
+        </div>
     </div>
+
+    <!-- Phần tạo câu hỏi thủ công -->
+    <button id="addQuestionForm" class="mb-4 rounded-md bg-blue-500 px-4 py-2 text-white transition duration-300 hover:bg-blue-600">
+        Thêm form câu hỏi mới
+    </button>
+
+    <form id="multiQuestionForm" asp-action="CreateMultiple" method="post" onsubmit="return validateForms()">
+        <div id="questionForms" class="space-y-6">
+            <!-- Form mẫu -->
+            <div class="question-form rounded-lg border border-gray-200 bg-white p-6 shadow-md" data-index="0">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="form-group">
+                        <label for="Question_Content_0" class="block text-sm font-medium text-gray-700">Nội dung câu hỏi</label>
+                        <textarea id="Question_Content_0" name="Questions[0].Question_Content" class="form-control w-full rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập nội dung câu hỏi" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Subject_ID_0" class="block text-sm font-medium text-gray-700">Môn học</label>
+                        <select id="Subject_ID_0" name="Questions[0].Subject_ID" class="form-control w-full rounded-md border p-2 focus:ring focus:ring-blue-300" asp-items="ViewBag.SubjectId" required>
+                            <option value="">-- Chọn môn học --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Level_ID_0" class="block text-sm font-medium text-gray-700">Độ khó</label>
+                        <select id="Level_ID_0" name="Questions[0].Level_ID" class="form-control w-full rounded-md border p-2 focus:ring focus:ring-blue-300" asp-items="ViewBag.LevelId" required>
+                            <option value="">-- Chọn độ khó --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="QuestionTypeId_0" class="block text-sm font-medium text-gray-700">Loại câu hỏi</label>
+                        <select id="QuestionTypeId_0" name="Questions[0].QuestionTypeId" class="form-control question-type-selector w-full rounded-md border p-2 focus:ring focus:ring-blue-300" asp-items="ViewBag.QuestionTypes" required>
+                            <option value="">-- Chọn loại câu hỏi --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Giao diện động cho từng loại câu hỏi -->
+                <div id="questionTypeContainer_0" class="mt-4"></div>
+
+                <!-- Nút xóa form -->
+                <button type="button" class="remove-form mt-4 rounded-md bg-red-500 px-3 py-1 text-white transition duration-300 hover:bg-red-600">
+                    Xóa form này
+                </button>
+            </div>
+        </div>
+
+        <!-- Nút thêm tất cả -->
+        <button type="submit" class="mt-6 rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600">
+            Thêm tất cả câu hỏi
+        </button>
+    </form>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let formIndex = 0;
 
+        // Hàm thêm form mới
+        $("#addQuestionForm").on("click", function () {
+            const template = $(".question-form").first().clone();
+            formIndex++;
+            template.attr("data-index", formIndex);
+
+            // Cập nhật ID và tên của các trường
+            template.find("[id]").each(function () {
+                $(this).attr("id", $(this).attr("id").replace(/\d+/, formIndex));
+            });
+            template.find("[name]").each(function () {
+                $(this).attr("name", $(this).attr("name").replace(/\d+/, formIndex));
+            });
+            template.find("#questionTypeContainer_" + (formIndex - 1)).attr("id", "questionTypeContainer_" + formIndex);
+            template.find(".question-type-selector").attr("id", "QuestionTypeId_" + formIndex);
+            template.find(".remove-form").on("click", function () {
+                template.hide();
+            });
+
+            // Thêm form vào danh sách
+            $("#questionForms").append(template);
+
+            // Gắn sự kiện cho loại câu hỏi
+            setupQuestionTypeListener(formIndex);
+        });
+
+        // Hàm thiết lập sự kiện cho loại câu hỏi
+        function setupQuestionTypeListener(index) {
+            const selector = $("#QuestionTypeId_" + index);
+            const container = $("#questionTypeContainer_" + index);
+
+            selector.on("change", function () {
+                const selectedType = $(this).val();
+                container.html("");
+
+                if (selectedType == "1") { // Câu hỏi trắc nghiệm
+                    container.html(`
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700">Danh sách đáp án</label>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="" class="form-check-input" id="optionA_${index}">
+                                <label for="optionA_${index}" class="form-check-label text-sm text-gray-700">Đáp án A:</label>
+                                <input type="text" name="Questions[${index}].Options[0]" class="form-control option-input inline-block w-3/4 rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập đáp án A" data-target="optionA_${index}">
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="" class="form-check-input" id="optionB_${index}">
+                                <label for="optionB_${index}" class="form-check-label text-sm text-gray-700">Đáp án B:</label>
+                                <input type="text" name="Questions[${index}].Options[1]" class="form-control option-input inline-block w-3/4 rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập đáp án B" data-target="optionB_${index}">
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="" class="form-check-input" id="optionC_${index}">
+                                <label for="optionC_${index}" class="form-check-label text-sm text-gray-700">Đáp án C:</label>
+                                <input type="text" name="Questions[${index}].Options[2]" class="form-control option-input inline-block w-3/4 rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập đáp án C" data-target="optionC_${index}">
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="" class="form-check-input" id="optionD_${index}">
+                                <label for="optionD_${index}" class="form-check-label text-sm text-gray-700">Đáp án D:</label>
+                                <input type="text" name="Questions[${index}].Options[3]" class="form-control option-input inline-block w-3/4 rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập đáp án D" data-target="optionD_${index}">
+                            </div>
+                        </div>
+                    `);
+
+                    $(`#questionTypeContainer_${index} .option-input`).on("input", function () {
+                        const radioId = $(this).attr("data-target");
+                        const radio = $("#" + radioId);
+                        radio.val($(this).val().trim());
+                        console.log(`Updated radio ${radioId} value to: ${radio.val()}`);
+                    });
+                } else if (selectedType == "2") { // Câu hỏi đúng/sai
+                    container.html(`
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700">Đáp án</label>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="Đúng" class="form-check-input" id="optionTrue_${index}">
+                                <label for="optionTrue_${index}" class="form-check-label text-sm text-gray-700">Đúng</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="Questions[${index}].Correct_Option" value="Sai" class="form-check-input" id="optionFalse_${index}">
+                                <label for="optionFalse_${index}" class="form-check-label text-sm text-gray-700">Sai</label>
+                            </div>
+                        </div>
+                    `);
+                } else if (selectedType == "3") { // Câu hỏi điền từ
+                    container.html(`
+                        <div class="form-group">
+                            <label for="CorrectAnswer_${index}" class="block text-sm font-medium text-gray-700">Đáp án đúng</label>
+                            <input type="text" name="Questions[${index}].Correct_Option" id="CorrectAnswer_${index}" class="form-control w-full rounded-md border p-2 focus:ring focus:ring-blue-300" placeholder="Nhập đáp án đúng">
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // Hàm kiểm tra dữ liệu trước khi gửi
+        function validateForms() {
+            const forms = $(".question-form");
+            let isValid = true;
+
+            forms.each(function (index) {
+                if ($(this).css("display") === "none") return;
+
+                const questionContent = $("#Question_Content_" + index).val();
+                const subjectId = $("#Subject_ID_" + index).val();
+                const levelId = $("#Level_ID_" + index).val();
+                const questionTypeId = $("#QuestionTypeId_" + index).val();
+
+                if (!questionContent || !subjectId || !levelId || !questionTypeId) {
+                    alert(`Vui lòng điền đầy đủ thông tin cho câu hỏi ${index + 1}.`);
+                    isValid = false;
+                    return false;
+                }
+
+                if (questionTypeId == "1") {
+                    const options = [
+                        $(`input[name='Questions[${index}].Options[0]']`).val(),
+                        $(`input[name='Questions[${index}].Options[1]']`).val(),
+                        $(`input[name='Questions[${index}].Options[2]']`).val(),
+                        $(`input[name='Questions[${index}].Options[3]']`).val(),
+                    ];
+                    const correctOption = $(`input[name='Questions[${index}].Correct_Option']:checked`).val();
+
+                    if (!options.every(opt => opt.trim()) || !correctOption) {
+                        alert(`Vui lòng điền đầy đủ các đáp án và chọn đáp án đúng cho câu hỏi ${index + 1}.`);
+                        isValid = false;
+                        return false;
+                    }
+                } else if (questionTypeId == "2") {
+                    const correctOption = $(`input[name='Questions[${index}].Correct_Option']:checked`).val();
+                    if (!correctOption) {
+                        alert(`Vui lòng chọn đáp án đúng/sai cho câu hỏi ${index + 1}.`);
+                        isValid = false;
+                        return false;
+                    }
+                } else if (questionTypeId == "3") {
+                    const correctOption = $(`input[name='Questions[${index}].Correct_Option']`).val();
+                    if (!correctOption.trim()) {
+                        alert(`Vui lòng nhập đáp án đúng cho câu hỏi ${index + 1}.`);
+                        isValid = false;
+                        return false;
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // Khởi tạo form mẫu
+        setupQuestionTypeListener(0);
+
+        // Sự kiện mở form AI
+        $("#btnGenerateWithAI").on("click", function () {
+            $("#aiForm").toggleClass("hidden");
+        });
+
+        // Sự kiện tạo câu hỏi với AI
+        $("#generateQuestions").on("click", function () {
+            const form = $("#generateQuestionsForm")[0];
+            const formData = new FormData(form);
+
+            // Chuyển đổi dữ liệu thành đối tượng với kiểu số nguyên
+            const requestData = {
+                numberOfQuestions: parseInt(formData.get('numberOfQuestions')) || 0,
+                subjectId: parseInt(formData.get('subjectId')) || 0,
+                levelId: parseInt(formData.get('levelId')) || 0,
+                questionTypeId: parseInt(formData.get('questionTypeId')) || 0
+            };
+
+            // Kiểm tra dữ liệu đầu vào
+            if (requestData.numberOfQuestions <= 0) {
+                $("#generatedQuestions").html('<p class="text-red-500">Vui lòng nhập số câu hỏi lớn hơn 0.</p>');
+                return;
+            }
+            if (requestData.subjectId <= 0) {
+                $("#generatedQuestions").html('<p class="text-red-500">Vui lòng chọn môn học hợp lệ.</p>');
+                return;
+            }
+            if (requestData.levelId <= 0) {
+                $("#generatedQuestions").html('<p class="text-red-500">Vui lòng chọn độ khó hợp lệ.</p>');
+                return;
+            }
+            if (requestData.questionTypeId <= 0) {
+                $("#generatedQuestions").html('<p class="text-red-500">Vui lòng chọn loại câu hỏi hợp lệ.</p>');
+                return;
+            }
+
+            console.log('Request Data:', requestData);
+
+            $.ajax({
+                url: "/Teacher/Question/GenerateWithAI",
+                type: "POST",
+                data: JSON.stringify(requestData),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    console.log('Response Data:', data);
+
+                    let questionsToDisplay = [];
+                    if (data.questionContent && data.options) {
+                        questionsToDisplay = [data];
+                    } else if (Array.isArray(data)) {
+                        questionsToDisplay = data;
+                    } else if (data.questions && Array.isArray(data.questions)) {
+                        questionsToDisplay = data.questions;
+                    }
+
+                    if (questionsToDisplay.length > 0) {
+                        let html = '';
+                        questionsToDisplay.forEach((q, index) => {
+                            console.log('Processing question:', q);
+                            const optionsHtml = q.options && Array.isArray(q.options) && q.options.length > 0
+                                ? q.options.map((opt, i) => `<p>${String.fromCharCode(65 + i)}: ${opt}</p>`).join('')
+                                : '<p class="text-yellow-500">Không có đáp án nào.</p>';
+
+                            html += `
+                                <div class="mb-4 rounded-lg bg-white p-4 shadow-md">
+                                    <h3 class="text-lg font-semibold text-gray-800">Câu hỏi ${index + 1}: ${q.questionContent || 'Không có nội dung câu hỏi'}</h3>
+                                    <div class="mt-2"><strong>Đáp án:</strong><br>${optionsHtml}</div>
+                                    <p class="mt-2 font-semibold text-green-600">Đáp án đúng: ${q.correctOption || 'Không có đáp án'}</p>
+                                </div>
+                            `;
+                        });
+                        $("#generatedQuestions").html(html);
+                    } else if (data && data.error) {
+                        $("#generatedQuestions").html(`<p class="text-red-500">Lỗi từ server: ${data.error}</p>`);
+                    } else {
+                        $("#generatedQuestions").html('<p class="text-red-500">Không có câu hỏi nào được tạo. Có thể dữ liệu đầu vào không hợp lệ hoặc server không thể tạo câu hỏi.</p>');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    $("#generatedQuestions").html(`<p class="text-red-500">Đã xảy ra lỗi khi tạo câu hỏi: ${error}</p>`);
+                }
+            });
+        });
+    </script>
+}

@@ -2,69 +2,144 @@
 
 @{
     ViewData["Title"] = "Tạo bài thi và thêm câu hỏi";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="bg-gradient-to-br min-h-screen from-indigo-50 to-purple-50 p-8">
+    <h2 class="mb-8 border-b-4 border-indigo-500 pb-2 text-4xl font-extrabold text-gray-900">@ViewData["Title"]</h2>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-6 rounded-lg border-l-4 border-green-500 bg-green-50 p-4 text-green-700 shadow-md" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="CreateWithQuestions" method="post" class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Form tạo bài thi -->
+            <div class="rounded-xl bg-white p-6 shadow-lg">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label asp-for="Exam_Name" class="block text-lg font-semibold text-gray-800">Tên bài thi</label>
+                        <input asp-for="Exam_Name" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="Exam_Name" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label for="SubjectId" class="block text-lg font-semibold text-gray-800">Môn học</label>
+                        <select id="SubjectId" name="Subject_ID" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.SubjectId">
+                            <option value="">-- Chọn môn học --</option>
+                        </select>
+                        <span asp-validation-for="Subject_ID" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="TotalQuestions" class="block text-lg font-semibold text-gray-800">Số câu hỏi</label>
+                        <input asp-for="TotalQuestions" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="TotalQuestions" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="StartTime" class="block text-lg font-semibold text-gray-800">Thời gian bắt đầu</label>
+                        <input asp-for="StartTime" type="datetime-local" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="StartTime" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="EndTime" class="block text-lg font-semibold text-gray-800">Thời gian kết thúc</label>
+                        <input asp-for="EndTime" type="datetime-local" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="EndTime" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Exam_Date" class="block text-lg font-semibold text-gray-800">Ngày thi</label>
+                        <input asp-for="Exam_Date" type="date" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="Exam_Date" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Duration" class="block text-lg font-semibold text-gray-800">Thời gian làm bài</label>
+                        <input asp-for="Duration" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="Duration" class="text-sm text-red-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="PassScore" class="block text-lg font-semibold text-gray-800">Điểm đạt</label>
+                        <input asp-for="PassScore" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <span asp-validation-for="PassScore" class="text-sm text-red-500"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form lọc câu hỏi và bảng chọn câu hỏi -->
+            <div class="rounded-xl bg-white p-6 shadow-lg">
+                <div class="mb-6">
+                    <label for="QuestionTypeId" class="mb-2 block text-lg font-semibold text-gray-800">Loại câu hỏi</label>
+                    <select id="QuestionTypeId" name="questionTypeId" class="w-full rounded-lg border border-gray-300 bg-white p-3 shadow-sm transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.QuestionTypeId">
+                        <option value="">-- Chọn loại câu hỏi --</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label for="DifficultyLevel" class="mb-2 block text-lg font-semibold text-gray-800">Độ khó</label>
+                    <select id="DifficultyLevel" name="difficultyLevel" class="w-full rounded-lg border border-gray-300 bg-white p-3 shadow-sm transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.DifficultyLevels">
+                        <option value="">-- Chọn độ khó --</option>
+                    </select>
+                </div>
+                <h3 class="mb-4 border-l-4 border-purple-500 pl-2 text-2xl font-bold text-gray-900">Chọn câu hỏi</h3>
+                <div class="overflow-x-auto">
+                    <table id="questionsTable" class="w-full border-collapse text-gray-700">
+                        <thead class="bg-indigo-600 text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold">Chọn</th>
+                                <th class="px-6 py-3 text-left font-semibold">Nội dung câu hỏi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-white">
+                            @foreach (var question in (List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
+                            {
+                                <tr class="transition duration-200 hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <input type="checkbox" name="questionIds" value="@question.Question_ID" class="form-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
+                                    </td>
+                                    <td class="px-6 py-4">@question.Question_Content</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="w-full rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white shadow-md transition duration-300 hover:bg-indigo-700 lg:w-auto">Tạo bài thi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#SubjectId, #QuestionTypeId, #DifficultyLevel').change(function () {
+                var subjectId = $('#SubjectId').val();
+                var questionTypeId = $('#QuestionTypeId').val();
+                var difficultyLevel = $('#DifficultyLevel').val();
+
+                $.ajax({
+                    url: '@Url.Action("GetFilteredQuestions", "Exam", new { area = "Teacher" })',
+                    type: 'GET',
+                    data: { subjectId: subjectId, questionTypeId: questionTypeId, difficultyLevel: difficultyLevel },
+                    success: function (data) {
+                        $('#questionsTable tbody').empty();
+                        data.forEach(function (question) {
+                            $('#questionsTable tbody').append(`
+                                <tr class="transition duration-200 hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <input type="checkbox" name="questionIds" value="${question.question_ID}" class="form-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
+                                    </td>
+                                    <td class="px-6 py-4">${question.question_Content}</td>
+                                </tr>
+                            `);
+                        });
+                    },
+                    error: function () {
+                        alert('Không thể tải danh sách câu hỏi.');
+                    }
+                });
+            });
+        });
+    </script>
 }
-
-<form asp-action="CreateWithQuestions" method="post">
-    <div class="form-group">
-        <label asp-for="Exam_Name" class="control-label"></label>
-        <input asp-for="Exam_Name" class="form-control" />
-        <span asp-validation-for="Exam_Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="TotalQuestions" class="control-label"></label>
-        <input asp-for="TotalQuestions" class="form-control" />
-        <span asp-validation-for="TotalQuestions" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Duration" class="control-label"></label>
-        <input asp-for="Duration" class="form-control" />
-        <span asp-validation-for="Duration" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="PassScore" class="control-label"></label>
-        <input asp-for="PassScore" class="form-control" />
-        <span asp-validation-for="PassScore" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Subject_ID" class="control-label">Môn học</label>
-        <select asp-for="Subject_ID" asp-items="ViewBag.SubjectId" class="form-control"></select>
-        <span asp-validation-for="Subject_ID" class="text-danger"></span>
-    </div>
-
-    <h3>Chọn câu hỏi</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Chọn</th>
-                <th>Nội dung câu hỏi</th>
-                <th>Môn học</th>
-                <th>Mức độ</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var question in (List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
-            {
-                <tr>
-                    <td>
-                        <input type="checkbox" name="questionIds" value="@question.Question_ID" />
-                    </td>
-                    <td>@question.Question_Content</td>
-                    <td>@question.Subject?.Subject_Name</td>
-                    <td>@question.Level?.LevelName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <button type="submit" class="btn btn-primary">Tạo bài thi</button>
-</form>

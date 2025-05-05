@@ -1,0 +1,48 @@
+﻿@model DoAnWebThiTracNghiem.Models.Exam_Result
+@{
+    ViewData["Title"] = "Chi tiết kết quả bài thi";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+<div class="mx-auto mt-8 max-w-3xl rounded bg-white p-6 shadow">
+    <h2 class="mb-4 text-2xl font-bold">Chi tiết kết quả: @Model.Exam?.Exam_Name</h2>
+    <div class="mb-4">
+        <span class="font-semibold">Học viên:</span> @Model.User?.FullName <br />
+        <span class="font-semibold">Điểm:</span> @Model.Score <br />
+        <span class="font-semibold">Số câu đúng:</span> @Model.CorrectAnswers <br />
+        <span class="font-semibold">Số câu sai:</span> @Model.WrongAnswers <br />
+        <span class="font-semibold">Thời gian bắt đầu:</span> @Model.Start_Time.ToString("g") <br />
+        <span class="font-semibold">Thời gian kết thúc:</span> @Model.End_Time.ToString("g")
+    </div>
+
+    <h3 class="mb-2 text-xl font-semibold">Chi tiết câu trả lời</h3>
+    <div class="space-y-4">
+        @foreach (var answer in Model.Student_Answers)
+        {
+            <div class="rounded border bg-gray-50 p-4">
+                <div class="mb-2">
+                    <span class="font-semibold">Câu hỏi:</span> @answer.Question?.Question_Content
+                </div>
+                <div>
+                    <span class="font-semibold">Đáp án của học viên:</span> <span class="text-blue-600">@answer.Selected_Option</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Đáp án đúng:</span> <span class="text-green-600">@answer.Question?.Correct_Option</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Kết quả:</span>
+                    @if (answer.Selected_Option == answer.Question?.Correct_Option)
+                    {
+                        <span class="font-bold text-green-600">Đúng</span>
+                    }
+                    else
+                    {
+                        <span class="font-bold text-red-600">Sai</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+

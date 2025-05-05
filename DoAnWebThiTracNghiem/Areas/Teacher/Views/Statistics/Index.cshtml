@@ -1,0 +1,245 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.StatisticsViewModel
+
+@{
+    ViewData["Title"] = "Thống kê";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+<div class="container mx-auto p-4">
+    <h1 class="mb-6 text-center text-2xl font-bold">Thống Kê </h1>
+
+    <!-- Hàng 1: Lớp học (Trái) và Bài thi (Phải) -->
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <!-- Lớp học -->
+        <div class="rounded-lg bg-white p-4 shadow-md">
+            <h2 class="mb-3 text-lg font-semibold">Lớp Học</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-lg bg-blue-100 p-3 text-center">
+                    <p class="text-sm font-medium">Tổng số lớp học</p>
+                    <p class="text-lg font-bold text-blue-600">@Model.TotalClasses</p>
+                </div>
+                <div class="rounded-lg bg-green-100 p-3 text-center">
+                    <p class="text-sm font-medium">Lớp đang hoạt động</p>
+                    <p class="text-lg font-bold text-green-600">@Model.ActiveClasses</p>
+                </div>
+                <div class="rounded-lg bg-red-100 p-3 text-center">
+                    <p class="text-sm font-medium">Lớp không hoạt động</p>
+                    <p class="text-lg font-bold text-red-600">@Model.InactiveClasses</p>
+                </div>
+                <div class="rounded-lg bg-yellow-100 p-3 text-center">
+                    <p class="text-sm font-medium">Lớp nhiều SV nhất</p>
+                    <p class="text-lg font-bold text-yellow-600">@Model.ClassWithMostStudents</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <canvas id="classChart" style="max-height: 200px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Bài thi -->
+        <div class="rounded-lg bg-white p-4 shadow-md">
+            <h2 class="mb-3 text-lg font-semibold">Bài Thi</h2>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="rounded-lg bg-blue-100 p-3 text-center">
+                    <p class="text-sm font-medium">Tổng số bài thi</p>
+                    <p class="text-lg font-bold text-blue-600">@Model.TotalExams</p>
+                </div>
+                <div class="rounded-lg bg-green-100 p-3 text-center">
+                    <p class="text-sm font-medium">Bài thi đang hoạt động</p>
+                    <p class="text-lg font-bold text-green-600">@Model.ActiveExams</p>
+                </div>
+                <div class="rounded-lg bg-red-100 p-3 text-center">
+                    <p class="text-sm font-medium">Bài thi không hoạt động</p>
+                    <p class="text-lg font-bold text-red-600">@Model.InactiveExams</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <canvas id="examChart" style="max-height: 200px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng 2: Sinh viên (Trái) và Câu hỏi (Phải) -->
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <!-- Sinh viên -->
+        <div class="rounded-lg bg-white p-4 shadow-md">
+            <h2 class="mb-3 text-lg font-semibold">Sinh Viên</h2>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div class="rounded-lg bg-blue-100 p-3 text-center">
+                    <p class="text-sm font-medium">SV làm nhiều bài thi nhất</p>
+                    <p class="text-lg font-bold text-blue-600">@Model.TopStudentByExams?.FullName</p>
+                    <p class="text-xs">Số bài thi: @Model.TopStudentByExams?.ExamCount</p>
+                </div>
+                <div class="rounded-lg bg-green-100 p-3 text-center">
+                    <p class="text-sm font-medium">SV có điểm TB cao nhất</p>
+                    <p class="text-lg font-bold text-green-600">@Model.TopStudentByAverageScore?.FullName</p>
+                    <p class="text-xs">Điểm TB: @Model.TopStudentByAverageScore?.AverageScore</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <canvas id="studentChart" style="max-height: 200px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Câu hỏi -->
+        <div class="rounded-lg bg-white p-4 shadow-md">
+            <h2 class="mb-3 text-lg font-semibold">Câu Hỏi (Theo loại)</h2>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                @foreach (var questionType in Model.QuestionsByType)
+                {
+                    <div class="rounded-lg bg-blue-100 p-3 text-center">
+                        <p class="text-sm font-medium">@questionType.QuestionTypeName</p>
+                        <p class="text-lg font-bold text-blue-600">@questionType.QuestionCount</p>
+                    </div>
+                }
+            </div>
+            <div class="mt-4">
+                <canvas id="questionChart" style="max-height: 200px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Môn học -->
+    <div class="rounded-lg bg-white p-4 shadow-md">
+        <h2 class="mb-3 text-lg font-semibold">Môn Học</h2>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+            @foreach (var subject in Model.Subjects)
+            {
+                <div class="rounded-lg bg-blue-100 p-3 text-center">
+                    <p class="text-sm font-medium">@subject.SubjectName</p>
+                    <p class="text-xs">Số bài thi: @subject.ExamCount</p>
+                    <p class="text-xs">Số câu hỏi: @subject.QuestionCount</p>
+                </div>
+            }
+        </div>
+        <div class="mt-4">
+            <canvas id="subjectChart" style="max-height: 200px;"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Biểu đồ lớp học
+        const classData = {
+            labels: ['Đang hoạt động', 'Không hoạt động'],
+            datasets: [{
+                data: [@Model.ActiveClasses, @Model.InactiveClasses],
+                backgroundColor: ['#10B981', '#EF4444']
+            }]
+        };
+        new Chart(document.getElementById('classChart'), {
+            type: 'pie',
+            data: classData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 12 } } },
+                    title: { display: true, text: 'Trạng Thái Lớp Học', font: { size: 14 } }
+                }
+            }
+        });
+
+        // Biểu đồ bài thi
+        const examData = {
+            labels: ['Đang hoạt động', 'Không hoạt động'],
+            datasets: [{
+                data: [@Model.ActiveExams, @Model.InactiveExams],
+                backgroundColor: ['#22C55E', '#EF4444']
+            }]
+        };
+        if (document.getElementById('examChart')) {
+            new Chart(document.getElementById('examChart'), {
+                type: 'doughnut',
+                data: examData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 12 } } },
+                        title: { display: true, text: 'Trạng Thái Bài Thi', font: { size: 14 } }
+                    }
+                }
+            });
+        }
+
+        // Biểu đồ sinh viên
+        const studentData = {
+            labels: ['Số bài thi', 'Điểm trung bình'],
+            datasets: [{
+                label: 'Thành tích sinh viên',
+                data: [@Model.TopStudentByExams?.ExamCount ?? 0, @Model.TopStudentByAverageScore?.AverageScore ?? 0],
+                backgroundColor: ['#3B82F6', '#22C55E']
+            }]
+        };
+        new Chart(document.getElementById('studentChart'), {
+            type: 'bar',
+            data: studentData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 12 } } },
+                    title: { display: true, text: 'Thành Tích Sinh Viên', font: { size: 14 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // Biểu đồ câu hỏi
+        const questionLabels = @Html.Raw(Json.Serialize(Model.QuestionsByType.Select(q => q.QuestionTypeName)));
+        const questionCounts = @Html.Raw(Json.Serialize(Model.QuestionsByType.Select(q => q.QuestionCount)));
+        const questionData = {
+            labels: questionLabels,
+            datasets: [{
+                label: 'Số câu hỏi',
+                data: questionCounts,
+                backgroundColor: '#3B82F6'
+            }]
+        };
+        new Chart(document.getElementById('questionChart'), {
+            type: 'bar',
+            data: questionData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 12 } } },
+                    title: { display: true, text: 'Phân Loại Câu Hỏi', font: { size: 14 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // Biểu đồ môn học
+        const subjectLabels = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.SubjectName)));
+        const subjectExamCounts = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.ExamCount)));
+        const subjectQuestionCounts = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.QuestionCount)));
+        const subjectData = {
+            labels: subjectLabels,
+            datasets: [{
+                label: 'Số bài thi',
+                data: subjectExamCounts,
+                backgroundColor: '#3B82F6'
+            }, {
+                label: 'Số câu hỏi',
+                data: subjectQuestionCounts,
+                backgroundColor: '#10B981'
+            }]
+        };
+        new Chart(document.getElementById('subjectChart'), {
+            type: 'bar',
+            data: subjectData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 12 } } },
+                    title: { display: true, text: 'Thống Kê Môn Học', font: { size: 14 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    });
+</script>

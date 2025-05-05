@@ -11,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<AppDBContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging()); // B?t logging chi ti?t
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, EFUserRepository>();
@@ -19,6 +21,7 @@ builder.Services.AddScoped<ISubjectRepository, EFSubjectRepository>();
 builder.Services.AddScoped<IClassTnRepository, EFClassTnRepository>();
 builder.Services.AddScoped<IExamRepository, EFExamRepository>();
 builder.Services.AddScoped<IQuestionRepository, EFQuestionRepository>();
+builder.Services.AddSingleton<ChatbotService>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -48,6 +51,7 @@ app.UseSession();
 app.UseRouting();
 app.UseMiddleware<AdminAuthorizationMiddleware>();
 app.UseMiddleware<TeacherAuthorizationMiddleware>();
+app.UseMiddleware<StudentAuthorizationMiddleware>();
 app.UseAuthorization();
 app.MapControllerRoute(
     name: "areas",

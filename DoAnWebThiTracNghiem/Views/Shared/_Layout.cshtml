@@ -1,68 +1,36 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DoAnWebThiTracNghiem</title>
-    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nquiz - Thi trắc nghiệm trực tuyến</title>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAnWebThiTracNghiem.styles.css" asp-append-version="true" />
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen">
-        <aside class="fixed h-full w-64 bg-blue-600 text-white">
-            <nav class="p-4">
-                <div class="mb-8">
-                    <h1 class="text-2xl font-bold">ExamPro</h1>
-                </div>
+<body class="bg-gradient-to-br flex min-h-screen flex-col from-blue-50 to-blue-100">
 
-                <ul class="space-y-2">
-                    <li class="flex items-center rounded bg-blue-700 p-2">
-                        <i data-lucide="home" class="mr-2 h-5 w-5" asp-area="" asp-controller="Home" asp-action="Index"></i>
-                        Trang chủ
-                    </li>
-                  <li class="flex items-center rounded p-2 hover:bg-blue-700" asp-area="">
-                        <i data-lucide="book-open" class="mr-2 h-5 w-5"></i>
-                        <a asp-controller="Users" asp-action="Index"> Người dùng</a>
-                    </li>
-                    <li class="flex items-center rounded p-2 hover:bg-blue-700">
-                        <i data-lucide="clock" class="mr-2 h-5 w-5"></i>
-                        Lịch sử
-                    </li>
-                    <li class="flex items-center rounded p-2 hover:bg-blue-700">
-                        <i data-lucide="bar-chart" class="mr-2 h-5 w-5"></i>
-                        Thống kê
-                    </li>
-                    @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
-                    {
-                        <a asp-action="Profile" asp-controller="Users">Thông tin cá nhân</a>
-                        <a asp-action="Logout" asp-controller="Users">Đăng xuất</a>
-                    }
-                    else
-                    {
-                        <a asp-action="Login" asp-controller="Users">Đăng nhập</a>
-                        <a asp-action="Register" asp-controller="Users">Đăng ký</a>
-                    }
-
-
-                </ul>
-               
-            </nav>
-        </aside>
-        
+    <!-- Navbar -->
+    <header class="bg-blue-600 shadow-md">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+            <a asp-action="Index" asp-controller="Home" class="text-2xl font-semibold tracking-wider text-white no-underline">NQuiz?</a>
+            <div class="space-x-4">
+                <a asp-action="Login" asp-controller="Users" class="rounded-lg bg-white px-4 py-2 font-semibold text-blue-600 transition hover:bg-blue-100">Đăng nhập</a>
+                <a asp-action="Register" asp-controller="Users" class="rounded-lg bg-green-500 px-4 py-2 font-semibold text-white transition hover:bg-green-600">Đăng ký</a>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex flex-grow items-center justify-center px-6 lg:px-10" style="background-image: url('/images/ảnh chụp màn hình 2025-05-14 042539.png');" >
+        @RenderBody()
+    </main>
     
-        <main class="ml-64 flex-1 p-8">
-            @RenderBody()
-        </main>
-    
-    </div>
-    <script>
-        lucide.createIcons(); // Khởi tạo icons
-    </script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Footer -->
+    <footer class="py-4 text-center text-sm text-gray-500">
+        © 2025 Nquiz. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

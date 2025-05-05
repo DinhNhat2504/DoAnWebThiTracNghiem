@@ -13,11 +13,20 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task<IEnumerable<Exam>> GetAllAsync(int id)
         {
-            return await _context.Exams
-                .Include(e => e.Subject)
-                .Include(e => e.Creator)
-                .Where(e => e.CreatorUser_Id == id)
-                .ToListAsync();
+            if(id == 1)
+            {
+                return await _context.Exams
+                    .Include(e => e.Subject)
+                    .Include(e => e.Creator)
+                    .ToListAsync();
+            }
+            else {
+                return await _context.Exams
+                    .Include(e => e.Subject)
+                    .Include(e => e.Creator)
+                    .Where(e => e.CreatorUser_Id == id)
+                    .ToListAsync(); }
+                
         }
         public async Task<Exam> GetByIdAsync(int id)
         {
@@ -42,6 +51,41 @@ namespace DoAnWebThiTracNghiem.Repositories
            
                 _context.Exams.Remove(exam);
                 await _context.SaveChangesAsync();
+            
+        }
+        public async Task<IEnumerable<Exam>> GetPagedAsync(int RoleAd, int page, int pageSize)
+        {
+            if (RoleAd == 1)
+            {
+                return await _context.Exams
+                    .OrderBy(u => u.Exam_ID)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(u => u.Subject)
+                    .Include(u => u.Creator)
+                    .ToListAsync();
+            }
+            else {
+                return await _context.Exams
+                    .OrderBy(u => u.Exam_ID)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(u => u.Subject)
+                    .Include(u => u.Creator).Where(e =>e.Creator.RoleId  == RoleAd)
+                    .ToListAsync(); 
+            }
+                
+        }
+        public async Task<int> CountAsync(int creatorId)
+        {
+            if (creatorId == 1)
+            {
+                return await _context.Exams.CountAsync();
+            }
+            else
+            {
+                return await _context.Exams.CountAsync(e => e.CreatorUser_Id == creatorId);
+            }
             
         }
     }

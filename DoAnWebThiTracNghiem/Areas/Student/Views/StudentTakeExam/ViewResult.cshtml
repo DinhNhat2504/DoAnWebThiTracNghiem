@@ -1,0 +1,80 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.ViewResultViewModel
+
+@{
+    ViewData["Title"] = "Kết quả bài thi";
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-6 text-center text-2xl font-bold">Kết quả bài thi: @Model.Exam.Exam_Name</h2>
+
+<div class="mb-4">
+    <p class="text-lg">Điểm: <span class="font-semibold">@Model.Score</span></p>
+    <p class="text-lg">Số câu đúng: <span class="font-semibold">@Model.CorrectAnswers</span></p>
+    <p class="text-lg">Số câu sai: <span class="font-semibold">@Model.WrongAnswers</span></p>
+</div>
+
+<div class="space-y-6">
+    @foreach (var answer in Model.StudentAnswers.OrderBy(a => a.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order))
+    {
+        <div class="rounded-lg border bg-white p-4 shadow-md">
+            <p class="text-lg font-semibold">
+                Câu @answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order:
+                @answer.Question.Question_Content
+                <span class="text-sm text-gray-500">(@answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Points điểm)</span>
+            </p>
+            <div class="mt-4">
+                @if (answer.Question.QuestionType.Name == "Chọn 1 đáp án")
+                {
+                    @for (int i = 0; i < answer.Question.Options.Count; i++)
+                    {
+                        <div class="mb-2 flex items-center">
+                            <input type="radio" id="option-@answer.Question.Question_ID-@i" name="answers[@answer.Question.Question_ID]" value="@answer.Question.Options[i]" class="mr-2" disabled @(answer.Selected_Option == answer.Question.Options[i] ? "checked" : "")>
+                            <label for="option-@answer.Question.Question_ID-@i" class="text-gray-700">
+                                @((char)(65 + i)). @answer.Question.Options[i]
+                            </label>
+                        </div>
+                    }
+                }
+                else if (answer.Question.QuestionType.Name == "Đúng/Sai")
+                {
+                    <div class="mb-2 flex items-center">
+                        <input type="radio" id="true-@answer.Question.Question_ID" name="answers[@answer.Question.Question_ID]" value="Đúng" class="mr-2" disabled @(answer.Selected_Option == "True" ? "checked" : "")>
+                        <label for="true-@answer.Question.Question_ID" class="text-gray-700">Đúng</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="false-@answer.Question.Question_ID" name="answers[@answer.Question.Question_ID]" value="Sai" class="mr-2" disabled @(answer.Selected_Option == "False" ? "checked" : "")>
+                        <label for="false-@answer.Question.Question_ID" class="text-gray-700">Sai</label>
+                    </div>
+                }
+                else if (answer.Question.QuestionType.Name == "Điền từ đúng")
+                {
+                    <input type="text" name="answers[@answer.Question.Question_ID]" value="@answer.Selected_Option" class="w-full rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                }
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-sm">
+                    Đáp án đúng: <span class="font-semibold text-green-600">@answer.Question.Correct_Option</span>
+                </p>
+                @if (answer.Question.QuestionType?.Name == "Chọn 1 đáp án")
+                {
+                    <p class="text-sm">
+                        Lựa chọn của bạn:
+                        <span class="font-semibold @(answer.Selected_Option == answer.Question.Correct_Option ? "text-green-600" : "text-red-600")">
+                           @((char)(65 + answer.Question.Options.IndexOf(answer.Selected_Option)))
+                        </span>
+                    </p>
+                }
+                else
+                {
+                    <p class="text-sm">
+                        Lựa chọn của bạn:
+                        <span class="font-semibold @(answer.Selected_Option == answer.Question.Correct_Option ? "text-green-600" : "text-red-600")">
+                            @answer.Selected_Option
+                        </span>
+                    </p>
+                }
+            </div>
+        </div>
+    }
+</div>

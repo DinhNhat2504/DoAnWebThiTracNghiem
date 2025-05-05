@@ -14,12 +14,23 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task<IEnumerable<Question>> GetAllAsync(int Id)
         {
-            return await _context.Question
-                .Include(q => q.Subject)
-                .Include(q => q.Level)
-                .Include(q => q.Creator)
-                .Where(q => q.CreatorUser_Id == Id)
-                .ToListAsync();
+            if(Id == 1)
+            {
+                return await _context.Question
+                    .Include(q => q.Subject)
+                    .Include(q => q.Level)
+                    .Include(q => q.Creator)
+                    .ToListAsync();
+            }
+            else {
+                return await _context.Question
+                    .Include(q => q.Subject)
+                    .Include(q => q.Level)
+                    .Include(q => q.Creator)
+                    .Where(q => q.CreatorUser_Id == Id)
+                    .ToListAsync(); 
+            }
+                
         } 
         public async Task<Question> GetByIdAsync(int id)
         {

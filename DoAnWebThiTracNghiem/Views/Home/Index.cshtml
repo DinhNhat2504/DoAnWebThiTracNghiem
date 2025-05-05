@@ -2,43 +2,61 @@
     ViewData["Title"] = "Home Page";
 }
 
-<header class="mb-8 flex items-center justify-between">
-    <div class="relative w-96">
-        <input type="search"
-               placeholder="Tìm kiếm đề thi..."
-               class="w-full rounded-lg border py-2 pr-4 pl-10 focus:outline-none focus:border-blue-500">
-        <i data-lucide="search" class="absolute top-2.5 left-3 text-gray-400"></i>
-    </div>
+<div class="grid max-w-6xl grid-cols-1 items-center gap-8 md:grid-cols-2">
 
-    <div class="flex items-center space-x-2">
-        <div class="h-8 w-8 rounded-full bg-gray-200"></div>
-        <span>Nguyễn Văn A</span>
-    </div>
-</header>
+    <!-- Text content -->
+    <div class="space-y-6">
+        <h2 class="text-4xl leading-snug font-extrabold text-gray-800">
+            Khám phá <span class="text-blue-600">NQuiz?</span> ✨
+        </h2>
+        <p class="text-lg text-gray-600">Nền tảng thi trắc nghiệm trực tuyến mạnh mẽ, nhanh chóng và dễ sử dụng.</p>
 
-<!-- Danh sách đề thi -->
-<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-    <!-- Đề thi mẫu - lặp lại block này cho mỗi đề -->
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-        <h3 class="mb-4 text-lg font-semibold">Đề thi Toán Học</h3>
-        <ul class="mb-6 space-y-2">
-            <li class="flex justify-between">
-                <span>· Số câu hỏi</span>
-                <span>40</span>
-            </li>
-            <li class="flex justify-between">
-                <span>· Thời gian</span>
-                <span>60 phút</span>
-            </li>
-            <li class="flex justify-between">
-                <span>· Độ khó</span>
-                <span>Trung bình</span>
-            </li>
-        </ul>
-        <button class="w-full rounded-lg bg-violet-400 py-2 text-white transition hover:bg-blue-700">
-            Làm bài
+        <div class="space-y-4">
+            <div class="flex items-start gap-4">
+                <div class="rounded-full bg-blue-100 p-2 text-blue-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12h6m-6 4h6m-7 4h8a2 2 0 0 0 2-2V8.83a2 2 0 0 0-.59-1.41l-3.83-3.83A2 2 0 0 0 14.17 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h1" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Tạo đề thi dễ dàng</h4>
+                    <p class="text-sm text-gray-600">Soạn câu hỏi, trộn đề và cấu hình chỉ trong vài phút.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="rounded-full bg-green-100 p-2 text-green-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 17v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6m-6 0h6m-9 0h.01" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Quản lý lớp học</h4>
+                    <p class="text-sm text-gray-600">Thêm sinh viên, gán bài thi và theo dõi tiến độ.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="rounded-full bg-yellow-100 p-2 text-yellow-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M11 17h2m-6 0h.01M17 17h.01M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Thống kê thông minh</h4>
+                    <p class="text-sm text-gray-600">Xem điểm, phân tích kết quả chi tiết theo lớp và bài thi.</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="bg-gradient-to-r mt-6 rounded-full from-green-400 to-blue-500 px-6 py-3 text-lg font-semibold text-white transition hover:scale-105 hover:shadow-lg">
+            Bắt đầu miễn phí
         </button>
     </div>
 
-    <!-- Thêm các đề thi khác ở đây -->
+    <!-- Illustration -->
+    @* <div class="hidden md:block"> *@
+    @*     <img src="~/images/ảnh chụp màn hình 2025-05-14 042539.png" class="w-full rounded-2xl shadow-lg" /> *@
+        
+    @* </div> *@
 </div>

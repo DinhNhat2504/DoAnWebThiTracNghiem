@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace DoAnWebThiTracNghiem.Models
 {
@@ -11,6 +12,9 @@ namespace DoAnWebThiTracNghiem.Models
         [ForeignKey("Users")]
         public int CreatorUser_Id { get; set; }
         public Users? Creator { get; set; }
-
+        [JsonIgnore]
+        public ICollection<Exam>? Exams { get; set; }
+        [JsonIgnore]
+        public ICollection<Question>? Questions { get; set; }
     }
 }

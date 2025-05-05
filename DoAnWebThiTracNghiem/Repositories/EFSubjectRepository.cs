@@ -13,10 +13,18 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task<IEnumerable<Subject>> GetAllAsync(int id)
         {
-            return await _context.Subjects.Where(c => c.CreatorUser_Id == id).ToListAsync();
+            if(id == 0)
+            {
+                return await _context.Subjects.ToListAsync();
+            }
+            else {
+                return await _context.Subjects.Where(c => c.CreatorUser_Id == id).ToListAsync(); 
+            }
+                
         }
         public async Task<Subject> GetByIdAsync(int id)
         {
+
             return await _context.Subjects.Include(s => s.Creator).FirstOrDefaultAsync(s => s.Subject_Id == id);
         }
         public async Task AddAsync(Subject subject)
@@ -29,15 +37,15 @@ namespace DoAnWebThiTracNghiem.Repositories
             _context.Subjects.Update(subject);
             await _context.SaveChangesAsync();
         }
-        //public async Task DeleteAsync(int id)
-        //{
-        //    var subject = await _context.Subjects.FindAsync(id);
-        //    if (subject != null)
-        //    {
-        //        _context.Subjects.Remove(subject);
-        //        await _context.SaveChangesAsync();
-        //    }
-        //}
+        public async Task DeleteAsync(int id)
+        {
+            var subject = await _context.Subjects.FindAsync(id);
+            if (subject != null)
+            {
+                _context.Subjects.Remove(subject);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
     
 

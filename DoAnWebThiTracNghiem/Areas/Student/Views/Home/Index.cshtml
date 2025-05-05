@@ -1,0 +1,99 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.StudentHomeIndexViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Phần lớp học -->
+<section class="mb-8 md:mb-12">
+    <div class="mb-4 flex flex-col items-center justify-between md:flex-row md:mb-6">
+        <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Lớp học của bạn</h2>
+        <a href="@Url.Action("Index", "StudentClass", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
+        @if (Model.RecentClasses != null && Model.RecentClasses.Any())
+        {
+            foreach (var cls in Model.RecentClasses)
+            {
+                <div class="bg-white p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg md:p-6">
+                    <h3 class="text-base font-medium text-gray-700 md:text-lg">
+                        <a href="@Url.Action("Details", "StudentClass", new { area = "Student", id = cls.Class_Id })">@cls.ClassName</a>
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        @((cls.Exam_Classes != null) ? cls.Exam_Classes.Count : 0) bài thi
+                    </p>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-span-3 text-center text-gray-500">Bạn chưa tham gia lớp học nào.</div>
+        }
+    </div>
+</section>
+
+<!-- Phần bài thi -->
+<section class="mb-8 md:mb-12">
+    <div class="mb-4 flex flex-col items-center justify-between md:flex-row md:mb-6">
+        <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Các bài thi mới nhất của bạn</h2>
+        <a href="@Url.Action("Index", "StudentExam", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
+        @if (Model.RecentExams != null && Model.RecentExams.Any())
+        {
+            foreach (var exam in Model.RecentExams)
+            {
+                <div class="bg-white p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg md:p-6">
+                    <h3 class="text-base font-medium text-gray-700 md:text-lg">
+                        <a href="@Url.Action("Details", "StudentExam", new { area = "Student", id = exam.Exam_ID })">@exam.Exam_Name</a>
+                    </h3>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-span-3 text-center text-gray-500">Chưa có bài thi nào được giao.</div>
+        }
+    </div>
+</section>
+
+<!-- Phần thành tích đồ -->
+<section>
+    <div class="mb-4 flex flex-col items-center justify-between md:flex-row md:mb-6">
+        <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Thành tích gần đây</h2>
+        <a href="@Url.Action("Index", "StudentExam", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="bg-white p-4 shadow-md md:p-6">
+            <h4 class="mb-2 font-semibold text-gray-700">Bài thi điểm số cao nhất</h4>
+            @if (Model.HighestScoreExam != null && Model.HighestScoreExam.Exam != null)
+            {
+                <div>
+                    <span class="font-medium">@Model.HighestScoreExam.Exam.Exam_Name</span><br />
+                    <span>Điểm: <span class="font-bold">@Model.HighestScoreExam.Score</span></span>
+                </div>
+            }
+            else
+            {
+                <div>Chưa có dữ liệu.</div>
+            }
+        </div>
+        <div class="bg-white p-4 shadow-md md:p-6">
+            <h4 class="mb-2 font-semibold text-gray-700">Lớp học hoạt động nhiều nhất</h4>
+            @if (Model.MostActiveClass != null)
+            {
+                <div>
+                    <a class="font-medium hover:underline" href="@Url.Action("Details", "ClassTn", new { area = "Student", id = Model.MostActiveClass.Class_Id })">
+                        @Model.MostActiveClass.ClassName
+                    </a>
+                    <br />
+                    <span>Số bài thi đã làm: <span class="font-bold">@Model.MostActiveClassExamCount</span></span>
+                </div>
+            }
+            else
+            {
+                <div>Chưa có dữ liệu.</div>
+            }
+        </div>
+    </div>
+</section>
