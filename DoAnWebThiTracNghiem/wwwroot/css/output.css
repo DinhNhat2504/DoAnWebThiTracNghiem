@@ -1546,7 +1546,7 @@
   .md\:gap-6 {
     @media (width >= 48rem) {
       gap: calc(var(--spacing) * 6);
-    }
+  }
   }
   .md\:pl-4 {
     @media (width >= 48rem) {
