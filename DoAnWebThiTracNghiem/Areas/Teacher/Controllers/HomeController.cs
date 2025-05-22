@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 {
-    [Area("Teacher")]   
+    [Area("Teacher")]
     public class HomeController : Controller
     {
         private readonly IUserRepository _Ucontext;
@@ -50,7 +50,9 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                     .Where(c => c.CreatorUser_Id == userId)
                     .OrderByDescending(c => c.CreatedAt)
                     .Take(3)
-                    .ToList()
+                    .ToList(),
+                RecentQuestion = _Dbcontext.Question.Where(q => q.CreatorUser_Id == userId).OrderByDescending(c => c.CreatedAt).Take(3).ToList(),
+                RecentSubject = _Dbcontext.Subjects.Where(s => s.CreatorUser_Id == userId).OrderByDescending(s => s.CreateAt).Take(3).ToList()
             };
 
             return View(model);
@@ -60,7 +62,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login","Users");
+            return RedirectToAction("Login", "Users");
         }
 
     }

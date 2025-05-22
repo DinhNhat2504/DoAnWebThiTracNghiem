@@ -31,7 +31,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Class_Id"));
 
                     b.Property<string>("ClassName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -68,6 +70,9 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Exam_ID"));
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CreatorUser_Id")
                         .HasColumnType("int");
 
@@ -82,7 +87,8 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     b.Property<string>("Exam_Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -229,7 +235,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("CreatorUser_Id")
                         .HasColumnType("int");
@@ -255,16 +263,15 @@ namespace DoAnWebThiTracNghiem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Question_ID"));
 
                     b.Property<string>("Correct_Option")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CreatorUser_Id")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("IsTrueFalse")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Level_ID")
                         .HasColumnType("int");
@@ -276,7 +283,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Question_Content")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("Subject_ID")
                         .HasColumnType("int");
@@ -370,6 +379,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                     b.Property<int>("Class_ID")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("User_ID")
                         .HasColumnType("int");
 
@@ -390,11 +402,16 @@ namespace DoAnWebThiTracNghiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Subject_Id"));
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CreatorUser_Id")
                         .HasColumnType("int");
 
                     b.Property<string>("Subject_Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Subject_Id");
 
@@ -412,7 +429,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("User_Id"));
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
@@ -421,16 +439,23 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("ResetPasswordToken")
                         .HasColumnType("nvarchar(max)");
@@ -479,7 +504,7 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .IsRequired();
 
                     b.HasOne("DoAnWebThiTracNghiem.Models.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("Exams")
                         .HasForeignKey("Subject_ID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -586,7 +611,7 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .IsRequired();
 
                     b.HasOne("DoAnWebThiTracNghiem.Models.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("Questions")
                         .HasForeignKey("Subject_ID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -690,6 +715,13 @@ namespace DoAnWebThiTracNghiem.Migrations
 
             modelBuilder.Entity("DoAnWebThiTracNghiem.Models.QuestionType", b =>
                 {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("DoAnWebThiTracNghiem.Models.Subject", b =>
+                {
+                    b.Navigation("Exams");
+
                     b.Navigation("Questions");
                 });
 

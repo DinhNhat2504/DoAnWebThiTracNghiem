@@ -5,59 +5,102 @@
     ViewData["Title"] = "Danh sách bài thi";
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
-<div class="mx-auto max-w-7xl py-8">
-    <h2 class="mb-6 text-center text-2xl font-bold">Danh sách bài thi</h2>
-
-    <div class="mb-6 flex flex-col items-center gap-4 md:flex-row md:justify-between">
-        <a asp-action="CreateWithQuestions" class="rounded bg-green-500 px-6 py-2 font-semibold text-white shadow transition hover:bg-green-600">
-            Thêm mới
-        </a>
-        <form asp-action="Index" method="get" class="flex w-full gap-2 md:w-auto">
-            <input type="text" name="search" class="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 md:w-64" placeholder="Tìm kiếm bài thi hoặc môn học..." value="@(Context.Request.Query["search"])" />
-            <button type="submit" class="rounded bg-orange-500 px-4 py-2 font-semibold text-white transition hover:bg-orange-600">Tìm</button>
-        </form>
-    </div>
-
+<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Thông báo -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-lg border-l-4 border-red-500 bg-green-50 p-4 text-red-700 shadow-sm">
+            @TempData["ErrorMessage"]
+        </div>
+    }
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="mb-4 rounded bg-green-100 p-3 text-green-700 shadow">@TempData["SuccessMessage"]</div>
+        <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-lg border-l-4 border-green-500 bg-green-50 p-4 text-green-700 shadow-sm">
+            @TempData["SuccessMessage"]
+        </div>
     }
+    <!-- Header Section -->
+    <div class="mb-8">
+        <!-- Title and Search Bar Row -->
+        <div class="mb-6 flex flex-col justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách bài thi</h3>
+            <form method="get" class="mb-4 flex flex-col items-center space-x-2 sm:flex-row">
+                <input type="text" name="search" value="@(Context.Request.Query["search"])" placeholder="Tìm kiếm bài thi..." class="w-full rounded border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 sm:w-auto" />
+                <button type="submit" class="mt-2 w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+            <a asp-action="CreateWithQuestions"
+               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Thêm Bài thi</span>
+            </a>
+        </div>
+    </div>
 
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+    <!-- Exam Cards -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @foreach (var exam in Model)
         {
-            <div class="border-2 flex flex-col rounded-lg border-green-400 bg-white shadow-lg transition hover:shadow-2xl">
-                <div class="rounded-t-lg border-b-2 border-purple-400 bg-purple-100 p-3 text-center text-lg font-bold">
+            <div class="overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-center text-lg font-bold text-white">
                     @exam.Exam_Name
                 </div>
-                <div class="flex-1 p-4">
-                    <ul class="mb-4 space-y-1 text-gray-700">
-                        <li>- Số câu hỏi: <span class="font-semibold">@exam.TotalQuestions</span></li>
-                        <li>- Môn học: <span class="font-semibold">@exam.Subject?.Subject_Name</span></li>
-                        <li>- Thời gian làm bài: <span class="font-semibold">@exam.Duration phút</span></li>
-                        <li>- Ngày thi: <span class="font-semibold">@exam.Exam_Date.ToString("dd/MM/yyyy HH:mm")</span></li>
-                        <li>
-                            - Trạng thái:
-                            <span class="inline-block rounded px-2 py-1 text-xs font-bold @(exam.IsActive ? "bg-green-200 text-green-800" : "bg-gray-200 text-gray-600")">
+                <div class="p-6">
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-center">
+                            <svg class="mr-2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Số câu hỏi: <span class="ml-1 font-semibold">@exam.TotalQuestions</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="mr-2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Môn học: <span class="ml-1 font-semibold">@exam.Subject?.Subject_Name</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="mr-2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Thời gian làm bài: <span class="ml-1 font-semibold">@exam.Duration phút</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="mr-2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Ngày thi: <span class="ml-1 font-semibold">@exam.Exam_Date.ToString("dd/MM/yyyy HH:mm")</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="mr-2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Trạng thái:
+                            <span class="ml-1 inline-block rounded-full px-3 py-1 text-xs font-semibold @(exam.IsActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600")">
                                 @(exam.IsActive ? "Đang hoạt động" : "Không hoạt động")
                             </span>
                         </li>
                     </ul>
-                    <div class="flex justify-center gap-4">
+                    <div class="mt-6 flex justify-center gap-4">
                         <a asp-action="ManageExam" asp-route-examId="@exam.Exam_ID"
-                           class="rounded-full bg-green-200 p-3 text-green-900 shadow transition hover:bg-green-400"
+                           class="bg-gradient-to-r inline-flex transform items-center rounded-lg from-emerald-500 to-teal-500 px-4 py-2 font-semibold text-white shadow-md transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:-translate-y-1"
                            title="Quản lý bài thi">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
+                            Quản lý
                         </a>
                         <button type="button"
-                                class="rounded-full bg-orange-200 p-3 text-orange-900 shadow transition hover:bg-orange-400"
+                                class="bg-gradient-to-r inline-flex transform items-center rounded-lg from-red-500 to-rose-500 px-4 py-2 font-semibold text-white shadow-md transition-all duration-300 hover:from-red-600 hover:to-rose-600 hover:-translate-y-1"
                                 onclick="confirmDelete('@exam.Exam_ID', '@exam.Exam_Name')"
                                 title="Xóa bài thi">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v1H9V4a1 1 0 011-1zm-7 4h18" />
                             </svg>
+                            Xóa
                         </button>
                     </div>
                 </div>
@@ -65,7 +108,8 @@
         }
     </div>
 
-    <form id="deleteForm" method="post" asp-action="Delete">
+    <!-- Delete Form -->
+    <form id="deleteForm" method="post" asp-action="Delete" class="hidden">
         <input type="hidden" name="id" id="deleteExamId" />
     </form>
 </div>
@@ -73,14 +117,13 @@
 @section Scripts {
     <script>
         function confirmDelete(examId, examName) {
-            if (confirm('Bạn có muốn xóa bài thi "' + examName + '" không?')) {
+            if (confirm(`Bạn có muốn xóa bài thi "${examName}" không?`)) {
                 document.getElementById('deleteExamId').value = examId;
                 document.getElementById('deleteForm').submit();
             }
         }
     </script>
 }
-
 
 
 

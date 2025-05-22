@@ -2,9 +2,10 @@
 using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
-{ 
+{
     [Area("Student")]
     public class HomeController : Controller
     {
@@ -13,7 +14,7 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
         {
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var userRole = HttpContext.Session.GetString("UserRole");
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -23,62 +24,73 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             }
             int userId = int.Parse(userIdStr);
 
-            // 1. 3 most recent classes joined
-            var recentClasses = _context.ClassStudents
-                .Where(sc => sc.User_ID == userId)
-                .OrderByDescending(sc => sc.Timestamp)
-                .Select(sc => sc.ClassTn)
-                .Take(3)
-                .ToList();
+            var studentClasses = await _context.ClassStudents
+        .Include(sc => sc.ClassTn)
+            .ThenInclude(c => c.Creator)
+        .Where(sc => sc.User_ID == userId)
+        .ToListAsync();
+            var exams1 = await _context.ClassExams
+                                .Include(ec => ec.ClassTN)
+                               
 
-            // 2. 3 most recent exams assigned to those classes
-            var recentClassIds = recentClasses.Select(c => c.Class_Id).ToList();
-            var recentExams = _context.ClassExams
-                .Where(ec => recentClassIds.Contains(ec.ClassTNClass_Id))
-                .OrderByDescending(ec => ec.AssignedAt)
-                .Select(ec => ec.Exam)
-                .Distinct()
-                .Take(3)
-                .ToList();
+                                .Include(ec => ec.Exam)
+                                .ToListAsync();
+            // For each class, calculate exam stats
+            var classInfos = new List<ClassInfoViewModel>();
+            foreach (var sc in studentClasses)
+            {
+                var exams = await _context.ClassExams
+                                .Include(ec => ec.ClassTN)
+                                .Where(ec => ec.ClassTNClass_Id == sc.Class_ID)
 
-            // 3. Highest score exam for this student
-            var highestScoreExam = _context.ExamResult
-                .Where(er => er.User_ID == userId)
-                .OrderByDescending(er => er.Score)
-                .FirstOrDefault();
+                                .Select(ec => ec.Exam)
+                                .ToListAsync();
 
-            // 4. Most active class (where student did most exams)
-            var classExamCounts = _context.ExamResult
-                .Where(er => er.User_ID == userId && er.Exam != null)
-                .Select(er => new
+                var completed = await _context.ExamResult
+                    .CountAsync(er => er.User_ID == userId && exams.Select(e => e.Exam_ID).Contains(er.Exam_ID));
+                var pending = exams.Count - completed;
+
+                classInfos.Add(new ClassInfoViewModel
                 {
-                    er.Exam,
-                    er.Exam.Exam_Classes
-                })
-                .SelectMany(x => x.Exam.Exam_Classes, (x, ec) => new { ec.ClassTNClass_Id })
-                .GroupBy(x => x.ClassTNClass_Id)
-                .Select(g => new { ClassId = g.Key, Count = g.Count() })
-                .OrderByDescending(g => g.Count)
-                .FirstOrDefault();
-
-            ClassTn? mostActiveClass = null;
-            int mostActiveClassExamCount = 0;
-            if (classExamCounts != null)
-            {
-                mostActiveClass = _context.ClassTn.FirstOrDefault(c => c.Class_Id == classExamCounts.ClassId);
-                mostActiveClassExamCount = classExamCounts.Count;
+                    ClassId = sc.Class_ID,
+                    ClassName = sc.ClassTn.ClassName,
+                    Creator = sc.ClassTn.Creator?.FullName,
+                    CompletedExams = completed,
+                    PendingExams = pending,
+                    JoinDate = sc.Timestamp
+                });
             }
+            // Lấy danh sách ID lớp mà sinh viên đã tham gia
+            var classIds = await _context.ClassStudents
+                .Where(sc => sc.User_ID == userId)
+                .Select(sc => sc.Class_ID)
+                .ToListAsync();
 
-            var vm = new StudentHomeIndexViewModel
+            // Lấy các bài thi được giao cho các lớp này
+            var examClasses = await _context.ClassExams
+                .Include(ec => ec.Exam)
+                .Include(ec => ec.ClassTN)
+                .Where(ec => classIds.Contains(ec.ClassTNClass_Id))
+                .OrderByDescending(ec => ec.Exam.Exam_Date)
+                .Take(3)
+                .ToListAsync();
+            var latestExams = examClasses.Select(ec => new LatestExamDisplayViewModel
             {
-                RecentClasses = recentClasses,
-                RecentExams = recentExams,
-                HighestScoreExam = highestScoreExam,
-                MostActiveClass = mostActiveClass,
-                MostActiveClassExamCount = mostActiveClassExamCount
-            };
-
-            return View(vm);
+                Exam = ec.Exam,
+                ClassName = ec.ClassTN.ClassName
+            }).ToList();
+            
+            var examResults = await _context.ExamResult
+                .Where(er => er.User_ID == userId)
+                .ToListAsync();
+            ViewData["ExamResults"] = examResults;
+            ViewData["UserId"] = userId;
+            ViewData["LatestExams"] = latestExams;
+            ViewData["Classes"] = classInfos;
+            ViewData["UserID"] = userId;
+            
+            ViewData["Exams"] = exams1;
+            return View();
         }
 
 

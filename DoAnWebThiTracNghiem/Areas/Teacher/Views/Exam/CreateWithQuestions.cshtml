@@ -8,9 +8,16 @@
 <div class="bg-gradient-to-br min-h-screen from-indigo-50 to-purple-50 p-8">
     <h2 class="mb-8 border-b-4 border-indigo-500 pb-2 text-4xl font-extrabold text-gray-900">@ViewData["Title"]</h2>
 
+    <!-- Thông báo -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="mb-6 rounded-lg border-l-4 border-green-500 bg-green-50 p-4 text-green-700 shadow-md" role="alert">
+        <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
             @TempData["SuccessMessage"]
         </div>
     }
@@ -39,12 +46,12 @@
                     </div>
                     <div>
                         <label asp-for="StartTime" class="block text-lg font-semibold text-gray-800">Thời gian bắt đầu</label>
-                        <input asp-for="StartTime" type="datetime-local" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <input asp-for="StartTime" type="time" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
                         <span asp-validation-for="StartTime" class="text-sm text-red-500"></span>
                     </div>
                     <div>
                         <label asp-for="EndTime" class="block text-lg font-semibold text-gray-800">Thời gian kết thúc</label>
-                        <input asp-for="EndTime" type="datetime-local" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <input asp-for="EndTime" type="time" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
                         <span asp-validation-for="EndTime" class="text-sm text-red-500"></span>
                     </div>
                     <div>
@@ -84,18 +91,21 @@
                     <table id="questionsTable" class="w-full border-collapse text-gray-700">
                         <thead class="bg-indigo-600 text-white">
                             <tr>
-                                <th class="px-6 py-3 text-left font-semibold">Chọn</th>
+                                <th class="px-6 py-3 text-center font-semibold">
+                                    <input type="checkbox" id="selectAllQuestions" />
+                                    <span class="ml-1">Chọn</span>
+                                </th>
                                 <th class="px-6 py-3 text-left font-semibold">Nội dung câu hỏi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @foreach (var question in (List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
                             {
-                                <tr class="transition duration-200 hover:bg-gray-50">
+                                <tr class="text-center transition duration-200 hover:bg-gray-50">
                                     <td class="px-6 py-4">
-                                        <input type="checkbox" name="questionIds" value="@question.Question_ID" class="form-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
+                                        <input type="checkbox" name="questionIds" value="@question.Question_ID" class="form-checkbox question-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
                                     </td>
-                                    <td class="px-6 py-4">@question.Question_Content</td>
+                                    <td class="max-w-xs overflow-auto overflow-x-auto px-6 py-4" style="white-space:nowrap;">@question.Question_Content</td>
                                 </tr>
                             }
                         </tbody>
@@ -111,6 +121,9 @@
 </div>
 
 @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
         $(document).ready(function () {
             $('#SubjectId, #QuestionTypeId, #DifficultyLevel').change(function () {
@@ -128,7 +141,7 @@
                             $('#questionsTable tbody').append(`
                                 <tr class="transition duration-200 hover:bg-gray-50">
                                     <td class="px-6 py-4">
-                                        <input type="checkbox" name="questionIds" value="${question.question_ID}" class="form-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
+                                        <input type="checkbox" name="questionIds" value="${question.question_ID}" class="form-checkbox question-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
                                     </td>
                                     <td class="px-6 py-4">${question.question_Content}</td>
                                 </tr>
@@ -140,6 +153,20 @@
                     }
                 });
             });
+        });
+
+        // Xử lý chọn tất cả
+        $(document).on('change', '#selectAllQuestions', function () {
+            $('.question-checkbox').prop('checked', this.checked);
+        });
+
+        // Nếu có ajax load lại bảng, cần gán lại sự kiện cho checkbox mới
+        $(document).on('change', '.question-checkbox', function () {
+            if (!this.checked) {
+                $('#selectAllQuestions').prop('checked', false);
+            } else if ($('.question-checkbox:checked').length === $('.question-checkbox').length) {
+                $('#selectAllQuestions').prop('checked', true);
+            }
         });
     </script>
 }

@@ -1,4 +1,5 @@
-﻿using DoAnWebThiTracNghiem.Models;
+﻿using DoAnWebThiTracNghiem.Areas.Admin.Models;
+using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
 using DoAnWebThiTracNghiem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +25,8 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
             var RoleId = HttpContext.Session.GetString("RoleId");
             int userId = int.Parse(UserId);
             int roleId = int.Parse(RoleId);
-            var total = await _Clcontext.CountAsync(roleId,userId,search);
-            var items = await _Clcontext.GetPagedAsync(roleId, userId,page, pageSize, search);
+            var total = await _Clcontext.CountAsync(roleId, userId, search);
+            var items = await _Clcontext.GetPagedAsync(roleId, userId, page, pageSize, search);
 
             var model = new PagedResult<ClassTn>
             {
@@ -35,7 +36,13 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
                 TotalItems = total,
                 Search = search
             };
-            
+            var subjects = await _Clcontext.GetAllSubjectsAsync(1, userId);
+            ViewData["Subjects"] = subjects.Select(s => new
+            {
+                Subject_Id = s.Subject_Id,
+                Subject_Display = $"{s.Subject_Name} - {s.CreatorName}"
+            }).ToList();
+
             return View(model);
         }
         [HttpGet]
@@ -49,27 +56,67 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
         }
 
 
-        public IActionResult Details()
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var classInfo = await _Clcontext.GetByIdAsync(id);
+            if (classInfo == null) return NotFound();
+
+            // Fix: Map Exams to Exam_Class objects
+            var exams = (await _Clcontext.GetExamsOfClassAsync(id))
+                .Select(exam => new Exam_Class
+                {
+                    Exam_ID = exam.Exam_ID,
+                    ClassTNClass_Id = id,
+                    Exam = exam,
+                    AssignedAt = DateTime.Now // Adjust as needed
+                }).ToList();
+
+            var students = (await _Clcontext.GetStudentsInClassAsync(id))
+                .Select(user => new Student_Class
+                {
+                    User_ID = user.User_Id,
+                    Class_ID = id,
+                    Timestamp = DateTime.Now, // Adjust as needed
+                    User = user
+                }).ToList();
+
+            var notifications = await _Clcontext.GetNotificationsOfClassAsync(id);
+
+            var model = new ClassDetailViewModel
+            {
+                Class = classInfo,
+                Students = students,
+                Exams = exams,
+                Notifications = notifications
+            };
+            return View(model);
         }
-        public IActionResult Create()
-        {
-            return View();
-        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClassTn classTn)
         {
+            var userID = HttpContext.Session.GetString("UserId");
+            classTn.CreatorUser_Id = int.Parse(userID);
+
             if (ModelState.IsValid)
             {
-                var userId = HttpContext.Session.GetString("UserId");
-                int adminId = int.Parse(userId);
-                classTn.CreatorUser_Id = adminId;
+
+                classTn.CreatedAt = DateTime.Now;
+                classTn.UpdatedAt = DateTime.Now;
+                classTn.InviteCode = await GenerateUniqueInviteCode();
                 await _Clcontext.AddAsync(classTn);
-                return RedirectToAction(nameof(Index));
+                
+                return Json(new { success = true, message = "Thêm lớp học thành công !" });
             }
-            return View(classTn);
+            // Trả về lỗi ModelState dạng JSON
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+            return BadRequest(new { success = false, errors });
+
         }
         // API lấy thông tin lớp học
         [HttpGet]
@@ -86,8 +133,17 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
         {
             if (classTn == null) return BadRequest();
             var existing = await _Clcontext.GetByIdAsync(classTn.Class_Id);
-            if (existing == null) return NotFound();
-
+            if (existing == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+                return BadRequest(new { success = false, errors });
+            }
             existing.ClassName = classTn.ClassName;
             existing.SubjectId = classTn.SubjectId;
             existing.UpdatedAt = DateTime.Now;
@@ -103,6 +159,29 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
             if (classTn == null) return NotFound();
             await _Clcontext.DeleteAsync(id);
             return Ok();
+        }
+        private async Task<string> GenerateUniqueInviteCode()
+        {
+            string inviteCode;
+            bool exists;
+
+            do
+            {
+                // Tạo mã InviteCode gồm 7 ký tự chữ hoa và số
+                inviteCode = GenerateRandomCode(7);
+
+                // Kiểm tra xem mã này đã tồn tại trong cơ sở dữ liệu chưa
+                exists = await _Clcontext.Check(inviteCode);
+            } while (exists);
+
+            return inviteCode;
+        }
+        private string GenerateRandomCode(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

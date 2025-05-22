@@ -10,5 +10,7 @@ namespace DoAnWebThiTracNghiem.ViewModel
         public int TotalQuestions { get; set; }
         public List<Exam> RecentExams { get; set; } = new();
         public List<ClassTn> RecentClasses { get; set; } = new();
+        public List<Question> RecentQuestion { get; set; } = new();
+        public List<Subject> RecentSubject { get; set; } = new();
     }
 }

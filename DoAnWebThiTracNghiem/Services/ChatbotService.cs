@@ -9,47 +9,53 @@ namespace DoAnWebThiTracNghiem.Services
     public class ChatbotService
     {
         private readonly string _apiKey;
-        private readonly string _apiUrl = "http://195.179.229.119/gpt/api.php";
+        private readonly string _apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
 
         public ChatbotService(IConfiguration configuration)
         {
             _apiKey = configuration["ChatbotSettings:ApiKey"];
-            _apiUrl = configuration["ChatbotSettings:ApiUrl"];
         }
-
 
         public async Task<string> GetResponseAsync(string prompt)
         {
-            // Define the default model
-            string model = "gpt-3.5-turbo";
-
-            // Build the URL with query parameters
-            string apiUrlWithParams = $"{_apiUrl}?prompt={HttpUtility.UrlEncode(prompt)}&api_key={HttpUtility.UrlEncode(_apiKey)}&model={HttpUtility.UrlEncode(model)}";
-
             using var client = new HttpClient();
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            }
+            };
+
+            var requestUrl = $"{_apiUrl}{_apiKey}";
+            var jsonBody = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json");
+            Console.WriteLine($"Request URL: {requestUrl}");
+            Console.WriteLine($"Request Body: {jsonBody}");
+
             try
             {
-                // Send the GET request
-                HttpResponseMessage response = await client.GetAsync(apiUrlWithParams);
-
-                // Check if the request was successful
-                response.EnsureSuccessStatusCode();
-
-                // Read the response as a string
+                HttpResponseMessage response = await client.PostAsync(requestUrl, content);
                 string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response Status: {response.StatusCode}");
+                Console.WriteLine($"Response Body: {responseBody}");
 
-                // Giải mã chuỗi Unicode sang tiếng Việt
-                string decodedResponse = System.Text.RegularExpressions.Regex.Unescape(responseBody);
-
-                // Return the decoded response
-                return decodedResponse;
+                // Kiểm tra trạng thái sau khi đã lưu responseBody
+                response.EnsureSuccessStatusCode();
+                return responseBody;
             }
             catch (HttpRequestException e)
             {
+                // Không sử dụng e.Response vì nó không tồn tại
                 Console.WriteLine($"Request error: {e.Message}");
-                throw new Exception("Failed to fetch response from AI API.");
+                throw new Exception("Không thể lấy phản hồi từ API AI: " + e.Message);
             }
         }
-
     }
 }

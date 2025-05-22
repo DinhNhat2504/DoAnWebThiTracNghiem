@@ -1,0 +1,392 @@
+﻿@model PagedResult<DoAnWebThiTracNghiem.Models.Question>
+@using DoAnWebThiTracNghiem.ViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
+
+
+}
+
+<div class="content-section">
+    <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
+        <div class="mb-6 flex flex-col justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách câu hỏi</h3>
+            <form method="get" class="mb-4 flex flex-col items-center space-x-2 sm:flex-row">
+                <input type="text" name="search" value="@Model.Search" placeholder="Tìm kiếm câu hỏi..." class="w-full rounded border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 sm:w-auto" />
+
+                <button type="submit" class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+            <a asp-action="Create"
+               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Thêm Câu hỏi</span>
+            </a>
+        </div>
+        <div class="mb-6 flex justify-end pb-4">
+            <form asp-action="Index" method="get" class="flex w-full flex-col gap-2 sm:flex-row sm:w-auto sm:items-end">
+                <select name="subjectId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.Subjects">
+                    <option value="">-- Môn học --</option>
+
+                </select>
+                <select name="levelId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.Levels">
+                    <option value="">-- Độ khó --</option>
+
+                </select>
+                <select name="questionTypeId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.QuestionTypes">
+                    <option value="">-- Loại câu hỏi --</option>
+
+                </select>
+                <button type="submit" class="w-full rounded bg-blue-500 px-4 py-1 text-white sm:w-auto">Lọc</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Nội dung</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Môn học</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Loại</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Người tạo</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Độ khó</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Ngày tạo</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="max-w-xs overflow-x-auto px-4 py-3 text-sm font-medium text-gray-800" style="white-space:nowrap;">@item.Question_Content</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Subject?.Subject_Name</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600"> @item.QuestionType?.Name</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Creator?.FullName</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Level?.LevelName</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            @{
+                                var editObj = new
+                                {
+                                    Question_ID = item.Question_ID,
+                                    Question_Content = item.Question_Content,
+                                    Options = item.Options,
+                                    Correct_Option = item.Correct_Option,
+                                    Subject_ID = item.Subject_ID,
+                                    Level_ID = item.Level_ID,
+                                    QuestionTypeId = item.QuestionTypeId
+                                };
+                                var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
+                            }
+                            <td class="space-x-2 px-4 py-3 text-center text-sm font-medium whitespace-nowrap">
+                                <button type="button" onclick='openEditModal(@Html.Raw(editJson),@(item.Creator?.RoleId ?? 0) )' class="p-1 text-blue-600 hover:text-blue-800" title="Sửa">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                    </svg>
+                                </button>
+                                <button type="button" onclick="deleteQuestion(@item.Question_ID)" class="p-1 text-red-600 hover:text-red-800" title="Xóa">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Pagination -->
+        <div class="mt-6 flex flex-col items-center justify-between space-y-3 sm:flex-row sm:space-y-0">
+            <span class="text-sm text-gray-600">
+                Hiển thị trang @Model.PageNumber trên tổng @Model.TotalPages, tổng @Model.TotalItems câu hỏi
+            </span>
+            <div class="flex space-x-1">
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" asp-route-search="@Model.Search" asp-route-subjectId="@Model.SubjectId"
+                   asp-route-levelId="@Model.LevelId"
+                   asp-route-questionTypeId="@Model.QuestionTypeId" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a asp-action="Index" asp-route-page="@i" asp-route-search="@Model.Search" asp-route-subjectId="@Model.SubjectId"
+                       asp-route-levelId="@Model.LevelId"
+                       asp-route-questionTypeId="@Model.QuestionTypeId"
+                       class="rounded-md border px-3 py-1 text-sm @(i == Model.PageNumber ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50")">
+                        @i
+                    </a>
+                }
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" asp-route-search="@Model.Search" asp-route-subjectId="@Model.SubjectId"
+                   asp-route-levelId="@Model.LevelId"
+                   asp-route-questionTypeId="@Model.QuestionTypeId" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
+            </div>
+
+            <div id="editModal" class="bg-opacity-40 fixed inset-0 z-50 flex hidden items-center justify-center">
+                <div class="relative w-full max-w-3xl rounded-xl bg-white p-6 shadow-lg">
+                    <form id="editModalForm" onsubmit="return submitEditModalForm(event)">
+                        <input type="hidden" name="Question_ID" id="editModal_Question_ID" />
+                        <div class="mb-2">
+                            <label class="font-semibold">Nội dung:</label>
+                            <input type="text" name="Question_Content" id="editModal_Question_Content" class="w-full rounded border px-2 py-1" />
+                            <span id="Question_ContentError" class="text-red-500"></span>
+                        </div>
+                        <div class="mb-2" id="editModalOptions">
+                        </div>
+                        <div class="mb-2" id="editModalCorrectOption">
+                        </div>
+                        <div class="mb-2">
+                            <label class="font-semibold">Môn học:</label>
+                            <select name="Subject_ID" id="editModal_Subject_ID" class="rounded border px-2 py-1">
+
+                                <option value=""></option>
+
+                            </select>
+                            <span id="Subject_IDError" class="text-red-500"></span>
+                            <label class="ml-2 font-semibold">Độ khó:</label>
+                            <select name="Level_ID" id="editModal_Level_ID" class="rounded border px-2 py-1">
+                                @foreach (var level in (SelectList)ViewData["Levels"])
+                                {
+                                    <option value="@level.Value">@level.Text</option>
+                                }
+                            </select>
+                            <span id="Level_IDError" class="text-red-500"></span>
+                        </div>
+                        <button type="submit" class="rounded bg-blue-500 px-2 py-1 text-white">Lưu</button>
+                        <button type="button" onclick="closeEditModal()" class="ml-2 rounded border px-2 py-1">Hủy</button>
+                    </form>
+                </div>
+            </div>
+            <div id="edit-success-message" style="display:none;" class="mb-4 rounded bg-green-100 p-2 text-green-700"></div>
+
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+     let currentEditType = 1; // 1: 1 đáp án, 2: Đúng/Sai, 3: Điền từ
+
+          function openEditModal(item, creatorRoleId) {
+         // Hàm xử lý mở modal và load dữ liệu
+         function showEditModal() {
+             const modal = document.getElementById('editModal');
+             modal.classList.remove('hidden');
+              const errorIds = [
+            'Question_ContentError',
+            'Correct_OptionError',
+            'Subject_IDError',
+            'Level_IDError'
+        ];
+        errorIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = '';
+        });
+        for (let i = 0; i < 4; i++) {
+            const el = document.getElementById(`Option${i}Error`);
+            if (el) el.innerText = '';
+        }
+             $('#editModal_Question_ID').val(item.Question_ID);
+             $('#editModal_Question_Content').val(item.Question_Content);
+
+             fetch(`/Admin/Questions/GetQuesion?id=${item.Question_ID}`)
+                 .then(res => res.json())
+                 .then(cls => {
+                     fetch(`/Admin/Questions/GetSubjectForQuestion?questionId=${item.Question_ID}`)
+                         .then(res => res.ok ? res.json() : [])
+                         .then(subjects => {
+                             const select = document.getElementById('editModal_Subject_ID');
+                             select.innerHTML = '<option value="">-- Chọn môn học --</option>';
+                             subjects.forEach(sub => {
+                                 const option = document.createElement('option');
+                                 option.value = sub.subject_Id;
+                                 option.text = sub.subject_Name;
+                                 if (Number(sub.subject_Id) === Number(cls.subject_ID)) option.selected = true;
+                                 select.appendChild(option);
+                             });
+                         });
+                 });
+
+             $('#editModal_Level_ID').val(item.Level_ID);
+             currentEditType = item.QuestionTypeId;
+
+             let optionsHtml = '', correctHtml = '';
+             if (item.QuestionTypeId === 1) {
+                  optionsHtml = `
+        <div class="mb-2">
+          <label class="font-semibold">Đáp án A:</label>
+          <input type="text" name="Options[0]" value="${item.Options?.[0] || ''}" class="w-full rounded border px-2 py-1" />
+          <span id="Option0Error" class="text-red-500"></span>
+      </div>
+      <div class="mb-2">
+          <label class="font-semibold">Đáp án B:</label>
+          <input type="text" name="Options[1]" value="${item.Options?.[1] || ''}" class="w-full rounded border px-2 py-1" />
+          <span id="Option1Error" class="text-red-500"></span>
+      </div>
+      <div class="mb-2">
+          <label class="font-semibold">Đáp án C:</label>
+          <input type="text" name="Options[2]" value="${item.Options?.[2] || ''}" class="w-full rounded border px-2 py-1" />
+          <span id="Option2Error" class="text-red-500"></span>
+      </div>
+      <div class="mb-2">
+          <label class="font-semibold">Đáp án D:</label>
+          <input type="text" name="Options[3]" value="${item.Options?.[3] || ''}" class="w-full rounded border px-2 py-1" />
+          <span id="Option3Error" class="text-red-500"></span>
+      </div>`;
+                 correctHtml = `
+                     <div class="mb-2"><label class="font-semibold">Đáp án đúng:</label>
+                     <input type="text" name="Correct_Option" value="${item.Correct_Option || ''}" class="w-full rounded border px-2 py-1" /></div>
+                        <span id="Correct_OptionError" class="text-red-500"></span>`;
+
+             } else {
+                 correctHtml = `
+                     <div class="mb-2"><label class="font-semibold">Đáp án đúng:</label>
+                     <input type="text" name="Correct_Option" value="${item.Correct_Option || ''}" class="w-full rounded border px-2 py-1" ${item.QuestionTypeId === 2 ? 'placeholder="Nhập Đúng hoặc Sai"' : ''} /></div>
+                      <span id="Correct_OptionError" class="text-red-500"></span>
+                     `;
+             }
+             $('#editModalOptions').html(optionsHtml);
+             $('#editModalCorrectOption').html(correctHtml);
+         }
+
+         // Hiển thị cảnh báo theo role
+         let alertText = creatorRoleId === 2
+             ? 'Việc sửa câu hỏi của giáo viên này sẽ ảnh hưởng tới bài thi, làm bài thi và kết quả của học sinh do giáo viên này quản lý. Bạn có chắc muốn sửa?'
+             : 'Bạn có chắc muốn sửa câu hỏi này?';
+
+         Swal.fire({
+             title: 'Cảnh báo',
+             text: alertText,
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonText: 'Sửa',
+             cancelButtonText: 'Hủy'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 showEditModal();
+             }
+         });
+     }
+
+     function showAlert(message, type = "success") {
+
+         if (type === "success") {
+             Swal.fire({
+
+                     text: message,
+                     icon: "success"
+                     });
+         } else {
+                 Swal.fire({
+       icon: "error",
+       title: "Lỗi",
+       text: message,
+
+     });
+    }
+    }
+     function closeEditModal() {
+         const modal = document.getElementById('editModal');
+     modal.classList.add('hidden');
+     }
+    async function submitEditModalForm(event) {
+        event.preventDefault();
+
+        // Reset lỗi (an toàn với phần tử không tồn tại)
+        const errorIds = [
+            'Question_ContentError',
+            'Correct_OptionError',
+            'Subject_IDError',
+            'Level_IDError'
+        ];
+        errorIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = '';
+        });
+        for (let i = 0; i < 4; i++) {
+            const el = document.getElementById(`Option${i}Error`);
+            if (el) el.innerText = '';
+        }
+
+        const form = document.getElementById('editModalForm');
+        const formData = new FormData(form);
+
+        // Xử lý options cho câu hỏi 1 đáp án
+        let options = [];
+        if (currentEditType === 1) {
+            for (let i = 0; i < 4; i++) {
+                options.push(formData.get(`Options[${i}]`) || "");
+                formData.delete(`Options[${i}]`);
+            }
+            formData.append('Options', JSON.stringify(options));
+        }
+
+        const data = {};
+        formData.forEach((value, key) => { data[key] = value; });
+
+        try {
+            const response = await fetch('/Admin/Questions/Edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (response.ok) {
+                closeEditModal();
+                showAlert("Cập nhật câu hỏi thành công!", "success");
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                if (result.errors) {
+                    if (result.errors.Question_Content) {
+                        const el = document.getElementById('Question_ContentError');
+                        if (el) el.innerText = result.errors.Question_Content[0];
+                    }
+                    for (let i = 0; i < 4; i++) {
+                        if (result.errors[`Options[${i}]`]) {
+                            const el = document.getElementById(`Option${i}Error`);
+                            if (el) el.innerText = result.errors[`Options[${i}]`][0];
+                        }
+                    }
+                    if (result.errors.Correct_Option) {
+                        const el = document.getElementById('Correct_OptionError');
+                        if (el) el.innerText = result.errors.Correct_Option[0];
+                    }
+                    if (result.errors.Subject_ID) {
+                        const el = document.getElementById('Subject_IDError');
+                        if (el) el.innerText = result.errors.Subject_ID[0];
+                    }
+                    if (result.errors.Level_ID) {
+                        const el = document.getElementById('Level_IDError');
+                        if (el) el.innerText = result.errors.Level_ID[0];
+                    }
+                }
+            }
+               
+            
+        } catch (err) {
+            showAlert("Có lỗi xảy ra khi cập nhật!", "error");
+        }
+        return false;
+    }
+          function deleteQuestion(questionId) {
+         Swal.fire({
+             title: 'Xác nhận xóa',
+             text: 'Bạn có chắc chắn muốn xóa câu hỏi này? Hành động này không thể hoàn tác.',
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonText: 'Xóa',
+             cancelButtonText: 'Hủy'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 fetch(`/Admin/Questions/Delete?id=${questionId}`, { method: 'POST' })
+                     .then(res => {
+                         if (res.ok) {
+                             showAlert("Xóa thành công!", "success");
+                             setTimeout(() => location.reload(), 1200);
+                         } else {
+                             showAlert("Có lỗi xảy ra khi xóa!", "error");
+                         }
+                     })
+                     .catch(() => showAlert("Có lỗi xảy ra khi xóa!", "error"));
+             }
+         });
+     }
+</script>

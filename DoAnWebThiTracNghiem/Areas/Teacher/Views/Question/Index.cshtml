@@ -1,250 +1,150 @@
-﻿@model X.PagedList.IPagedList<DoAnWebThiTracNghiem.Models.Question>
-@using X.PagedList
-@using X.PagedList.Mvc.Core
+﻿@model PagedResult<DoAnWebThiTracNghiem.Models.Question>
+@using DoAnWebThiTracNghiem.ViewModel
 
 @{
     ViewData["Title"] = "Danh sách câu hỏi";
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
-    var singleAnswerQuestions = ViewData["SingleAnswerQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
-    var trueFalseQuestions = ViewData["TrueFalseQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
-    var fillInTheBlankQuestions = ViewData["FillInTheBlankQuestions"] as IPagedList<DoAnWebThiTracNghiem.Models.Question>;
 }
 
-<form asp-action="Index" method="get" class="mb-4 flex gap-2">
-    <input type="text" name="searchString" value="@(ViewContext.HttpContext.Request.Query["searchString"])" placeholder="Tìm theo nội dung câu hỏi..." class="rounded border px-2 py-1" />
-    <select name="subjectId" class="rounded border px-2 py-1" asp-items="ViewBag.Subjects">
-        <option value="">-- Môn học --</option>
-    </select>
-    <button type="submit" class="rounded bg-blue-500 px-4 py-1 text-white">Tìm kiếm</button>
-    <a href="@Url.Action("Create")" class="ml-2 rounded bg-green-500 px-4 py-1 text-white">+ Thêm câu hỏi</a>
-</form>
-
-<h1 class="mb-4 text-2xl font-bold">Danh sách câu hỏi</h1>
-
-<!-- Câu hỏi 1 đáp án -->
-<div class="mb-8">
-    <h2 class="mb-2 text-xl font-semibold">Câu hỏi 1 đáp án</h2>
-    <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án A</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án B</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án C</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án D</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án Đúng</th>
-                
-                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in singleAnswerQuestions)
-            {
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Options?[0]</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Options?[1]</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Options?[2]</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Options?[3]</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
-                    
-                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @{
-                            var editObj = new
-                            {
-                                Question_ID = item.Question_ID,
-                                Question_Content = item.Question_Content,
-                                Options = item.Options,
-                                Correct_Option = item.Correct_Option,
-                                Subject_ID = item.Subject_ID,
-                                Level_ID = item.Level_ID,
-                                QuestionTypeId = item.QuestionTypeId
-                            };
-                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
-                        }
-                        <button type="button" class="mr-2 text-blue-500 hover:underline"
-                                onclick='openEditModal(@Html.Raw(editJson))'>
-                            Sửa
-                        </button>
 
 
-                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
-                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
-                        </form>
-                    </td>
+<div class="content-section">
+    <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
+        <div class="mb-6 flex flex-col justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách câu hỏi</h3>
+            <form method="get" class="mb-4 flex flex-col items-center space-x-2 sm:flex-row">
+                <input type="text" name="search" value="@Model.Search" placeholder="Tìm kiếm câu hỏi..." class="w-full rounded border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 sm:w-auto" />
 
-                </tr>
-               
-            }
-        </tbody>
-    </table>
-    <div class="mt-4 flex justify-center">
-        <ul class="flex space-x-2">
-            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
-            {
-                if (i == singleAnswerQuestions.PageNumber)
+                <button type="submit" class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+            <a asp-action="Create"
+               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Thêm Câu hỏi</span>
+            </a>
+            <form asp-action="ImportExcel" asp-controller="Question" enctype="multipart/form-data" method="post" class="mt-5 mb-5 sm:mt-0">
+                <div class="input-group">
+                    <input type="file" name="excelFile" accept=".xlsx" class="w-full rounded border px-2 py-1 sm:w-auto" required />
+                    <button type="submit" class="mt-5 w-full rounded bg-green-500 px-4 py-1 text-white sm:mt-0 sm:w-auto">Import Excel</button>
+                </div>
+            </form>
+        </div>
+        <div class="mb-6 flex justify-end pb-4">
+            <form asp-action="Index" method="get" class="flex w-full flex-col gap-2 sm:flex-row sm:w-auto sm:items-end">
+                <select name="subjectId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.Subjects">
+                    <option value="">-- Môn học --</option>
+                </select>
+                <select name="levelId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.Levels">
+                    <option value="">-- Độ khó --</option>
+                </select>
+                <select name="questionTypeId" class="w-full rounded border px-2 py-1 sm:w-auto" asp-items="ViewBag.QuestionTypes">
+                    <option value="">-- Loại câu hỏi --</option>
+                </select>
+                <button type="submit" class="w-full rounded bg-blue-500 px-4 py-1 text-white sm:w-auto">Lọc</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Nội dung</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Môn học</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Loại</th>
+                        
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Độ khó</th>
+                       
+                        <th class="px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="max-w-xs overflow-x-auto px-4 py-3 text-sm font-medium text-gray-800" style="white-space:nowrap;">@item.Question_Content</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Subject?.Subject_Name</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600"> @item.QuestionType?.Name</td>
+                            
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Level?.LevelName</td>
+                            
+                            @{
+                                var editObj = new
+                                {
+                                    Question_ID = item.Question_ID,
+                                    Question_Content = item.Question_Content,
+                                    Options = item.Options,
+                                    Correct_Option = item.Correct_Option,
+                                    Subject_ID = item.Subject_ID,
+                                    Level_ID = item.Level_ID,
+                                    QuestionTypeId = item.QuestionTypeId
+                                };
+                                var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
+                            }
+                            @* onclick="openEditClassModal(@item.Question_ID)" *@
+                            <td class="space-x-2 px-4 py-3 text-center text-sm font-medium whitespace-nowrap">
+                                <button type="button" onclick='openEditModal(@Html.Raw(editJson))' class="p-1 text-blue-600 hover:text-blue-800" title="Sửa">
+                                    <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                    </svg>
+                                </button>
+                                <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                                    <button type="submit" class="p-1 text-red-600 hover:text-red-800" title="Xóa">
+                                        <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @* onclick="deleteClass(@item.Question_ID)" *@
+        <!-- Pagination -->
+        <div class="mt-6 flex flex-col items-center justify-between space-y-3 sm:flex-row sm:space-y-0">
+            <span class="text-sm text-gray-600">
+                Hiển thị trang @Model.PageNumber trên tổng @Model.TotalPages, tổng @Model.TotalItems câu hỏi
+            </span>
+            <div class="flex space-x-1">
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageNumber - 1)"
+                   asp-route-search="@Model.Search"
+                   asp-route-subjectId="@Model.SubjectId"
+                   asp-route-levelId="@Model.LevelId"
+                   asp-route-questionTypeId="@Model.QuestionTypeId"
+                   class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <li class="inline-block">
-                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
-                    </li>
+                    <a asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-search="@Model.Search"
+                       asp-route-subjectId="@Model.SubjectId"
+                       asp-route-levelId="@Model.LevelId"
+                       asp-route-questionTypeId="@Model.QuestionTypeId"
+                       class="rounded-md border px-3 py-1 text-sm @(i == Model.PageNumber ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50")">
+                        @i
+                    </a>
                 }
-                else
-                {
-                    <li class="inline-block">
-                        <a href="@Url.Action("Index", new { page1 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
-                    </li>
-                }
-            }
-        </ul>
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageNumber + 1)"
+                   asp-route-search="@Model.Search"
+                   asp-route-subjectId="@Model.SubjectId"
+                   asp-route-levelId="@Model.LevelId"
+                   asp-route-questionTypeId="@Model.QuestionTypeId"
+                   class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
+            </div>
+        </div>
+
+        
     </div>
+    <div id="editModal" class="bg-opacity-40 fixed inset-0 z-50 flex hidden items-center justify-center">
+        <div class="relative w-full max-w-3xl rounded-xl bg-white p-6 shadow-lg">
 
-</div>
-
-<!-- Câu hỏi đúng sai -->
-<div class="mb-8">
-    <h2 class="mb-2 text-xl font-semibold">Câu hỏi đúng sai</h2>
-    <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án</th>
-                <th class="border border-gray-300 px-4 py-2">Môn học</th>
-                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in trueFalseQuestions)
-            {
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Subject?.Subject_Name</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @{
-                            var editObj = new
-                            {
-                                Question_ID = item.Question_ID,
-                                Question_Content = item.Question_Content,
-                                Options = item.Options,
-                                Correct_Option = item.Correct_Option,
-                                Subject_ID = item.Subject_ID,
-                                Level_ID = item.Level_ID,
-                                QuestionTypeId = item.QuestionTypeId
-                            };
-                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
-                        }
-                        <button type="button" class="mr-2 text-blue-500 hover:underline"
-                                onclick='openEditModal(@Html.Raw(editJson))'>
-                            Sửa
-                        </button>
-
-
-
-
-                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
-                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-                
-            }
-        </tbody>
-    </table>
-    <div class="mt-4 flex justify-center">
-        <ul class="flex space-x-2">
-            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
-            {
-                if (i == singleAnswerQuestions.PageNumber)
-                {
-                    <li class="inline-block">
-                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
-                    </li>
-                }
-                else
-                {
-                    <li class="inline-block">
-                        <a href="@Url.Action("Index", new { page2 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
-                    </li>
-                }
-            }
-        </ul>
-    </div>
-
-</div>
-
-<!-- Câu hỏi điền từ -->
-<div class="mb-8">
-    <h2 class="mb-2 text-xl font-semibold">Câu hỏi điền từ</h2>
-    <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-4 py-2">Nội dung</th>
-                <th class="border border-gray-300 px-4 py-2">Đáp án</th>
-                <th class="border border-gray-300 px-4 py-2">Môn học</th>
-                <th class="border border-gray-300 px-4 py-2">Độ khó</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in fillInTheBlankQuestions)
-            {
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">@item.Question_Content</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Correct_Option</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Subject?.Subject_Name</td>
-                    <td class="border border-gray-300 px-4 py-2">@item.Level?.LevelName</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @{
-                            var editObj = new
-                            {
-                                Question_ID = item.Question_ID,
-                                Question_Content = item.Question_Content,
-                                Options = item.Options,
-                                Correct_Option = item.Correct_Option,
-                                Subject_ID = item.Subject_ID,
-                                Level_ID = item.Level_ID,
-                                QuestionTypeId = item.QuestionTypeId
-                            };
-                            var editJson = System.Text.Json.JsonSerializer.Serialize(editObj);
-                        }
-                        <button type="button" class="mr-2 text-blue-500 hover:underline"
-                                onclick='openEditModal(@Html.Raw(editJson))'>
-                            Sửa
-                        </button>
-
-
-
-                        <form asp-action="Delete" asp-route-id="@item.Question_ID" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
-                            <button type="submit" class="bg-transparent cursor-pointer border-none text-red-500 hover:underline">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-                
-            }
-        </tbody>
-    </table>
-    <div class="mt-4 flex justify-center">
-        <ul class="flex space-x-2">
-            @for (int i = 1; i <= singleAnswerQuestions.PageCount; i++)
-            {
-                if (i == singleAnswerQuestions.PageNumber)
-                {
-                    <li class="inline-block">
-                        <span class="rounded border bg-blue-500 px-4 py-2 text-white">@i</span>
-                    </li>
-                }
-                else
-                {
-                    <li class="inline-block">
-                        <a href="@Url.Action("Index", new { page3 = i })" class="rounded border px-4 py-2 hover:bg-gray-200">@i</a>
-                    </li>
-                }
-            }
-        </ul>
-    </div>
-    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000;">
-        <div style="background:white; min-width:400px; max-width:600px; margin:5% auto; padding:32px 24px; border-radius:12px; position:relative; box-shadow:0 2px 16px #0002;">
             <form id="editModalForm" onsubmit="return submitEditModalForm(event)">
                 <input type="hidden" name="Question_ID" id="editModal_Question_ID" />
                 <div class="mb-2">
@@ -252,26 +152,10 @@
                     <input type="text" name="Question_Content" id="editModal_Question_Content" class="w-full rounded border px-2 py-1" />
                 </div>
                 <div class="mb-2" id="editModalOptions">
-                    <div class="mb-2">
-                        <label class="font-semibold">Đáp án A:</label>
-                        <input type="text" name="Options[0]" class="w-full rounded border px-2 py-1" />
-                    </div>
-                    <div class="mb-2">
-                        <label class="font-semibold">Đáp án B:</label>
-                        <input type="text" name="Options[1]" class="w-full rounded border px-2 py-1" />
-                    </div>
-                    <div class="mb-2">
-                        <label class="font-semibold">Đáp án C:</label>
-                        <input type="text" name="Options[2]" class="w-full rounded border px-2 py-1" />
-                    </div>
-                    <div class="mb-2">
-                        <label class="font-semibold">Đáp án D:</label>
-                        <input type="text" name="Options[3]" class="w-full rounded border px-2 py-1" />
-                    </div>
+                   
                 </div>
                 <div class="mb-2" id="editModalCorrectOption">
-                    <label class="font-semibold">Đáp án đúng:</label>
-                    <input type="text" name="Correct_Option" class="w-full rounded border px-2 py-1" />
+                    
                 </div>
                 <div class="mb-2">
                     <label class="font-semibold">Môn học:</label>
@@ -294,16 +178,19 @@
             </form>
         </div>
     </div>
+</div>
+
+    
 
 
     <div id="edit-success-message" style="display:none;" class="mb-4 rounded bg-green-100 p-2 text-green-700"></div>
-</div>
 
 <script>
       let currentEditType = 1; // 1: 1 đáp án, 2: Đúng/Sai, 3: Điền từ
 
             function openEditModal(item) {
-        $('#editModal').show();
+       const modal = document.getElementById('editModal');
+    modal.classList.remove('hidden');
         $('#editModal_Question_ID').val(item.Question_ID);
         $('#editModal_Question_Content').val(item.Question_Content);
         $('#editModal_Subject_ID').val(item.Subject_ID);
@@ -355,7 +242,8 @@
 
 
     function closeEditModal() {
-        $('#editModal').hide();
+        const modal = document.getElementById('editModal');
+    modal.classList.add('hidden');
     }
 
     async function submitEditModalForm(event) {

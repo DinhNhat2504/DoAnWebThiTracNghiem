@@ -8,7 +8,11 @@ namespace DoAnWebThiTracNghiem.Models
     {
         [Key]
         public int Subject_Id { get; set; }
+
+        [Required(ErrorMessage = "Tên môn học là bắt buộc")]
+        [StringLength(100, ErrorMessage = "Tên môn học không được vượt quá 100 ký tự")]
         public string? Subject_Name { get; set; }
+        public DateTime CreateAt { get; set; }
         [ForeignKey("Users")]
         public int CreatorUser_Id { get; set; }
         public Users? Creator { get; set; }

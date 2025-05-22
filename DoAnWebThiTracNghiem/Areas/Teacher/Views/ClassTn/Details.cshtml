@@ -1,22 +1,21 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Details";
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
     var classTn = (DoAnWebThiTracNghiem.Models.ClassTn)ViewData["Class"];
     var notifications = (List<DoAnWebThiTracNghiem.Models.Notification>)ViewData["Notifications"];
     var exams = (List<DoAnWebThiTracNghiem.Models.Exam_Class>)ViewData["Exams"];
     var students = (List<DoAnWebThiTracNghiem.Models.Users>)ViewData["Students"];
+    var examCounts = ViewData["StudentExamCounts"] as Dictionary<int, int>;
 }
 
-<div class="container mx-auto p-6">
+<div class="container mx-auto p-2 sm:p-4 md:p-6">
     <!-- Thông tin lớp học -->
     <div class="relative mb-6 rounded-lg bg-blue-100 p-4 shadow-md">
         <h1 class="text-2xl font-bold text-blue-800">Thông tin lớp học: @classTn.ClassName</h1>
         <p class="mt-2 text-gray-700">Mã lớp: @classTn.InviteCode</p>
         <p class="text-gray-700">Môn học: @classTn.Subject?.Subject_Name</p>
         <p class="text-gray-700">Người tạo: @classTn.Creator?.FullName</p>
-        <button 
-                onclick="openModal('editModal')" class="absolute right-4 bottom-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">
+        <button onclick="openModal('editModal')" class="absolute right-4 bottom-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">
             Sửa
         </button>
         <a @Url.Action("Edit", "ClassTn", new { area = "Teacher", id = classTn.Class_Id })> Sửa </a>
@@ -25,19 +24,19 @@
     <div id="editModal" class="bg-opacity-30 fixed inset-0 z-50 flex hidden items-center justify-center">
         <div class="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
             <h3 class="mb-4 text-xl font-bold">Sửa thông tin lớp học</h3>
-        <form asp-action="Edit" asp-route-id="@classTn.Class_Id" method="post">
-    <div class="mb-4">
+            <form asp-action="Edit" asp-route-id="@classTn.Class_Id" method="post">
+                <div class="mb-4">
                     <label for="EditClassName" class="block text-sm font-medium text-gray-700">Tên lớp</label>
                     <input type="hidden" name="Class_Id" value="@classTn.Class_Id" />
-        <input type="text" id="EditClassName" name="ClassName" value="@classTn.ClassName" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
-    </div>
-    <div class="mb-4">
-                    
-        <label for="EditSubjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
+                    <input type="text" id="EditClassName" name="ClassName" value="@classTn.ClassName" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                </div>
+                <div class="mb-4">
+
+                    <label for="EditSubjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
                     <select id="EditSubjectId" name="SubjectId" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         @foreach (var subject in (IEnumerable<DoAnWebThiTracNghiem.Models.Subject>)ViewData["Subjects"])
                         {
-                            
+
                             if (subject.Subject_Id == classTn.SubjectId)
                             {
                                 <option value="@subject.Subject_Id" selected>@subject.Subject_Name</option>
@@ -48,52 +47,55 @@
                             }
                         }
                     </select>
-    </div>
-    <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('editModal')" class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Hủy</button>
-        <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">Lưu</button>
-    </div>
-</form>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('editModal')" class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Hủy</button>
+                    <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">Lưu</button>
+                </div>
+            </form>
 
+        </div>
     </div>
-</div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         <!-- Danh sách thông báo -->
-        <div class="col-span-2 rounded-lg bg-white p-4 shadow-md">
+        <div class="min-w-0 rounded-lg bg-white p-4 shadow-md md:col-span-2">
             <h2 class="mb-4 text-xl font-bold text-gray-800">Danh sách thông báo</h2>
-            <ul>
-                @if (notifications.Count == 0)
-                {
-                    <li class="text-gray-500">Không có thông báo nào.</li>
-                }
-                else
-                {
-                    @foreach (var notification in notifications)
+            <div class="max-h-50 overflow-y-auto pr-2">
+                <ul>
+                    @if (notifications.Count == 0)
                     {
-                        <li class="mb-4 flex items-center justify-between border-b pb-2">
-                            <div>
-                                <p class="text-gray-800">@notification.Content</p>
-                                <p class="text-sm text-gray-500">Gửi lúc: @notification.Timestamp.ToString("dd/MM/yyyy HH:mm")</p>
-                            </div>
-                            <form method="post" asp-action="DeleteNotification" asp-route-id="@notification.Announcement_ID" class="ml-4">
-                                <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Xóa
-                                </button>
-                            </form>
-                        </li>
+                        <li class="text-gray-500">Không có thông báo nào.</li>
                     }
-                }
-            </ul>
+                    else
+                    {
+                        @foreach (var notification in notifications)
+                        {
+                            <li class="mb-4 flex items-center justify-between border-b pb-2">
+                                <div>
+                                    <p class="text-gray-800">@notification.Content</p>
+                                    <p class="text-sm text-gray-500">Gửi lúc: @notification.Timestamp.ToString("dd/MM/yyyy HH:mm")</p>
+                                </div>
+                                <form method="post" asp-action="DeleteNotification" asp-route-id="@notification.Announcement_ID" class="ml-4">
+                                    <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Xóa
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
         </div>
 
 
 
+
         <!-- Tạo thông báo -->
-        <div class="rounded-lg bg-white p-4 shadow-md">
+        <div class="min-w-0 rounded-lg bg-white p-4 shadow-md">
             <h2 class="mb-4 text-xl font-bold text-gray-800">Tạo thông báo mới</h2>
             <form method="post" asp-action="CreateNotification" asp-route-classId="@classTn.Class_Id">
                 <div class="mb-4">
@@ -109,49 +111,53 @@
         </div>
     </div>
 
-    <div class="mt-6 grid grid-cols-3 gap-6">
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <!-- Danh sách bài thi -->
-        <div class="col-span-2 rounded-lg bg-white p-4 shadow-md">
+        <div class="min-w-0 rounded-lg bg-white p-4 shadow-md md:col-span-2">
             <h2 class="mb-4 text-xl font-bold text-gray-800">Danh sách bài thi</h2>
             <button id="openExamModal" class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                 Thêm
             </button>
-            <ul>
-                @if (exams.Count == 0)
-                {
-                    <li class="text-gray-500">Không có bài thi nào được giao.</li>
-                }
-                else
-                {
-                    @foreach (var exam in exams)
+            <div class="mt-4 max-h-72 overflow-y-auto pr-2">
+
+                <ul>
+                    @if (exams.Count == 0)
                     {
-                        <li class="mb-4 flex items-center justify-between border-b pb-2">
-                            <div>
-                                <p class="text-gray-800">Tên bài thi: @exam.Exam?.Exam_Name</p>
-                                <p class="text-sm text-gray-500">Ngày giao: @exam.AssignedAt.ToString("dd/MM/yyyy")</p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <a asp-area="Teacher" asp-controller="StudentClass" asp-action="ExamResults" asp-route-examId="@exam.Exam_ID" asp-route-classId="@classTn.Class_Id"
-                                   class="ml-1 rounded bg-green-500 px-3 py-1 text-sm font-bold text-white hover:bg-green-600">
-                                    Xem KQ
-                                </a>
-                                <a href="@Url.Action("ManageExam", "Exam", new { area = "Teacher", examId = @exam.Exam_ID })" class="flex items-center rounded bg-blue-500 px-3 py-1 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                    
-                                    Xem thêm
-                                </a>
-                                <form method="post" asp-action="DeleteExam" asp-route-id="@exam.EC_ID">
-                                    <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                        Xóa
-                                    </button>
-                                </form>
-                            </div>
-                        </li>
+                        <li class="text-gray-500">Không có bài thi nào được giao.</li>
                     }
-                }
-            </ul>
+                    else
+                    {
+                        @foreach (var exam in exams)
+                        {
+                            <li class="mb-4 flex items-center justify-between border-b pb-2">
+                                <div>
+                                    <p class="text-gray-800">Tên bài thi: @exam.Exam?.Exam_Name</p>
+                                    <p class="text-sm text-gray-500">Ngày giao: @exam.AssignedAt.ToString("dd/MM/yyyy")</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <a asp-area="Teacher" asp-controller="StudentClass" asp-action="ExamResults" asp-route-examId="@exam.Exam_ID" asp-route-classId="@classTn.Class_Id"
+                                       class="ml-1 rounded bg-green-500 px-3 py-1 text-sm font-bold text-white hover:bg-green-600">
+                                        Xem KQ
+                                    </a>
+                                    <a href="@Url.Action("ManageExam", "Exam", new { area = "Teacher", examId = @exam.Exam_ID })" class="flex items-center rounded bg-blue-500 px-3 py-1 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+
+                                        Xem thêm
+                                    </a>
+                                    <form method="post" asp-action="DeleteExam" asp-route-id="@exam.EC_ID">
+                                        <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+
+            </div>
         </div>
 
         <!-- Modal chọn bài thi -->
@@ -199,40 +205,51 @@
 
 
         <!-- Danh sách sinh viên -->
-        <div class="rounded-lg bg-white p-4 shadow-md">
+        <div class="min-w-0 rounded-lg bg-white p-4 shadow-md">
             <div class="flex">
                 <h2 class="mb-4 text-xl font-bold text-gray-800">Danh sách sinh viên ( @((ViewData["Students"] as List<DoAnWebThiTracNghiem.Models.Users>).Count))</h2>
-                <a href="" class="h ml-1 rounded px-3 py-1 font-bold text-red-400">
+                <a asp-action="ListStudents" asp-controller="StudentClass" asp-route-classId="@classTn.Class_Id" class="h ml-1 rounded px-3 py-1 font-bold text-red-400">
                     Xem
                 </a>
             </div>
-            
-            <ul>
-                @if (students.Count == 0)
-                {
-                    <li class="text-gray-500">Không có sinh viên nào trong lớp.</li>
-                }
-                else
-                {
-                    @foreach (var student in students)
+            <div class="max-h-72 overflow-y-auto pr-2">
+                <ul>
+                    @if (students.Count == 0)
                     {
-                        <li class="mb-4 flex items-center justify-between border-b pb-2">
-                            <div>
-                                <p class="text-gray-800">@student.FullName</p>
-                                <p class="text-sm text-gray-500">@student.Email</p>
-                            </div>
-                            <form method="post" asp-action="DeleteStudent" asp-route-id="@student.User_Id">
-                                <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Xóa
-                                </button>
-                            </form>
-                        </li>
+                        <li class="text-gray-500">Không có sinh viên nào trong lớp.</li>
                     }
-                }
-            </ul>
+                    else
+                    {
+                        @foreach (var student in students)
+                        {
+                            var completed = examCounts != null && examCounts.ContainsKey(student.User_Id) ? examCounts[student.User_Id] : 0;
+                            <li class="mb-4 flex items-center justify-between border-b pb-2">
+                                <div class="flex items-center gap-2">
+                                    <a asp-area="Teacher" asp-controller="StudentClass" asp-action="StudentExamResults"
+                                       asp-route-classId="@classTn.Class_Id" asp-route-studentId="@student.User_Id"
+                                       class="group flex cursor-pointer items-center">
+                                        <span class="text-gray-800 group-hover:underline">@student.FullName</span>
+                                        <span class="ml-2 flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4-4" />
+                                            </svg>
+                                            @completed
+                                        </span>
+                                    </a>
+                                </div>
+                                <form method="post" asp-action="DeleteStudent" asp-route-id="@student.User_Id">
+                                    <button type="submit" class="flex items-center rounded bg-red-500 px-3 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Xóa
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
         </div>
 
 

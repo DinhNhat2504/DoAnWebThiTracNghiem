@@ -3,6 +3,7 @@
     public class GenerateQuestionRequest
     {
         public int NumberOfQuestions { get; set; }
+        public string? Note { get; set; }
         public int SubjectId { get; set; }
         public int LevelId { get; set; }
         public int QuestionTypeId { get; set; }

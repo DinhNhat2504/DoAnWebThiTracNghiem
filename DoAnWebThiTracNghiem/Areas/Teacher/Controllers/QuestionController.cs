@@ -1,5 +1,4 @@
-﻿using Azure;
-using DoAnWebThiTracNghiem.Data;
+﻿using DoAnWebThiTracNghiem.Data;
 using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
 using DoAnWebThiTracNghiem.Services;
@@ -10,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using X.PagedList.Extensions;
+using OfficeOpenXml;
+using System.Globalization;
+
 
 namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -26,46 +27,151 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             _context = context;
             _chatbotService = chatbotService;
         }
-        public async Task<IActionResult> Index(string searchString, int? subjectId, int? page1, int? page2, int? page3)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10, string search = "", int? subjectId = null, int? levelId = null, int? questionTypeId = null)
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            int teacherId = int.Parse(userId);
+            var UserId = HttpContext.Session.GetString("UserId");
+            var RoleId = HttpContext.Session.GetString("RoleId");
+            if (string.IsNullOrEmpty(UserId) || string.IsNullOrEmpty(RoleId))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            int userId = int.Parse(UserId);
+            int roleId = int.Parse(RoleId);
 
-            var questions = await _questionRepository.GetAllAsync(teacherId);
+            // Sửa lại repository để nhận thêm các tham số lọc
+            var total = await _questionRepository.CountAsync(roleId, userId, search, subjectId, levelId, questionTypeId);
+            var items = await _questionRepository.GetPagedAsync(roleId, userId, page, pageSize, search, subjectId, levelId, questionTypeId);
 
-            // Lọc theo tên câu hỏi
-            if (!string.IsNullOrEmpty(searchString))
-                questions = questions.Where(q => q.Question_Content.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+            var model = new PagedResult<Question>
+            {
+                Items = items,
+                PageNumber = page,
+                TotalPages = (int)Math.Ceiling(total / (double)pageSize),
+                TotalItems = total,
+                Search = search,
+                SubjectId= subjectId,
+                LevelId = levelId,
+                QuestionTypeId = questionTypeId
 
-            // Lọc theo môn học
-            if (subjectId.HasValue && subjectId.Value > 0)
-                questions = questions.Where(q => q.Subject_ID == subjectId.Value);
+            };
 
-            // Phân loại câu hỏi
-            var singleAnswerQuestions = questions.Where(q => q.QuestionTypeId == 1);
-            var trueFalseQuestions = questions.Where(q => q.QuestionTypeId == 2);
-            var fillInTheBlankQuestions = questions.Where(q => q.QuestionTypeId == 3);
+            ViewData["Subjects"] = new SelectList(_context.Subjects.Where(s => s.CreatorUser_Id == userId), "Subject_Id", "Subject_Name", subjectId);
+            ViewData["QuestionTypes"] = new SelectList(_context.QuestionType, "Id", "Name", questionTypeId);
+            ViewData["Levels"] = new SelectList(_context.Levels, "Id", "LevelName", levelId);
 
-            int pageSize = 5;
-            int pageNumber1 = page1 ?? 1;
-            int pageNumber2 = page2 ?? 1;
-            int pageNumber3 = page3 ?? 1;
-
-            ViewData["SingleAnswerQuestions"] = singleAnswerQuestions.ToPagedList(pageNumber1, pageSize);
-            ViewData["TrueFalseQuestions"] = trueFalseQuestions.ToPagedList(pageNumber2, pageSize);
-            ViewData["FillInTheBlankQuestions"] = fillInTheBlankQuestions.ToPagedList(pageNumber3, pageSize);
-
-            // Để render dropdown môn học
-            ViewData["Subjects"] = new SelectList(_context.Subjects.Where(s => s.CreatorUser_Id == teacherId), "Subject_Id", "Subject_Name");
-            ViewData["Levels"] = new SelectList(_context.Levels, "Id", "LevelName");
-
-
-            return View();
+            return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ImportExcel(IFormFile excelFile)
+    {
+        if (excelFile == null || excelFile.Length == 0)
+        {
+            TempData["ImportError"] = "Vui lòng chọn file Excel.";
+            return RedirectToAction(nameof(Index));
+        }
 
+        var userId = HttpContext.Session.GetString("UserId");
+        int teacherId = int.Parse(userId);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // Lấy danh sách ánh xạ tên sang ID
+            var subjects = await _context.Subjects.Where(s => s.CreatorUser_Id == teacherId).ToListAsync();
+        var levels = await _context.Levels.ToListAsync();
+        var types = await _context.QuestionType.ToListAsync();
 
-        public async Task<IActionResult> Create()
+        var questions = new List<Question>();
+
+        using (var stream = new MemoryStream())
+        {
+            await excelFile.CopyToAsync(stream);
+                
+                using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets[0];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++) // Dòng 1 là header
+                {
+                    try
+                    {
+                        var content = worksheet.Cells[row, 1].Text?.Trim();
+                        var option1 = worksheet.Cells[row, 2].Text?.Trim();
+                        var option2 = worksheet.Cells[row, 3].Text?.Trim();
+                        var option3 = worksheet.Cells[row, 4].Text?.Trim();
+                        var option4 = worksheet.Cells[row, 5].Text?.Trim();
+                        var correct = worksheet.Cells[row, 6].Text?.Trim();
+                        var subjectValue = worksheet.Cells[row, 7].Text?.Trim();
+                        var levelValue = worksheet.Cells[row, 8].Text?.Trim();
+                        var typeValue = worksheet.Cells[row, 9].Text?.Trim();
+
+                        // Ánh xạ tên sang ID (nếu là số thì dùng luôn, nếu là tên thì tìm ID)
+                        int subjectId = int.TryParse(subjectValue, out var sid)
+                            ? sid
+                            : subjects.FirstOrDefault(s => s.Subject_Name.Equals(subjectValue, StringComparison.OrdinalIgnoreCase))?.Subject_Id ?? 0;
+
+                        int levelId = int.TryParse(levelValue, out var lid)
+                            ? lid
+                            : levels.FirstOrDefault(l => l.LevelName.Equals(levelValue, StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
+
+                        int typeId = int.TryParse(typeValue, out var tid)
+                            ? tid
+                            : types.FirstOrDefault(t => t.Name.Equals(typeValue, StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
+
+                        if (string.IsNullOrEmpty(content) || subjectId <= 0 || levelId <= 0 || typeId <= 0)
+                            continue;
+
+                        var q = new Question
+                        {
+                            Question_Content = content,
+                            Subject_ID = subjectId,
+                            Level_ID = levelId,
+                            QuestionTypeId = typeId,
+                            CreatorUser_Id = teacherId,
+                            CreatedAt = DateTime.Now
+                        };
+
+                        if (typeId == 1)
+                        {
+                            q.Options = new List<string> { option1, option2, option3, option4 };
+                            q.Correct_Option = correct;
+                        }
+                        else if (typeId == 2)
+                        {
+                            q.Options = new List<string> { "Đúng", "Sai" };
+                            q.Correct_Option = correct;
+                        }
+                        else if (typeId == 3)
+                        {
+                            q.Correct_Option = correct;
+                        }
+
+                        questions.Add(q);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        if (!questions.Any())
+        {
+            TempData["ImportError"] = "Không có câu hỏi hợp lệ để import.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        foreach (var q in questions)
+        {
+            await _questionRepository.AddAsync(q);
+        }
+        await _context.SaveChangesAsync();
+
+        TempData["ImportSuccess"] = $"Đã import thành công {questions.Count} câu hỏi.";
+        return RedirectToAction(nameof(Index));
+    }
+
+        public IActionResult Create()
         {
             var userId = HttpContext.Session.GetString("UserId");
             int teacherId = int.Parse(userId);
@@ -74,62 +180,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             ViewData["LevelId"] = new SelectList(_context.Levels, "Id", "LevelName");
             ViewData["QuestionTypes"] = new SelectList(_context.QuestionType, "Id", "Name");
 
-            return View(new Question());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(Question question, Dictionary<string, string> Options, string CorrectOption)
-        {
-            if (!ModelState.IsValid)
-            {
-                foreach (var modelState in ModelState.Values)
-                {
-                    foreach (var error in modelState.Errors)
-                    {
-                        Console.WriteLine(error.ErrorMessage);
-                    }
-                }
-                ViewData["SubjectId"] = new SelectList(_context.Subjects.Where(s => s.CreatorUser_Id == int.Parse(HttpContext.Session.GetString("UserId"))), "Subject_Id", "Subject_Name");
-                ViewData["LevelId"] = new SelectList(_context.Levels, "Id", "LevelName");
-                ViewData["QuestionTypes"] = new SelectList(_context.QuestionType, "Id", "Name");
-                return View(question);
-            }
-
-            var userID = HttpContext.Session.GetString("UserId");
-            question.CreatorUser_Id = int.Parse(userID);
-            question.CreatedAt = DateTime.Now;
-
-            // Xử lý theo loại câu hỏi
-            if (question.QuestionTypeId == 1) // Câu hỏi 1 đáp án
-            {
-                question.Options = Options.Values.ToList();
-                // Tìm key trong Options có giá trị khớp với CorrectOption
-                var correctOptionKey = Options.FirstOrDefault(x => x.Value == CorrectOption).Key;
-                if (!string.IsNullOrEmpty(correctOptionKey))
-                {
-                    question.Correct_Option = CorrectOption; // Lưu nội dung đáp án (như "rrrrrr")
-                }
-                else
-                {
-                    ModelState.AddModelError("CorrectOption", "Đáp án đúng không hợp lệ.");
-                    ViewData["SubjectId"] = new SelectList(_context.Subjects.Where(s => s.CreatorUser_Id == int.Parse(HttpContext.Session.GetString("UserId"))), "Subject_Id", "Subject_Name");
-                    ViewData["LevelId"] = new SelectList(_context.Levels, "Id", "LevelName");
-                    ViewData["QuestionTypes"] = new SelectList(_context.QuestionType, "Id", "Name");
-                    return View(question);
-                }
-            }
-            else if (question.QuestionTypeId == 2) // Câu hỏi đúng/sai
-            {
-                question.Options = new List<string> { "Đúng", "Sai" };
-                question.Correct_Option = CorrectOption;
-            }
-            else if (question.QuestionTypeId == 3) // Câu hỏi điền từ
-            {
-                question.Correct_Option = CorrectOption;
-            }
-
-            await _questionRepository.AddAsync(question);
-            return RedirectToAction(nameof(Index));
+            return View( new Question());
         }
 
         [HttpPost]
@@ -242,23 +293,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> Edit(int id)
-        {
-            var question = await _questionRepository.GetByIdAsync(id);
-            if (question == null)
-            {
-                return NotFound();
-            }
-            var userId = HttpContext.Session.GetString("UserId");
-            var teacherId = int.Parse(userId);
-            if (question.CreatorUser_Id != teacherId)
-            {
-                return Unauthorized();
-            }
-            ViewData["SubjectId"] = new SelectList(_context.Subjects.Where(s => s.CreatorUser_Id == teacherId), "Subject_Id", "Subject_Name");
-            ViewData["LevelId"] = new SelectList(_context.Levels, "Level_ID", "Level_Name", question.Level_ID);
-            return View(question);
-        }
+       
         [HttpPost]
         public async Task<IActionResult> Edit([FromBody] Dictionary<string, object> data)
         {
@@ -297,43 +332,45 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 return Unauthorized();
 
             await _questionRepository.DeleteAsync(id);
+
             return RedirectToAction(nameof(Index));
-        }
-
-
-        public async Task<IActionResult> CreateWithAI()
-        {
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login", "Account"); // Handle missing session
-            }
-            int teacherId = int.Parse(userId);
-
-            var level = await _context.Levels.ToListAsync();
-            var subject = await _context.Subjects
-                .Where(s => s.CreatorUser_Id == teacherId)
-                .ToListAsync();
-            var questiont = await _context.QuestionType.ToListAsync();
-
-            ViewData["Subjects"] = subject;
-            ViewData["Levels"] = level;
-            ViewData["QuestionTypes"] = questiont;
-
-            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> GenerateWithAI([FromBody] GenerateQuestionRequest request)
         {
-            if (request.NumberOfQuestions <= 0 || request.SubjectId <= 0 || request.LevelId <= 0 || request.QuestionTypeId <= 0)
+            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
+            var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")).Date;
+
+            // Kiểm tra số lần sử dụng trong ngày
+            var usageLog = await _context.AIUsageLog
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.Date == today);
+
+            if (usageLog != null && usageLog.UsageCount >= 6)
             {
-                return BadRequest(new { error = "Thông tin không hợp lệ." });
+                return BadRequest(new { error = "Bạn đã hết lượt sử dụng chức năng tạo câu hỏi với AI trong ngày hôm nay." });
             }
+
+            // Nếu chưa có log thì tạo mới, nếu có thì tăng số lần sử dụng
+            if (usageLog == null)
+            {
+                usageLog = new AIUsageLog
+                {
+                    UserId = userId,
+                    Date = today,
+                    UsageCount = 1
+                };
+                _context.AIUsageLog.Add(usageLog);
+            }
+            else
+            {
+                usageLog.UsageCount++;
+                _context.AIUsageLog.Update(usageLog);
+            }
+            await _context.SaveChangesAsync();
 
             try
             {
-                // Lấy tên môn học, mức độ và loại câu hỏi từ cơ sở dữ liệu
                 var subjectName = await _context.Subjects
                     .Where(s => s.Subject_Id == request.SubjectId)
                     .Select(s => s.Subject_Name)
@@ -354,10 +391,10 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                     return BadRequest(new { error = "Không tìm thấy thông tin tương ứng với ID." });
                 }
 
-                // Tạo prompt cho AI
+                var noteText = string.IsNullOrWhiteSpace(request.Note) ? "" : $" ({request.Note})";
                 var prompt = request.QuestionTypeId switch
                 {
-                    1 => $@"Tạo {request.NumberOfQuestions} câu hỏi trắc nghiệm về chủ đề '{subjectName}' 
+                    1 => $@"Tạo {request.NumberOfQuestions} câu hỏi trắc nghiệm về chủ đề '{subjectName}{noteText}' 
 với độ khó '{levelName}'. Mỗi câu hỏi phải có đúng 4 đáp án, chỉ 1 đáp án đúng. 
 Định dạng JSON như sau, đảm bảo tất cả các trường đều có giá trị:
 [
@@ -367,8 +404,7 @@ với độ khó '{levelName}'. Mỗi câu hỏi phải có đúng 4 đáp án, 
         ""correctAnswer"": ""Đáp án đúng (phải nằm trong options)""
     }}
 ]",
-
-                    2 => $@"Tạo {request.NumberOfQuestions} câu hỏi đúng/sai về chủ đề '{subjectName}' 
+                    2 => $@"Tạo {request.NumberOfQuestions} câu hỏi đúng/sai về chủ đề '{subjectName}{noteText}' 
 với độ khó '{levelName}'. 
 Định dạng JSON như sau, đảm bảo tất cả các trường đều có giá trị:
 [
@@ -378,8 +414,7 @@ với độ khó '{levelName}'.
         ""correctAnswer"": ""Đúng hoặc Sai""
     }}
 ]",
-
-                    3 => $@"Tạo {request.NumberOfQuestions} câu hỏi điền từ về chủ đề '{subjectName}' 
+                    3 => $@"Tạo {request.NumberOfQuestions} câu hỏi điền từ về chủ đề '{subjectName}{noteText}' 
 với độ khó '{levelName}'. 
 Định dạng JSON như sau, đảm bảo tất cả các trường đều có giá trị:
 [
@@ -388,31 +423,26 @@ với độ khó '{levelName}'.
         ""correctAnswer"": ""Đáp án đúng""
     }}
 ]",
-
                     _ => throw new ArgumentException("Loại câu hỏi không hợp lệ.")
                 };
 
-                // Gửi prompt đến AI
                 var aiResponse = await _chatbotService.GetResponseAsync(prompt);
-                Console.WriteLine($"AI Raw Response: {aiResponse}"); // Log phản hồi thô từ AI
+                Console.WriteLine($"AI Raw Response: {aiResponse}");
 
-                // Làm sạch JSON từ phản hồi
                 var jsonString = ExtractJsonFromResponse(aiResponse);
-                Console.WriteLine($"Extracted JSON: {jsonString}"); // Log JSON đã làm sạch
+                Console.WriteLine($"Extracted JSON: {jsonString}");
                 if (string.IsNullOrEmpty(jsonString))
                 {
-                    return BadRequest(new { error = "Không tìm thấy JSON hợp lệ trong phản hồi từ AI." });
+                    return BadRequest(new { error = "Không tìm thấy JSON hợp lệ trong phản hồi từ AI. Kiểm tra prompt hoặc phản hồi API." });
                 }
 
-                // Parse phản hồi từ AI
                 var serializerOptions = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     AllowTrailingCommas = true,
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Hỗ trợ tiếng Việt
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 };
 
-                // Deserialize dựa trên loại câu hỏi
                 List<object> generatedQuestions;
                 try
                 {
@@ -428,7 +458,7 @@ với độ khó '{levelName}'.
                             generatedQuestions = JsonSerializer.Deserialize<List<GeneratedQuestionFillInTheBlank>>(jsonString, serializerOptions)?.Cast<object>().ToList() ?? new List<object>();
                             break;
                         default:
-                            throw new ArgumentException("Loại câu hỏi không hợp lệ.");
+                            return BadRequest(new { error = "Loại câu hỏi không hợp lệ." });
                     }
                 }
                 catch (JsonException ex)
@@ -437,7 +467,6 @@ với độ khó '{levelName}'.
                     return BadRequest(new { error = "Lỗi khi phân tích JSON từ AI: Định dạng không hợp lệ." });
                 }
 
-                // Log số lượng câu hỏi sau khi deserialize
                 Console.WriteLine($"Số lượng câu hỏi sau deserialize: {generatedQuestions.Count}");
 
                 if (!generatedQuestions.Any())
@@ -446,7 +475,6 @@ với độ khó '{levelName}'.
                     return BadRequest(new { error = "Phản hồi từ AI không hợp lệ hoặc không có câu hỏi nào được tạo." });
                 }
 
-                // Ánh xạ thủ công dựa trên loại câu hỏi
                 var questions = new List<object>();
                 foreach (var q in generatedQuestions)
                 {
@@ -465,7 +493,7 @@ với độ khó '{levelName}'.
                             subjectId = request.SubjectId,
                             levelId = request.LevelId,
                             creatorUserId = int.Parse(HttpContext.Session.GetString("UserId") ?? "0"),
-                            createdAt = DateTime.Now
+                            createdAt = DateTime.Now 
                         });
                     }
                     else if (q is GeneratedQuestionTrueFalse tf)
@@ -504,7 +532,6 @@ với độ khó '{levelName}'.
                     }
                 }
 
-                // Log số lượng câu hỏi sau khi ánh xạ
                 Console.WriteLine($"Số lượng câu hỏi sau ánh xạ: {questions.Count}");
 
                 if (!questions.Any())
@@ -513,12 +540,11 @@ với độ khó '{levelName}'.
                     return BadRequest(new { error = "Phản hồi từ AI không hợp lệ hoặc không có câu hỏi nào được tạo." });
                 }
 
-                // Trả về JSON với camelCase
                 return Json(questions, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters = { new JsonStringEnumConverter() },
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Hỗ trợ tiếng Việt
+                    Converters = { new JsonStringEnumConverter() }, 
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
             }
             catch (JsonException ex)
@@ -533,27 +559,45 @@ với độ khó '{levelName}'.
             }
         }
 
-        // Hàm trích xuất JSON từ phản hồi
         private string ExtractJsonFromResponse(string response)
         {
             if (string.IsNullOrEmpty(response)) return null;
 
-            // Sử dụng regex để trích xuất JSON
-            var jsonMatch = Regex.Match(response, @"\[\s*\{.*?\}\s*\]", RegexOptions.Singleline);
-            if (jsonMatch.Success)
+            try
             {
-                return jsonMatch.Value.Trim();
+                // Parse response as JSON to check structure
+                var jsonResponse = JsonSerializer.Deserialize<JsonElement>(response);
+                if (jsonResponse.TryGetProperty("candidates", out JsonElement candidates))
+                {
+                    if (candidates.GetArrayLength() > 0)
+                    {
+                        var candidate = candidates[0];
+                        if (candidate.TryGetProperty("content", out JsonElement content) &&
+                            content.TryGetProperty("parts", out JsonElement parts))
+                        {
+                            var text = parts[0].GetProperty("text").GetString();
+                            // Attempt to extract JSON from text if it contains JSON
+                            var jsonMatch = Regex.Match(text, @"\[\s*\{.*?\}\s*\]", RegexOptions.Singleline);
+                            if (jsonMatch.Success)
+                            {
+                                return jsonMatch.Value.Trim();
+                            }
+                        }
+                    }
+                }
+                // Fallback to return the entire response if it looks like JSON array
+                if (response.TrimStart().StartsWith("[") && response.TrimEnd().EndsWith("]"))
+                {
+                    return response.Trim();
+                }
+                Console.WriteLine("Không tìm thấy JSON hợp lệ trong phản hồi: " + response);
+                return null;
             }
-
-            // Nếu không tìm thấy, kiểm tra xem toàn bộ response có phải JSON không
-            if (response.TrimStart().StartsWith("[") && response.TrimEnd().EndsWith("]"))
+            catch (JsonException ex)
             {
-                return response.Trim();
+                Console.WriteLine($"JSON parsing error: {ex.Message} - Response: {response}");
+                return null;
             }
-
-            // Log nếu không tìm thấy JSON
-            Console.WriteLine("Không tìm thấy JSON hợp lệ trong phản hồi: " + response);
-            return null;
         }
 
 

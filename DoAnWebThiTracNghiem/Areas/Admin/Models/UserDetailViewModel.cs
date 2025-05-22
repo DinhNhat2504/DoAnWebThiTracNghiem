@@ -12,4 +12,5 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Models
         public int JoinedClassCount { get; set; }
         public int TakenExamCount { get; set; }
     }
+   
 }

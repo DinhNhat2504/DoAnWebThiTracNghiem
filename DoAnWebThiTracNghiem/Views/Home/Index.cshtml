@@ -1,62 +1,57 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang chủ";
 }
+<main class="flex max-h-screen min-h-screen flex-grow items-center justify-center px-6 lg:px-10" style="background-image: url('images/anhbg4.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="grid max-w-6xl grid-cols-1 items-center gap-8 md:grid-cols-2">
+        <!-- Text content -->
 
-<div class="grid max-w-6xl grid-cols-1 items-center gap-8 md:grid-cols-2">
+        <div class="space-y-6">
+            <h2 class="flex text-4xl leading-snug font-extrabold text-gray-800">
+                Khám phá  <img src="~/images/logo-removebg.png" class="mt-2 ml-2 h-10 w-auto" />
+            </h2>
+            <p class="text-lg text-gray-600">Nền tảng thi trắc nghiệm trực tuyến mạnh mẽ, nhanh chóng và dễ sử dụng.</p>
 
-    <!-- Text content -->
-    <div class="space-y-6">
-        <h2 class="text-4xl leading-snug font-extrabold text-gray-800">
-            Khám phá <span class="text-blue-600">NQuiz?</span> ✨
-        </h2>
-        <p class="text-lg text-gray-600">Nền tảng thi trắc nghiệm trực tuyến mạnh mẽ, nhanh chóng và dễ sử dụng.</p>
-
-        <div class="space-y-4">
-            <div class="flex items-start gap-4">
-                <div class="rounded-full bg-blue-100 p-2 text-blue-600">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M9 12h6m-6 4h6m-7 4h8a2 2 0 0 0 2-2V8.83a2 2 0 0 0-.59-1.41l-3.83-3.83A2 2 0 0 0 14.17 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h1" />
-                    </svg>
+            <div class="space-y-4">
+                <div class="flex items-start gap-4">
+                    <div class="rounded-full bg-blue-100 p-2 text-blue-600">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12h6m-6 4h6m-7 4h8a2 2 0 0 0 2-2V8.83a2 2 0 0 0-.59-1.41l-3.83-3.83A2 2 0 0 0 14.17 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h1" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Tạo đề thi dễ dàng</h4>
+                        <p class="text-sm text-gray-600">Soạn câu hỏi, trộn đề và cấu hình chỉ trong vài phút.</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold text-gray-800">Tạo đề thi dễ dàng</h4>
-                    <p class="text-sm text-gray-600">Soạn câu hỏi, trộn đề và cấu hình chỉ trong vài phút.</p>
+
+                <div class="flex items-start gap-4">
+                    <div class="rounded-full bg-green-100 p-2 text-green-600">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 17v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6m-6 0h6m-9 0h.01" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Quản lý lớp học</h4>
+                        <p class="text-sm text-gray-600">Thêm sinh viên, gán bài thi và theo dõi tiến độ.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <div class="rounded-full bg-yellow-100 p-2 text-yellow-600">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M11 17h2m-6 0h.01M17 17h.01M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Thống kê thông minh</h4>
+                        <p class="text-sm text-gray-600">Xem điểm, phân tích kết quả chi tiết theo lớp và bài thi.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-start gap-4">
-                <div class="rounded-full bg-green-100 p-2 text-green-600">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M9 17v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6m-6 0h6m-9 0h.01" />
-                    </svg>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-gray-800">Quản lý lớp học</h4>
-                    <p class="text-sm text-gray-600">Thêm sinh viên, gán bài thi và theo dõi tiến độ.</p>
-                </div>
-            </div>
-
-            <div class="flex items-start gap-4">
-                <div class="rounded-full bg-yellow-100 p-2 text-yellow-600">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M11 17h2m-6 0h.01M17 17h.01M4 6h16M4 10h16M4 14h16M4 18h16" />
-                    </svg>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-gray-800">Thống kê thông minh</h4>
-                    <p class="text-sm text-gray-600">Xem điểm, phân tích kết quả chi tiết theo lớp và bài thi.</p>
-                </div>
-            </div>
+            <a asp-action="Register" asp-controller="Users" class="bg-gradient-to-r mt-6 rounded-full from-green-400 to-blue-500 px-6 py-3 text-lg font-semibold text-white transition hover:scale-105 hover:shadow-lg">
+                Bắt đầu miễn phí
+            </a>
         </div>
-
-        <button class="bg-gradient-to-r mt-6 rounded-full from-green-400 to-blue-500 px-6 py-3 text-lg font-semibold text-white transition hover:scale-105 hover:shadow-lg">
-            Bắt đầu miễn phí
-        </button>
     </div>
-
-    <!-- Illustration -->
-    @* <div class="hidden md:block"> *@
-    @*     <img src="~/images/ảnh chụp màn hình 2025-05-14 042539.png" class="w-full rounded-2xl shadow-lg" /> *@
-        
-    @* </div> *@
-</div>
+</main>

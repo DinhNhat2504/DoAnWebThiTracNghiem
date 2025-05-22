@@ -1,6 +1,5 @@
 ﻿@using DoAnWebThiTracNghiem.ViewModel
-@model PagedResult<DoAnWebThiTracNghiem.Models.Users>
-
+@model PagedResult<DoAnWebThiTracNghiem.Areas.Admin.Models.UserActivityViewModel>
 
 @{
     ViewData["Title"] = "Quản lý Người dùng";
@@ -9,16 +8,23 @@
 
 <div id="content-nguoi-dung" class="content-section">
     <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
-        <div class="mb-6 flex flex-col items-start justify-between border-b pb-4 sm:flex-row sm:items-center">
-            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách Người dùng</h3>
-            <a asp-action="Create"
-               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+        <div class="mb-6 flex flex-col justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách người dùng</h3>
+            <form method="get" class="mb-4 flex flex-col items-center space-x-2 sm:flex-row">
+                <input type="text" name="search" value="@Model.Search" placeholder="Tìm kiếm người dùng ..." class="w-full rounded border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 sm:w-auto" />
+                <button type="submit" class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+            <button onclick="openModal('addModal')"
+                    class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
                 <span>Thêm Người Dùng</span>
-            </a>
+            </button>
         </div>
+       
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -32,39 +38,50 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
+
                     @foreach (var item in Model.Items)
                     {
-                        <tr>
+                        var isActive = false;
+                        if (item.User.Role?.Name?.ToLower() == "student")
+                        {
+                            isActive = item.JoinedClassCount > 0 && item.TakenExamCount > 0;
+                        }
+                        else
+                        {
+                            isActive = item.ExamCount > 0 || item.SubjectCount > 0 || item.QuestionCount > 0 || item.ClassCount > 0;
+                        }
+                        var rowClass = isActive || item.User.RoleId == 1 ? "" : "bg-red-100";
+                        <tr class="@rowClass">
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <img class="h-10 w-10 rounded-full border object-cover"
-                                     src="@(string.IsNullOrEmpty(item.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + item.Email : item.AvatarUrl)"
-                                     alt="@item.FullName" />
+                                     src="@(string.IsNullOrEmpty(item.User.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + item.User.Email : item.User.AvatarUrl)"
+                                     alt="@item.User.FullName" />
                             </td>
-                            <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-800">@item.FullName</td>
-                            <td class="hidden px-4 py-3 text-sm whitespace-nowrap text-gray-600 md:table-cell">@item.Email</td>
-                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Role?.Name</td>
+                            <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-800">@item.User.FullName</td>
+                            <td class="hidden px-4 py-3 text-sm whitespace-nowrap text-gray-600 md:table-cell">@item.User.Email</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.User.Role?.Name</td>
                             <td class="hidden px-4 py-3 whitespace-nowrap sm:table-cell">
-                                @if (item.ResetPasswordTokenExpiry == null || item.ResetPasswordTokenExpiry > DateTime.Now)
+                                @if (isActive || item.User.RoleId == 1)
                                 {
                                     <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs leading-5 font-semibold text-green-800">Hoạt động</span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex rounded-full bg-gray-200 px-2 py-1 text-xs leading-5 font-semibold text-gray-600">Không hoạt động</span>
+                                    <span class="inline-flex rounded-full bg-red-200 px-2 py-1 text-xs leading-5 font-semibold text-red-800">Không hoạt động</span>
                                 }
                             </td>
                             <td class="space-x-2 px-4 py-3 text-center text-sm font-medium whitespace-nowrap">
-                                <button type="button" onclick="openEditModal(@item.User_Id)" class="p-1 text-blue-600 transition duration-150 ease-in-out hover:text-blue-800" title="Sửa">
+                                <button type="button" onclick="openEditModal(@item.User.User_Id)" class="p-1 text-blue-600 transition duration-150 ease-in-out hover:text-blue-800" title="Sửa">
                                     <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                     </svg>
                                 </button>
-                                <a asp-action="Details" asp-route-id="@item.User_Id" class="p-1 text-green-600 transition duration-150 ease-in-out hover:text-green-800" title="Chi tiết">
+                                <a asp-action="Details" asp-route-id="@item.User.User_Id" class="p-1 text-green-600 transition duration-150 ease-in-out hover:text-green-800" title="Chi tiết">
                                     <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                                     </svg>
                                 </a>
-                                <button type="button" onclick="deleteUser(@item.User_Id, '@item.Role?.Name')" class="p-1 text-red-600 transition duration-150 ease-in-out hover:text-red-800" title="Xóa">
+                                <button type="button" onclick="handleRemoveClick(@item.User.User_Id, @item.User.RoleId, @isActive.ToString().ToLower())" class="p-1 text-red-600 transition duration-150 ease-in-out hover:text-red-800" title="Xóa">
                                     <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                     </svg>
@@ -81,18 +98,56 @@
                 Hiển thị trang @Model.PageNumber trên tổng @Model.TotalPages, tổng @Model.TotalItems người dùng
             </span>
             <div class="flex space-x-1">
-                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" asp-route-search="@Model.Search" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <a asp-action="Index" asp-route-page="@i"
+                    <a asp-action="Index" asp-route-page="@i" asp-route-search="@Model.Search"
                        class="rounded-md border px-3 py-1 text-sm @(i == Model.PageNumber ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50")">
                         @i
                     </a>
                 }
-                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" asp-route-search="@Model.Search" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
             </div>
         </div>
 
+    </div>
+    <!-- Modal thêm người dùng -->
+    <div id="addModal" class="absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center">
+        <div class="relative w-full max-w-lg scale-95 transform rounded-lg bg-white p-6 shadow-lg">
+            <h3 class="mb-4 text-xl font-bold">Thêm người dùng</h3>
+            <form asp-action="Create" method="post">
+                <div class="mb-4">
+                    <label for="FullName" class="block text-sm font-medium text-gray-700">Tên người dùng</label>
+                    <input type="text" id="FullName" name="FullName" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                    <span id="FullNameError" class="text-red-500"></span>
+                </div>
+                <div class="mb-4">
+                    <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="Email" name="Email" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                    <span id="EmailError" class="text-red-500"></span>
+                </div>
+                <div class="mb-4">
+                    <label for="Password" class="block text-sm font-medium text-gray-700">PassWord</label>
+                    <input type="password" id="Password" name="Password" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                    <span id="PasswordError" class="text-red-500"></span>
+                </div>
+                <div class="mb-4">
+                    <label for="RoleId" class="block text-sm font-medium text-gray-700">Quyền</label>
+                    <select id="RoleId" name="RoleId" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <option value="">Chọn quyền</option>
+                        @foreach (var role in (IEnumerable<DoAnWebThiTracNghiem.Models.Roles>)ViewData["Roles"])
+                        {
+                            <option value="@role.Id">@role.Name</option>
+                        }
+                    </select>
+                    <span id="RoleError" class="text-red-500"></span>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('addModal')" class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Hủy</button>
+                    <button type="submit" class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">Lưu</button>
+                </div>
+            </form>
+        </div>
     </div>
     <!-- Modal sửa người dùng -->
     <div id="editUserModal" class="bg-opacity-40 fixed inset-0 z-50 flex hidden items-center justify-center">
@@ -106,7 +161,7 @@
                 <input type="hidden" name="User_Id" id="editUserId" />
                 <div class="mb-4 flex flex-col items-center">
                     <label for="editAvatar" class="cursor-pointer">
-                        <img id="editAvatarImg" src="" class="border-2 h-20 w-20 rounded-full border-blue-400 object-cover" />
+                        <img id="editAvatarImg" src="" class="h-20 w-20 rounded-full border-2 border-blue-400 object-cover" />
                         <input type="file" id="editAvatar" name="AvatarFile" class="hidden" accept="image/*" />
                     </label>
                     <span class="mt-1 text-xs text-gray-500">Nhấp vào ảnh để thay đổi</span>
@@ -114,22 +169,27 @@
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700">Họ tên</label>
                     <input type="text" name="FullName" id="editFullName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                    <span id="EFullNameError" class="text-red-500"></span>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" name="Email" id="editEmail" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                    <span id="EEmailError" class="text-red-500"></span>
                 </div>
                 <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700">Mật khẩu (để trống nếu không đổi)</label>
+                    <label class="block text-sm font-medium text-gray-700">Mật khẩu </label>
                     <input type="password" name="Password" id="editPassword" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                    <span id="EPasswordError" class="text-red-500"></span>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
                     <input type="text" name="PhoneNumber" id="editPhoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                    <span id="EPhoneNumberError" class="text-red-500"></span>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium text-gray-700">Địa chỉ</label>
                     <input type="text" name="Address" id="editAddress" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                    <span id="EAddressError" class="text-red-500"></span>
                 </div>
                 <div class="flex justify-end">
                     <button type="button" onclick="closeEditModal()" class="mr-2 rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300">Hủy</button>
@@ -141,8 +201,44 @@
 
 </div>
 <!-- Include any necessary scripts here -->
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+           function handleRemoveClick(UserId, RoleId, isActive) {
+               if (RoleId === 1) { showAlert("Không thể xóa admin!", "error");
+            return;}
+
+        let alertText = "Bạn có chắc muốn xóa thông tin người dùng này?";
+
+        if (RoleId === 2) {
+            alertText = isActive
+                ? "Việc xóa thông tin của giáo viên này sẽ ảnh hưởng tới lớp học, bài thi và câu hỏi do giáo viên này quản lý. Bạn có chắc muốn xóa?"
+                : "Bạn có chắc muốn xóa thông tin giáo viên này?";
+        } else if (RoleId === 3) {
+            alertText = isActive
+                ? "Việc xóa thông tin của sinh viên này sẽ ảnh hưởng tới lớp học, kết quả thi của sinh viên này. Bạn có chắc muốn xóa?"
+                : "Bạn có chắc muốn xóa thông tin sinh viên này?";
+        }
+
+        Swal.fire({
+            title: 'Cảnh báo',
+            text: alertText,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sửa',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteUser(UserId);
+            }
+        });
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+      function openModal(modalId) {
+             document.getElementById(modalId).classList.remove('hidden');
+         }
     function openEditModal(userId) {
         fetch(`/Admin/Users/GetUser/${userId}`)
             .then(res => res.json())
@@ -150,7 +246,7 @@
                 document.getElementById('editUserId').value = user.user_Id;
                 document.getElementById('editFullName').value = user.fullName || '';
                 document.getElementById('editEmail').value = user.email || '';
-                document.getElementById('editPassword').value = '';
+                document.getElementById('editPassword').value = user.password || '';
                 document.getElementById('editPhoneNumber').value = user.phoneNumber || '';
                 document.getElementById('editAddress').value = user.address || '';
                 document.getElementById('editAvatarImg').src = user.avatarUrl || `https://i.pravatar.cc/40?u=${user.email}`;
@@ -161,7 +257,24 @@
     function closeEditModal() {
         document.getElementById('editUserModal').classList.add('hidden');
     }
+    function showAlert(message, type = "success") {
 
+        if (type === "success") {
+            Swal.fire({
+
+                    text: message,
+                    icon: "success"
+                    });
+        } else {
+                Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: message,
+
+    });
+        }
+
+    }
     document.getElementById('editAvatar').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
@@ -172,35 +285,111 @@
             reader.readAsDataURL(file);
         }
     });
-    document.getElementById('editUserForm').addEventListener('submit', function (e) {
+       document.getElementById('editUserForm').addEventListener('submit', function (e) {
         e.preventDefault();
+
+        // Xóa lỗi cũ
+        document.getElementById('EFullNameError').innerText = '';
+        document.getElementById('EEmailError').innerText = '';
+        document.getElementById('EPasswordError').innerText = '';
+        document.getElementById('EPhoneNumberError').innerText = '';
+        document.getElementById('EAddressError').innerText = '';
+
         const form = e.target;
         const formData = new FormData(form);
 
-        fetch('/Admin/Users/EditInline', {
-            method: 'POST',
-            body: formData
-        }).then(res => {
-            if (res.ok) {
-                location.reload();
-            } else {
-                alert('Có lỗi xảy ra khi cập nhật!');
+            fetch('/Admin/Users/EditInline', {
+        method: 'POST',
+        body: formData
+    }).then(async res => {
+        const data = await res.json();
+        if (res.ok && data.success) {
+            showAlert("Sửa người dùng thành công!", "success");
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            if (data.message) {
+                showAlert(data.message, "error");
             }
-        });
+            if (data.errors) {
+                if (data.errors.FullName)
+                    document.getElementById('EFullNameError').innerText = data.errors.FullName[0];
+                if (data.errors.Email)
+                    document.getElementById('EEmailError').innerText = data.errors.Email[0];
+                if (data.errors.Password)
+                    document.getElementById('EPasswordError').innerText = data.errors.Password[0];
+                if (data.errors.PhoneNumber)
+                    document.getElementById('EPhoneNumberError').innerText = data.errors.PhoneNumber[0];
+                if (data.errors.Address)
+                    document.getElementById('EAddressError').innerText = data.errors.Address[0];
+            }
+        }
+    }).catch(() => {
+        showAlert("Có lỗi xảy ra khi gửi dữ liệu!", "error");
+    });
     });
 
 
-    function deleteUser(userId, roleName) {
-        if (roleName.toLowerCase() === 'admin') {
-            alert('Không thể xóa admin!');
-            return;
+    function deleteUser(userId) {
+        
+        fetch(`/Admin/Users/DeleteInline?id=${userId}`, { method: 'POST' })
+    .then(async res => {
+        if (res.ok) {
+            showAlert("Xóa người dùng thành công!", "success");
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            const data = await res.json().catch(() => ({}));
+            showAlert(data.message || "Có lỗi xảy ra khi xóa!", "error");
         }
-        if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-            fetch(`/Admin/Users/DeleteInline?id=${userId}`, { method: 'POST' })
-                .then(res => {
-                    if (res.ok) location.reload();
-                    else alert('Có lỗi xảy ra khi xóa!');
-                });
-        }
+    });
+        
     }
+        document.addEventListener('DOMContentLoaded', function () {
+        var addUserForm = document.querySelector('#addModal form');
+        if (addUserForm) {
+            addUserForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Xóa lỗi cũ
+                document.getElementById('FullNameError').innerText = '';
+                document.getElementById('EmailError').innerText = '';
+                document.getElementById('PasswordError').innerText = '';
+                document.getElementById('RoleError').innerText = '';
+
+                var formData = new FormData(addUserForm);
+
+                  fetch('/Admin/Users/Create', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (res.ok && data.success) {
+            showAlert(data.message || "Thêm người dùng thành công!", "success");
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            if (data.message) {
+                showAlert(data.message, "error");
+            }
+            if (data.errors) {
+                if (data.errors.FullName)
+                    document.getElementById('FullNameError').innerText = data.errors.FullName[0];
+                if (data.errors.Email)
+                    document.getElementById('EmailError').innerText = data.errors.Email[0];
+                if (data.errors.Password)
+                    document.getElementById('PasswordError').innerText = data.errors.Password[0];
+                if (data.errors.RoleId)
+                    document.getElementById('RoleError').innerText = data.errors.RoleId[0];
+            }
+        }
+    })
+    .catch(() => {
+        showAlert("Có lỗi xảy ra khi gửi dữ liệu!", "error");
+    });
+            });
+        }
+    });
+
 </script>

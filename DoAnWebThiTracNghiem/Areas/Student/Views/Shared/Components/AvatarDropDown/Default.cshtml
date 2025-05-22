@@ -1,0 +1,21 @@
+﻿@model DoAnWebThiTracNghiem.Models.Users
+
+
+    <div class="relative flex items-center">
+        <div class="flex items-center" id="userDropdown">
+
+        <div id="userDropdownToggle" class="relative flex cursor-pointer items-center">
+            <img class="mr-2 h-8 w-8 rounded-full" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + Model.Email : Model.AvatarUrl) " alt="User Avatar">
+            <svg class="ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            <div id="userDropdownContent" class="invisible absolute top-full right-0 z-10 mt-2 w-48 translate-y-2 rounded-md border border-gray-700 bg-white opacity-0 shadow-lg transition-transform duration-300 ease-in-out">
+               
+                <p class="block bg-gray-700 px-4 py-2 text-white hover:text-indigo-400">@Html.DisplayFor(model => model.FullName)</p>
+                <a asp-action="Index" asp-controller="Account" class="block px-4 py-2 text-gray-700 hover:text-indigo-400">Xem hồ sơ</a>
+                <a asp-action="Logout" asp-controller="Home" class="block rounded-md border-b px-4 py-2 text-gray-700 hover:text-indigo-400">Đăng xuất</a>
+            </div>
+        </div>
+            </div>
+        
+    </div>

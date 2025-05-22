@@ -1,0 +1,45 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.StudentExamResultsViewModel
+@{
+    ViewData["Title"] = "StudentExamResults";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+<div class="container mx-auto p-4">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-blue-800">Kết quả thi của @Model.Student.FullName</h1>
+        <p class="text-gray-600">Email: @Model.Student.Email</p>
+    </div>
+    <div class="rounded-lg bg-white p-4 shadow-md">
+        <h2 class="mb-4 text-xl font-bold text-gray-800">Các bài thi đã làm</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tên bài thi</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ngày làm</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Điểm</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Model.Results)
+                    {
+                        <tr>
+                            <td class="px-4 py-2">@result.Exam?.Exam_Name</td>
+                            <td class="px-4 py-2">@result.End_Time.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-4 py-2">@result.Score</td>
+                            <td class="px-4 py-2">
+                                <a asp-action="ExamResultDetail" asp-route-resultId="@result.Result_ID"
+                                   class="rounded bg-blue-500 px-3 py-1 text-sm font-bold text-white hover:bg-blue-700">Xem chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a asp-action="Details" asp-route-id="@ViewContext.RouteData.Values["classId"]" class="text-blue-500 hover:underline">← Quay lại lớp học</a>
+    </div>
+</div>
+

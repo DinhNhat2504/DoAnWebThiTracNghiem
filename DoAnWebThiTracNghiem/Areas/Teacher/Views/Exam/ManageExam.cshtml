@@ -9,16 +9,16 @@
     <h1 class="mb-6 text-3xl font-bold text-blue-700">Quản lý bài thi</h1>
 
     <!-- Thông báo -->
-    @if (TempData["ErrorMessage"] != null)
+    @if (TempData["MnErrorMessage"] != null)
     {
         <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
-            @TempData["ErrorMessage"]
+            @TempData["MnErrorMessage"]
         </div>
     }
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["MnSuccessMessage"] != null)
     {
         <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
-            @TempData["SuccessMessage"]
+            @TempData["MnSuccessMessage"]
         </div>
     }
 
@@ -123,7 +123,10 @@
                     <table class="min-w-full rounded-lg bg-white shadow">
                         <thead>
                             <tr class="bg-green-100">
-                                <th class="px-4 py-2">Chọn</th>
+                                <th class="px-4 py-2 text-center">
+                                    <input type="checkbox" id="selectAllQuestions" />
+                                    <span class="ml-1">Chọn</span>
+                                </th>
                                 <th class="px-4 py-2">Nội dung</th>
                                 <th class="px-4 py-2">Loại</th>
                                 <th class="px-4 py-2">Độ khó</th>
@@ -136,12 +139,13 @@
                                 {
                                     <tr class="hover:bg-gray-50">
                                         <td class="border px-4 py-2 text-center">
-                                            <input type="checkbox" name="questionIds" value="@q.Question_ID" class="accent-blue-600" />
+                                            <input type="checkbox" name="questionIds" value="@q.Question_ID" class="question-checkbox accent-blue-600" />
                                         </td>
                                         <td class="border px-4 py-2">@q.Question_Content</td>
                                         <td class="border px-4 py-2">@q.QuestionType?.Name</td>
                                         <td class="border px-4 py-2">@q.Level?.LevelName</td>
                                     </tr>
+                                    <span asp-validation-for="AvailableQuestions" class="text-sm text-red-500"></span>
                                 }
                             }
                             else
@@ -161,4 +165,13 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('selectAllQuestions')?.addEventListener('change', function () {
+            var checkboxes = document.querySelectorAll('.question-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = this.checked;
+            }
+        });
+    </script>
+}
 }

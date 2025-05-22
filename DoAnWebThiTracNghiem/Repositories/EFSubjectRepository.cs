@@ -11,16 +11,13 @@ namespace DoAnWebThiTracNghiem.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Subject>> GetAllAsync(int id)
+        public async Task<IEnumerable<Subject>> GetAllAsync()
         {
-            if(id == 0)
-            {
+            
                 return await _context.Subjects.ToListAsync();
-            }
-            else {
-                return await _context.Subjects.Where(c => c.CreatorUser_Id == id).ToListAsync(); 
-            }
-                
+            
+            
+
         }
         public async Task<Subject> GetByIdAsync(int id)
         {
@@ -29,7 +26,7 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task AddAsync(Subject subject)
         {
-           _context.Subjects.Add(subject);
+            _context.Subjects.Add(subject);
             await _context.SaveChangesAsync();
         }
         public async Task UpdateAsync(Subject subject)
@@ -46,8 +43,49 @@ namespace DoAnWebThiTracNghiem.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<int> CountAsync(int RoleAd, int id, string search)
+        {
+            if (RoleAd == 1)
+            {
+                return await _context.Subjects.Where(c => string.IsNullOrEmpty(search) || c.Subject_Name.Contains(search)).CountAsync();
+            }
+            else
+            {
+                return await _context.Subjects.Where(c => c.CreatorUser_Id == id && (string.IsNullOrEmpty(search) || c.CreatorUser_Id == id && c.Subject_Name.Contains(search))).CountAsync();
+            }
+        }
+        public async Task<IEnumerable<Subject>> GetPagedAsync(int RoleAd, int id, int page, int pageSize, string search)
+        {
+            if (RoleAd == 1)
+            {
+                return await _context.Subjects
+                    .Where(c => string.IsNullOrEmpty(search) || c.Subject_Name.Contains(search))
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(c => c.Creator)
+                    .ToListAsync();
+            }
+            else
+            {
+                return await _context.Subjects
+                    .Where(c => c.CreatorUser_Id == id && (string.IsNullOrEmpty(search) || c.CreatorUser_Id == id && c.Subject_Name.Contains(search)))
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(c => c.Creator)
+                    .ToListAsync();
+            }
+        }
+        public async Task<List<Subject>> GetSubjectsCreatedBetween(DateTime start, DateTime end)
+        {
+            return await _context.Subjects
+                .Where(s => s.CreateAt >= start && s.CreateAt <= end)
+                .ToListAsync();
+        }
+        public async Task<int> CountAllAsync()
+        {
+            return await _context.Subjects.CountAsync();
+        }
     }
-    
 
     }
 

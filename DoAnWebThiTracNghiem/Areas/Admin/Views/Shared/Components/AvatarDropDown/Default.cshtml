@@ -7,7 +7,7 @@
         <div class="flex items-center" id="userDropdown">
             
             <div id="userDropdownToggle" class="relative flex cursor-pointer items-center">
-                <img class="mr-2 h-8 w-8 rounded-full" src="@Html.DisplayFor(model => model.AvatarUrl)" alt="User Avatar">
+                <img class="mr-2 h-8 w-8 rounded-full" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + Model.Email : Model.AvatarUrl) " alt="User Avatar">
                 <p class="cursor-pointer">@Html.DisplayFor(model => model.FullName)</p>
                 <svg class="ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

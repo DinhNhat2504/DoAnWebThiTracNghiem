@@ -44,9 +44,9 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         [HttpPost]
         public async Task<IActionResult> Profile(Users user, IFormFile AvatarFile)
         {
-            ModelState.Remove("AvatarUrl");
-            if (ModelState.IsValid)
-            {
+                ModelState.Remove("AvatarUrl");
+
+            
                 // Lấy UserId từ session
                 var userId = HttpContext.Session.GetString("UserId");
                 if (string.IsNullOrEmpty(userId) || user.User_Id != int.Parse(userId))
@@ -75,9 +75,9 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 await _Ucontext.UpdateAsync(existingUser);
                 TempData["Message"] = "Thông tin cá nhân đã được cập nhật thành công.";
                 return RedirectToAction(nameof(Profile));
-            }
+            
 
-            return View(user);
+            
         }
 
         // Lưu hình ảnh vào thư mục wwwroot/images

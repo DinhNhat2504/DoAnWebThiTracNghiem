@@ -1,38 +1,81 @@
-﻿@model IEnumerable<DoAnWebThiTracNghiem.Models.Exam_Result>
+﻿@model DoAnWebThiTracNghiem.Areas.Teacher.Models.ExamResultsViewModel
 @{
     ViewData["Title"] = "ExamResults";
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+    var classId = ViewBag.ClassId as int? ?? 0;
+    var examId = ViewBag.ExamId as int? ?? 0;
 }
 
 
-<h2>@ViewBag.ExamName - Student Results</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Student Name</th>
-            <th>Score</th>
-            <th>Correct Answers</th>
-            <th>Wrong Answers</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Chi tiết</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var result in Model)
-        {
-            <tr>
-                <td>@result.User?.FullName</td>
-                <td>@result.Score</td>
-                <td>@result.CorrectAnswers</td>
-                <td>@result.WrongAnswers</td>
-                <td>@result.Start_Time.ToString("g")</td>
-                <td>@result.End_Time.ToString("g")</td>
-                <a asp-area="Teacher" asp-controller="StudentClass" asp-action="ExamResultDetail" asp-route-resultId="@result.Result_ID"
-                   class="text-blue-600 hover:underline">Xem chi tiết</a>
-            </tr>
-
-        }
-    </tbody>
-</table>
+<div class="container mx-auto p-4">
+    <h2 class="mb-4 text-2xl font-bold">Kết quả bài thi: @Model.ExamName</h2>
+    <form method="get" class="mb-4 flex flex-wrap gap-2">
+        <input type="text" name="search" value="@Model.Search" placeholder="Tìm tên sinh viên"
+               class="mr-2 rounded border px-3 py-2" />
+        <select name="passFilter" class="rounded border px-2 py-1">
+            <option value="">Tất cả</option>
+            <option value="pass" selected="@(Model.PassFilter == "pass" ? "selected" : null)">Đạt</option>
+            <option value="fail" selected="@(Model.PassFilter == "fail" ? "selected" : null)">Không đạt</option>
+        </select>
+        <input type="hidden" name="examId" value="@Context.Request.Query["examId"]" />
+        <input type="hidden" name="classId" value="@Context.Request.Query["classId"]" />
+        <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">Lọc</button>
+    </form>
+    <a asp-area="Teacher"
+       asp-controller="StudentClass" 
+       asp-action="ExportExcel"
+       asp-route-examId="@examId"
+       asp-route-classId="@classId"
+       class="inline-block rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600">
+        Xuất Excel
+    </a>
+    <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full rounded-lg bg-white">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-left">Tên sinh viên</th>
+                    <th class="px-4 py-2 text-left">
+                        <a asp-route-sortOrder="@(Model.SortOrder == "score_asc" ? "score_desc" : "score_asc")"
+                           asp-route-examId="@Context.Request.Query["examId"]"
+                           asp-route-classId="@Context.Request.Query["classId"]"
+                           asp-route-search="@Model.Search"
+                           asp-route-passFilter="@Model.PassFilter"
+                           class="cursor-pointer hover:underline">
+                            Điểm số
+                            @(Model.SortOrder == "score_asc" ? "▲" : Model.SortOrder == "score_desc" ? "▼" : "")
+                        </a>
+                    </th>
+                    <th class="px-4 py-2 text-center">Số câu đúng</th>
+                    <th class="px-4 py-2 text-center">Số câu sai</th>
+                    <th class="px-4 py-2 text-center">Trạng thái</th>
+                    <th class="px-4 py-2 text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">@item.StudentName</td>
+                        <td class="px-4 py-2">@item.Score</td>
+                        <td class="px-4 py-2 text-center">@item.CorrectAnswers</td>
+                        <td class="px-4 py-2 text-center">@item.WrongAnswers</td>
+                        <td class="px-4 py-2 text-center">
+                            @if (item.IsPassed)
+                            {
+                                <span class="font-semibold text-green-600">Đạt</span>
+                            }
+                            else
+                            {
+                                <span class="font-semibold text-red-600">Không đạt</span>
+                            }
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <a asp-action="ExamResultDetail" asp-route-resultId="@item.ResultId"
+                               class="rounded bg-blue-500 px-3 py-1 text-white transition hover:bg-blue-600">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

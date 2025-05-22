@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
 using DoAnWebThiTracNghiem.ViewModel;
 using DoAnWebThiTracNghiem.Services;
 

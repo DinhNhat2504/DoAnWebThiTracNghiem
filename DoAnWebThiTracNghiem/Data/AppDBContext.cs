@@ -15,6 +15,7 @@ namespace DoAnWebThiTracNghiem.Data
             optionsBuilder.LogTo(Console.WriteLine);
         }
         public DbSet<Users> Users { get; set; }
+        public DbSet<AIUsageLog> AIUsageLog { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Question> Question { get; set; }
         public DbSet<QuestionType> QuestionType { get; set; }

@@ -5,35 +5,51 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-
-<h2>Đăng ký</h2>
-<form asp-action="Register" method="post">
-    <div>
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+<div class="flex min-h-screen items-center justify-center bg-white">
+    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+        <h1 class="mb-2 text-center text-2xl font-bold text-gray-800">Chào mừng bạn đến với</h1> 
+        <div class="mb-2 flex justify-center"><img src="~/images/logo-removebg.png" class="mt-2 ml-2 h-10 w-auto" /></div>
+        
+        <form asp-action="Register" method="post" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input asp-for ="Email" type="email" id="email"  required
+                       class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span asp-validation-for="Email" class="text-red-500"></span>
+            </div>
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700">Họ tên</label>
+                <input asp-for="FullName" type="text" id="fullName"  required
+                       class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span asp-validation-for="FullName" class="text-red-500"></span>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                <input asp-for="Password" type="password" id="password" required
+                       class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span asp-validation-for="Password" class="text-red-500"></span>
+            </div>
+            <div>
+                <label for="role" class="block text-sm font-medium text-gray-700">Bạn là:</label>
+                <select asp-for="RoleId" asp-items="ViewBag.Roles"  required
+                        class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected>Chọn vai trò</option>
+                </select>
+                <span asp-validation-for="RoleId" class="text-red-500"></span>
+            </div>
+            <div>
+                <button type="submit" 
+                        class="w-full rounded-md bg-blue-600 px-4 py-2 text-white transition duration-300 hover:bg-blue-700">
+                    Đăng ký
+                </button>
+            </div>
+        </form>
+        <p class="mt-4 text-center text-sm text-gray-600">
+            Đã có tài khoản?
+            <a asp-action="Login" asp-controller="Users" class="text-blue-600 hover:underline">Đăng nhập</a>
+        </p>
     </div>
-    <div>
-        <label>Mật khẩu</label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div>
-        <label>Họ và tên</label>
-        <input asp-for="FullName" class="form-control" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-    </div>
-    <div>
-        <label>Quyền</label>
-        <select asp-for="RoleId" asp-items="ViewBag.Roles" class="form-control"></select>
-        <span asp-validation-for="RoleId" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Đăng ký</button>
-</form>
-
-
-
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

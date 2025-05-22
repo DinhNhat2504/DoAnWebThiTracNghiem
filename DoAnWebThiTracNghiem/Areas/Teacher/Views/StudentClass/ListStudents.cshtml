@@ -1,0 +1,119 @@
+﻿@model List<DoAnWebThiTracNghiem.Areas.Teacher.Models.StudentInClassViewModel>
+@{
+    ViewData["Title"] = "Danh sách sinh viên";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+    var classId = ViewBag.ClassId as int? ?? 0;
+    var search = ViewBag.Search as string ?? "";
+    var sortOrder = ViewBag.SortOrder as string ?? "";
+    string GetSortOrder(string col)
+    {
+        if (sortOrder == $"{col}_desc") return $"{col}_asc";
+        return $"{col}_desc";
+    }
+}
+
+<div class="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+    <h1 class="mb-6 text-2xl font-bold">Danh sách sinh viên trong lớp</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-4 rounded bg-green-100 p-3 text-green-700">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 rounded bg-red-100 p-3 text-red-700">@TempData["ErrorMessage"]</div>
+    }
+
+    <form method="get" class="mb-6 flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
+        <input type="hidden" name="classId" value="@classId" />
+        <input type="text"
+               name="search"
+               value="@search"
+               placeholder="Tìm theo tên hoặc email..."
+               class="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 sm:w-64" />
+        <button type="submit"
+                class="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600">
+            Tìm kiếm
+        </button>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full rounded-lg border border-gray-200 bg-white shadow-md">
+            <thead>
+                <tr class="bg-gray-100 text-sm text-gray-700 sm:text-base">
+                    <th class="border-b px-4 py-3">Tên</th>
+                    <th class="border-b px-4 py-3">Email</th>
+                    <th class="border-b px-4 py-3">
+                        <a href="?classId=@classId&search=@search&sortOrder=@GetSortOrder("completed")"
+                           class="flex items-center gap-1 hover:underline">
+                            Bài thi đã làm
+                            @if (sortOrder.StartsWith("completed"))
+                            {
+                                <span>@(sortOrder == "completed_desc" ? "▼" : "▲")</span>
+                            }
+                        </a>
+                    </th>
+                    <th class="border-b px-4 py-3">
+                        <a href="?classId=@classId&search=@search&sortOrder=@GetSortOrder("pending")"
+                           class="flex items-center gap-1 hover:underline">
+                            Bài thi chưa làm
+                            @if (sortOrder.StartsWith("pending"))
+                            {
+                                <span>@(sortOrder == "pending_desc" ? "▼" : "▲")</span>
+                            }
+                        </a>
+                    </th>
+                    <th class="border-b px-4 py-3">
+                        <a href="?classId=@classId&search=@search&sortOrder=@GetSortOrder("passed")"
+                           class="flex items-center gap-1 hover:underline">
+                            Số bài thi đạt
+                            @if (sortOrder.StartsWith("passed"))
+                            {
+                                <span>@(sortOrder == "passed_desc" ? "▼" : "▲")</span>
+                            }
+                        </a>
+                    </th>
+                    <th class="border-b px-4 py-3">Ngày tham gia lớp</th>
+                    <th class="border-b px-4 py-3">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr class="transition-colors hover:bg-gray-50">
+                        <td class="border-b px-4 py-2">@student.FullName</td>
+                        <td class="border-b px-4 py-2">@student.Email</td>
+                        <td class="border-b px-4 py-2 text-center">@student.ExamsCompleted</td>
+                        <td class="border-b px-4 py-2 text-center">@student.ExamsPending</td>
+                        <td class="border-b px-4 py-2 text-center">@student.ExamsPassed</td>
+                        <td class="border-b px-4 py-2 text-center">@student.JoinedAt.ToString("dd/MM/yyyy")</td>
+                        <td class="border-b px-4 py-2 text-center">
+                            <a asp-area="Teacher"
+                               asp-controller="StudentClass"
+                               asp-action="StudentExamResults"
+                               asp-route-classId="@student.ClassId"
+                               asp-route-studentId="@student.StudentId"
+                               class="mr-1 inline-block rounded bg-blue-500 px-3 py-1 text-sm text-white transition-colors hover:bg-blue-600 sm:text-base">
+                                Xem
+                            </a>
+                            <form asp-area="Teacher"
+                                  asp-controller="StudentClass"
+                                  asp-action="RemoveStudent"
+                                  asp-route-classId="@student.ClassId"
+                                  asp-route-studentId="@student.StudentId"
+                                  method="post"
+                                  class="inline"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa sinh viên này khỏi lớp?');">
+                                <button type="submit"
+                                        class="inline-block rounded bg-red-500 px-3 py-1 text-sm text-white transition-colors hover:bg-red-600 sm:text-base">
+                                    Xóa
+                                </button>
+                                @Html.AntiForgeryToken()
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

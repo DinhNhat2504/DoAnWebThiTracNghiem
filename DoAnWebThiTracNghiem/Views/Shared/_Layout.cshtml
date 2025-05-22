@@ -10,23 +10,22 @@
 <body class="bg-gradient-to-br flex min-h-screen flex-col from-blue-50 to-blue-100">
 
     <!-- Navbar -->
-    <header class="bg-blue-600 shadow-md">
+    <header class="bg-indigo-600 shadow-md">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-            <a asp-action="Index" asp-controller="Home" class="text-2xl font-semibold tracking-wider text-white no-underline">NQuiz?</a>
+            <a asp-action="Index" asp-controller="Home" class="text-2xl font-semibold tracking-wider text-white no-underline"><img src="~/images/logo-removebg.png" class="h-10 w-auto" /></a>
             <div class="space-x-4">
                 <a asp-action="Login" asp-controller="Users" class="rounded-lg bg-white px-4 py-2 font-semibold text-blue-600 transition hover:bg-blue-100">Đăng nhập</a>
                 <a asp-action="Register" asp-controller="Users" class="rounded-lg bg-green-500 px-4 py-2 font-semibold text-white transition hover:bg-green-600">Đăng ký</a>
             </div>
         </div>
     </header>
-    <!-- Main Content -->
-    <main class="flex flex-grow items-center justify-center px-6 lg:px-10" style="background-image: url('/images/ảnh chụp màn hình 2025-05-14 042539.png');" >
-        @RenderBody()
-    </main>
+    <!-- Main Content --> 
+    @RenderBody()
+
     
     <!-- Footer -->
-    <footer class="py-4 text-center text-sm text-gray-500">
-        © 2025 Nquiz. All rights reserved.
+    <footer class="bg-indigo-600 py-4 text-center text-sm text-white">
+        © 2025 Bản quyền thuộc về Nquiz. Tất cả quyền được bảo lưu.
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

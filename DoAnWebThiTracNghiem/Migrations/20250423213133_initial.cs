@@ -38,6 +38,27 @@ namespace DoAnWebThiTracNghiem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AIUsageLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UsageCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AIUsageLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AIUsageLog_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "User_Id",
+                        onDelete: ReferentialAction.Cascade); 
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -133,7 +154,8 @@ namespace DoAnWebThiTracNghiem.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     
                     CreatorUser_Id = table.Column<int>(type: "int", nullable: false),
-                    Subject_ID = table.Column<int>(type: "int", nullable: false)
+                    Subject_ID = table.Column<int>(type: "int", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,7 +221,7 @@ namespace DoAnWebThiTracNghiem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     User_ID = table.Column<int>(type: "int", nullable: false),
                     Class_ID = table.Column<int>(type: "int", nullable: false),
-                    
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,7 +259,7 @@ namespace DoAnWebThiTracNghiem.Migrations
                         name: "FK_Notifications_ClassTn_ClassTNClass_Id",
                         column: x => x.ClassTNClass_Id,
                         principalTable: "ClassTn",
-                        principalColumn: "Class_Id");
+                        principalColumn: "Class_Id", onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Notifications_Users_CreatorUser_Id",
                         column: x => x.CreatorUser_Id,
@@ -350,7 +372,9 @@ namespace DoAnWebThiTracNghiem.Migrations
                         name: "FK_Answers_ExamResult_Result_ID1",
                         column: x => x.Result_ID1,
                         principalTable: "ExamResult",
-                        principalColumn: "Result_ID");
+                        principalColumn: "Result_ID",
+                        onDelete: ReferentialAction.Cascade);
+                        
                     table.ForeignKey(
                         name: "FK_Answers_Question_Question_ID",
                         column: x => x.Question_ID,

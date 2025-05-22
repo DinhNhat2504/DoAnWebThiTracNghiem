@@ -1,0 +1,114 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.AdminStatisticsViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
+}
+
+<h1>Thống kê</h1>
+<form method="get" class="mb-6 flex flex-wrap items-end gap-2">
+    <div>
+        <label class="block text-sm font-medium">Từ ngày</label>
+        <input type="date" name="start" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="rounded border px-2 py-1" />
+    </div>
+    <div>
+        <label class="block text-sm font-medium">Đến ngày</label>
+        <input type="date" name="end" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="rounded border px-2 py-1" />
+    </div>
+    <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">Lọc</button>
+</form>
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <!-- Người dùng -->
+    <div class="rounded-lg bg-white p-4 shadow">
+        <h2 class="mb-2 font-bold">Người dùng mới</h2>
+        <canvas id="userChart" height="120"></canvas>
+    </div>
+    <!-- Lớp học -->
+    <div class="rounded-lg bg-white p-4 shadow">
+        <h2 class="mb-2 font-bold">Lớp học mới</h2>
+        <canvas id="classChart" height="120"></canvas>
+        <div class="mt-4">
+            <h3 class="font-semibold">Lớp đang hoạt động</h3>
+            <ul class="ml-5 list-disc text-green-700">
+                @foreach (var c in Model.ActiveClasses)
+                {
+                    <li>@c.ClassName</li>
+                }
+            </ul>
+            <h3 class="mt-2 font-semibold">Lớp không hoạt động</h3>
+            <ul class="ml-5 list-disc text-red-700">
+                @foreach (var c in Model.InactiveClasses)
+                {
+                    <li>@c.ClassName</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <!-- Bài thi -->
+    <div class="rounded-lg bg-white p-4 shadow">
+        <h2 class="mb-2 font-bold">Bài thi mới</h2>
+        <canvas id="examChart" height="120"></canvas>
+    </div>
+    <!-- Câu hỏi -->
+    <div class="rounded-lg bg-white p-4 shadow">
+        <h2 class="mb-2 font-bold">Câu hỏi mới</h2>
+        <canvas id="questionChart" height="120"></canvas>
+    </div>
+    <!-- Môn học -->
+    <div class="rounded-lg bg-white p-4 shadow">
+        <h2 class="mb-2 font-bold">Môn học mới</h2>
+        <canvas id="subjectChart" height="120"></canvas>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function renderLineChart(id, labels, data, label, color) {
+            new Chart(document.getElementById(id), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color + '33',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Dữ liệu từ server
+        const userLabels = @Html.Raw(Json.Serialize(Model.UserStats.Select(x => x.Date)));
+        const userData = @Html.Raw(Json.Serialize(Model.UserStats.Select(x => x.Count)));
+        renderLineChart('userChart', userLabels, userData, 'Người dùng', '#3B82F6');
+
+        const classLabels = @Html.Raw(Json.Serialize(Model.ClassStats.Select(x => x.Date)));
+        const classData = @Html.Raw(Json.Serialize(Model.ClassStats.Select(x => x.Count)));
+        renderLineChart('classChart', classLabels, classData, 'Lớp học', '#10B981');
+
+        const examLabels = @Html.Raw(Json.Serialize(Model.ExamStats.Select(x => x.Date)));
+        const examData = @Html.Raw(Json.Serialize(Model.ExamStats.Select(x => x.Count)));
+        renderLineChart('examChart', examLabels, examData, 'Bài thi', '#F59E42');
+
+        const questionLabels = @Html.Raw(Json.Serialize(Model.QuestionStats.Select(x => x.Date)));
+        const questionData = @Html.Raw(Json.Serialize(Model.QuestionStats.Select(x => x.Count)));
+        renderLineChart('questionChart', questionLabels, questionData, 'Câu hỏi', '#EF4444');
+
+        const subjectLabels = @Html.Raw(Json.Serialize(Model.SubjectStats.Select(x => x.Date)));
+        const subjectData = @Html.Raw(Json.Serialize(Model.SubjectStats.Select(x => x.Count)));
+        renderLineChart('subjectChart', subjectLabels, subjectData, 'Môn học', '#6366F1');
+    </script>
+}
+

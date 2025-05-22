@@ -1,0 +1,109 @@
+﻿@model DoAnWebThiTracNghiem.Models.Exam
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
+    var questions = ViewData["Questions"] as List<DoAnWebThiTracNghiem.Models.Question>;
+}
+
+<div class="mx-auto mt-8 max-w-6xl rounded-lg bg-white p-6 shadow">
+    <h2 class="mb-4 text-2xl font-bold text-blue-700">Thông tin bài thi</h2>
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div><span class="font-semibold">Tên bài thi:</span> @Model.Exam_Name</div>
+        <div><span class="font-semibold">Môn học:</span> @Model.Subject?.Subject_Name</div>
+        <div><span class="font-semibold">Người tạo:</span> @Model.Creator?.FullName</div>
+        <div><span class="font-semibold">Ngày thi:</span> @Model.Exam_Date.ToString("dd/MM/yyyy")</div>
+        <div><span class="font-semibold">Tổng số câu hỏi:</span> @Model.TotalQuestions</div>
+        <div><span class="font-semibold">Thời gian làm bài:</span> @Model.Duration phút</div>
+        <div><span class="font-semibold">Điểm đạt:</span> @Model.PassScore</div>
+        <div>
+            <span class="font-semibold">Trạng thái:</span>
+            @if (Model.IsActive)
+            {
+                <span class="inline-block rounded bg-green-100 px-2 py-1 text-xs text-green-800">Đang mở</span>
+            }
+            else
+            {
+                <span class="inline-block rounded bg-gray-200 px-2 py-1 text-xs text-gray-600">Đã đóng</span>
+            }
+        </div>
+    </div>
+
+    <h3 class="mb-3 text-xl font-semibold text-blue-600">Danh sách câu hỏi</h3>
+    <div class="max-h-[500px] overflow-x-auto overflow-y-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sm:px-6 sm:py-3">STT</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sm:px-6 sm:py-3">Nội dung câu hỏi</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sm:px-6 sm:py-3">Loại</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase sm:px-6 sm:py-3">Đáp án/Đúng sai/Điền từ</th>
+                </tr>
+            </thead>
+            <tbody class="max-h-[50px] divide-y divide-gray-200 overflow-y-auto bg-white">
+                @if (questions != null && questions.Count > 0)
+                {
+                    int stt = 1;
+                    foreach (var q in questions)
+                    {
+                        <tr>
+                            <td class="px-4 py-2 sm:px-6 sm:py-3">@stt</td>
+                            <td class="max-h-32 max-w-lg overflow-y-auto px-4 py-2 break-words whitespace-pre-line sm:max-w-xl sm:px-6 sm:py-3">
+                                @q.Question_Content
+                            </td>
+                            <td class="px-4 py-2 sm:px-6 sm:py-3">
+                                @{
+                                    string type = q.QuestionTypeId == 1 ? "Chọn 1 đáp án" :
+                                    q.QuestionTypeId == 2 ? "Đúng/Sai" :
+                                    q.QuestionTypeId == 3 ? "Điền từ" : "Khác";
+                                }
+                                <span class="inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">@type</span>
+                            </td>
+                            <td class="max-h-32 max-w-xs overflow-y-auto px-4 py-2 sm:max-w-sm sm:px-6 sm:py-3">
+                                @if (q.QuestionTypeId == 1 && q.Options != null && q.Options.Count > 0)
+                                {
+                                    <ul class="list-disc pl-5">
+                                        @for (int i = 0; i < q.Options.Count; i++)
+                                        {
+                                            var label = ((char)('A' + i)).ToString();
+                                            <li>
+                                                <span class="font-semibold">@label:</span> @q.Options[i]
+                                                @if (q.Correct_Option == label)
+                                                {
+                                                    <span class="ml-2 font-semibold text-green-600">(Đáp án đúng)</span>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else if (q.QuestionTypeId == 2)
+                                {
+                                    <span class="font-semibold">Đáp án: </span>
+                                    <span class="font-semibold text-green-600">@((q.Correct_Option?.ToLower() == "true" || q.Correct_Option == "1") ? "Đúng" : "Sai")</span>
+                                }
+                                else if (q.QuestionTypeId == 3)
+                                {
+                                    <span class="font-semibold">Đáp án: </span>
+                                    <span class="font-semibold text-green-600">@q.Correct_Option</span>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-500">Không xác định</span>
+                                }
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="py-4 text-center text-gray-500 sm:px-6 sm:py-3">Không có câu hỏi nào trong bài thi này.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-6">
+        <a asp-action="Index" class="inline-block rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400">Quay lại danh sách</a>
+    </div>
+</div>

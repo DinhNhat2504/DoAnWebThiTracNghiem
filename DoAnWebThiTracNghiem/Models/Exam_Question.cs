@@ -12,6 +12,8 @@ namespace DoAnWebThiTracNghiem.Models
         
         public Exam? Exam { get; set; }
         [ForeignKey("Question")]
+        [Required(ErrorMessage = "Vui lòng chọn 1 câu hỏi!")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn câu hỏi hợp lệ")]
         public int Question_ID { get; set; }
        
         public Question? Question { get; set; }

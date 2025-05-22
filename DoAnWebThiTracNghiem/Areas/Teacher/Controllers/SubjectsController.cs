@@ -1,7 +1,9 @@
 ﻿using DoAnWebThiTracNghiem.Data;
 using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
+using DoAnWebThiTracNghiem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -16,12 +18,25 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 5, string search = "")
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            int teacherId = int.Parse(userId);
-            var subject = await _subjectRepository.GetAllAsync(teacherId);
-            return View(subject);
+            var UserId = HttpContext.Session.GetString("UserId");
+            var RoleId = HttpContext.Session.GetString("RoleId");
+            int userId = int.Parse(UserId);
+            int roleId = int.Parse(RoleId);
+            var total = await _subjectRepository.CountAsync(roleId, userId, search);
+            var items = await _subjectRepository.GetPagedAsync(roleId, userId, page, pageSize, search);
+
+            var model = new PagedResult<Subject>
+            {
+                Items = items,
+                PageNumber = page,
+                TotalPages = (int)Math.Ceiling(total / (double)pageSize),
+                TotalItems = total,
+                Search = search
+            };
+
+            return View(model);
         }
         public IActionResult Create()
         {
@@ -40,39 +55,49 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             return View(subject);
         }
 
-        public async Task<IActionResult> Edit(int id)
-        {   
-            var subject = await _subjectRepository.GetByIdAsync(id);
-            var userId = HttpContext.Session.GetString("UserId");
-            if (subject.CreatorUser_Id != int.Parse(userId))
-            {
-                return Unauthorized();
-            }
+        [HttpGet]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var subject = await _context.Subjects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Subject_Id == id);
+
             if (subject == null)
-            {
                 return NotFound();
-            }
-            return View(subject);
+
+            return Json(new
+            {
+                subject_Id = subject.Subject_Id,
+                subject_Name = subject.Subject_Name
+            });
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Subject subject)
+        public async Task<IActionResult> Edit( Subject subject)
         {
-            if (id != subject.Subject_Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var existingSubject = await _subjectRepository.GetByIdAsync(id);
+                if (subject == null) return BadRequest();
+                var existing = await _subjectRepository.GetByIdAsync(subject.Subject_Id);
+                if (existing == null) return NotFound();
+                
                 var userID = HttpContext.Session.GetString("UserId");
-                existingSubject.Subject_Name = subject.Subject_Name;
+                
                 subject.CreatorUser_Id = int.Parse(userID);
-                existingSubject.CreatorUser_Id = subject.CreatorUser_Id;
-                await _subjectRepository.UpdateAsync(existingSubject);
-                return RedirectToAction(nameof(Index));
+                existing.Subject_Name = subject.Subject_Name;
+                
+                
+                await _subjectRepository.UpdateAsync(existing);
+                
+                return Ok();
+
+
             }
-            return View(subject);
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+           
+
         }
         public async Task<IActionResult> Delete(int id)
         {
@@ -91,12 +116,24 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
-            if (subject != null)
+            try
             {
-                _context.Subjects.Remove(subject);
-                await _context.SaveChangesAsync();
+                var classTn = await _subjectRepository.GetByIdAsync(id);
+                if (classTn == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy lớp học để xóa.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                await _subjectRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Xóa lớp học thành công.";
             }
+            catch (Exception e)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa lớp học.";
+                Console.WriteLine(e);
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }

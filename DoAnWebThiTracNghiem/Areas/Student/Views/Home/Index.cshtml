@@ -1,7 +1,12 @@
-﻿@model DoAnWebThiTracNghiem.ViewModel.StudentHomeIndexViewModel
+﻿@using DoAnWebThiTracNghiem.ViewModel
+@model DoAnWebThiTracNghiem.ViewModel.ClassInfoViewModel
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    var classes = ViewData["Classes"] as List<ClassInfoViewModel>;
+    var latestExams = ViewData["LatestExams"] as List<LatestExamDisplayViewModel>;
+    var studentId = Convert.ToInt32(ViewData["UserId"]);
+    var examResults = ViewData["ExamResults"] as List<DoAnWebThiTracNghiem.Models.Exam_Result>;
 }
 
 <!-- Phần lớp học -->
@@ -11,17 +16,19 @@
         <a href="@Url.Action("Index", "StudentClass", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
     </div>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-        @if (Model.RecentClasses != null && Model.RecentClasses.Any())
+        @if (classes != null)
         {
-            foreach (var cls in Model.RecentClasses)
+            @foreach (var c in classes)
             {
-                <div class="bg-white p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg md:p-6">
-                    <h3 class="text-base font-medium text-gray-700 md:text-lg">
-                        <a href="@Url.Action("Details", "StudentClass", new { area = "Student", id = cls.Class_Id })">@cls.ClassName</a>
-                    </h3>
-                    <p class="text-sm text-gray-500">
-                        @((cls.Exam_Classes != null) ? cls.Exam_Classes.Count : 0) bài thi
-                    </p>
+                <div class="mb-4 rounded bg-white p-4 shadow">
+                    <div class="font-bold">@c.ClassName</div>
+                    <div>Người tạo: @c.Creator</div>
+                    <div>Đã làm: @c.CompletedExams | Chưa làm: @c.PendingExams</div>
+                    <div>Ngày tham gia: @c.JoinDate.ToString("dd/MM/yyyy")</div>
+                    <a href="@Url.Action("Details", "StudentClass", new { area = "Student", id = c.ClassId })"
+                       class="mt-2 inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">
+                        Chi tiết
+                    </a>
                 </div>
             }
         }
@@ -38,15 +45,50 @@
         <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Các bài thi mới nhất của bạn</h2>
         <a href="@Url.Action("Index", "StudentExam", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
     </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-        @if (Model.RecentExams != null && Model.RecentExams.Any())
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @if (latestExams != null && latestExams.Count > 0)
         {
-            foreach (var exam in Model.RecentExams)
+            foreach (var item in latestExams)
             {
-                <div class="bg-white p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg md:p-6">
-                    <h3 class="text-base font-medium text-gray-700 md:text-lg">
-                        <a href="@Url.Action("Details", "StudentExam", new { area = "Student", id = exam.Exam_ID })">@exam.Exam_Name</a>
-                    </h3>
+                var exam = item.Exam;
+                var className = item.ClassName;
+                var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                var hasTakenExam = examResults != null && examResults.Any(r => r.Exam_ID == exam.Exam_ID && r.User_ID == studentId);
+                <div class="rounded-lg border p-4 shadow-md">
+                    
+                    <h3 class="mb-2 text-lg font-bold text-purple-800">@exam.Exam_Name</h3>
+                    <p class="text-gray-700">Lớp học: @className</p>
+                    <p class="text-gray-700">Thời gian làm bài: @exam.Duration phút</p>
+                    <p class="text-gray-700">Ngày thi: @exam.Exam_Date.ToString("dd/MM/yyyy")</p>
+                    <p class="text-gray-700">Thời gian bắt đầu: @exam.StartTime.ToString("HH:mm")</p>
+                    <p class="text-gray-700">Thời gian kết thúc: @exam.EndTime.ToString("HH:mm")</p>
+                    @if (hasTakenExam)
+                    {
+                        <a href="@Url.Action("ViewResult", "StudentTakeExam", new { area = "Student", examId = exam.Exam_ID })"
+                           class="mt-4 block w-full rounded bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600">
+                            Xem kết quả
+                        </a>
+                    }
+                    else if (now.Date > exam.Exam_Date || (now.Date == exam.Exam_Date && now > exam.EndTime))
+                    {
+                        <button class="mt-4 block w-full cursor-not-allowed rounded bg-gray-500 px-4 py-2 text-center text-white">
+                            Hết hạn làm bài
+                        </button>
+                    }
+                    else if (now.Date < exam.Exam_Date || (now.Date == exam.Exam_Date && now < exam.StartTime))
+                    {
+                        <button class="mt-4 block w-full rounded bg-yellow-500 px-4 py-2 text-center text-white hover:bg-yellow-600">
+                            Chờ thi
+                        </button>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("TakeExam", "StudentTakeExam", new { area = "Student", examId = exam.Exam_ID })"
+                           class="mt-4 block w-full rounded bg-green-500 px-4 py-2 text-center text-white hover:bg-green-600">
+                            Làm bài
+                        </a>
+                    }
                 </div>
             }
         }
@@ -55,45 +97,46 @@
             <div class="col-span-3 text-center text-gray-500">Chưa có bài thi nào được giao.</div>
         }
     </div>
+
 </section>
 
 <!-- Phần thành tích đồ -->
-<section>
-    <div class="mb-4 flex flex-col items-center justify-between md:flex-row md:mb-6">
-        <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Thành tích gần đây</h2>
-        <a href="@Url.Action("Index", "StudentExam", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
-    </div>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div class="bg-white p-4 shadow-md md:p-6">
-            <h4 class="mb-2 font-semibold text-gray-700">Bài thi điểm số cao nhất</h4>
-            @if (Model.HighestScoreExam != null && Model.HighestScoreExam.Exam != null)
-            {
-                <div>
-                    <span class="font-medium">@Model.HighestScoreExam.Exam.Exam_Name</span><br />
-                    <span>Điểm: <span class="font-bold">@Model.HighestScoreExam.Score</span></span>
-                </div>
-            }
-            else
-            {
-                <div>Chưa có dữ liệu.</div>
-            }
-        </div>
-        <div class="bg-white p-4 shadow-md md:p-6">
-            <h4 class="mb-2 font-semibold text-gray-700">Lớp học hoạt động nhiều nhất</h4>
-            @if (Model.MostActiveClass != null)
-            {
-                <div>
-                    <a class="font-medium hover:underline" href="@Url.Action("Details", "ClassTn", new { area = "Student", id = Model.MostActiveClass.Class_Id })">
-                        @Model.MostActiveClass.ClassName
-                    </a>
-                    <br />
-                    <span>Số bài thi đã làm: <span class="font-bold">@Model.MostActiveClassExamCount</span></span>
-                </div>
-            }
-            else
-            {
-                <div>Chưa có dữ liệu.</div>
-            }
-        </div>
-    </div>
-</section>
+@* <section> *@
+@*     <div class="mb-4 flex flex-col items-center justify-between md:flex-row md:mb-6"> *@
+@*         <h2 class="mb-2 text-lg font-semibold md:text-xl md:mb-0">Thành tích gần đây</h2> *@
+@*         <a href="@Url.Action("Index", "StudentExam", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a> *@
+@*     </div> *@
+@*     <div class="grid grid-cols-1 gap-4 md:grid-cols-2"> *@
+@*         <div class="bg-white p-4 shadow-md md:p-6"> *@
+@*             <h4 class="mb-2 font-semibold text-gray-700">Bài thi điểm số cao nhất</h4> *@
+@*             @if (Model.HighestScoreExam != null && Model.HighestScoreExam.Exam != null) *@
+@*             { *@
+@*                 <div> *@
+@*                     <span class="font-medium">@Model.HighestScoreExam.Exam.Exam_Name</span><br /> *@
+@*                     <span>Điểm: <span class="font-bold">@Model.HighestScoreExam.Score</span></span> *@
+@*                 </div> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <div>Chưa có dữ liệu.</div> *@
+@*             } *@
+@*         </div> *@
+@*         <div class="bg-white p-4 shadow-md md:p-6"> *@
+@*             <h4 class="mb-2 font-semibold text-gray-700">Lớp học hoạt động nhiều nhất</h4> *@
+@*             @if (Model.MostActiveClass != null) *@
+@*             { *@
+@*                 <div> *@
+@*                     <a class="font-medium hover:underline" href="@Url.Action("Details", "ClassTn", new { area = "Student", id = Model.MostActiveClass.Class_Id })"> *@
+@*                         @Model.MostActiveClass.ClassName *@
+@*                     </a> *@
+@*                     <br /> *@
+@*                     <span>Số bài thi đã làm: <span class="font-bold">@Model.MostActiveClassExamCount</span></span> *@
+@*                 </div> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <div>Chưa có dữ liệu.</div> *@
+@*             } *@
+@*         </div> *@
+@*     </div> *@
+@* </section> *@

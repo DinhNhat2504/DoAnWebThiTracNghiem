@@ -1,86 +1,85 @@
-﻿
+﻿@model DoAnWebThiTracNghiem.ViewModel.HomeDashboardViewModel
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
 }
 
-<div id="content-thong-ke" class="content-section">
-    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 sm:mb-8 xl:grid-cols-4">
-        <div class="bg-gradient-to-r transform rounded-xl from-blue-500 to-blue-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
-            <div class="flex items-start justify-between">
-                <div class="space-y-1">
-                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Tổng Người Dùng</p>
-                    <p class="text-2xl font-bold sm:text-3xl">1,250</p>
+<div id="content-thong-ke" class="content-section mx-auto max-w-7xl p-6">
+    <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Total Users -->
+        <div class="bg-gradient-to-r rounded-xl from-blue-500 to-blue-600 p-6 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <p class="text-opacity-80 text-xs font-medium tracking-wider uppercase">Tổng Người Dùng</p>
+                    <p class="text-3xl font-bold sm:text-4xl">@Model.TotalUsers</p>
                 </div>
-                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
-                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <!-- Icon: users -->
-                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.02 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                <div class="bg-opacity-20 rounded-lg p-3">
+                    <svg class="mr-2 h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-r transform rounded-xl from-green-500 to-green-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
-            <div class="flex items-start justify-between">
-                <div class="space-y-1">
-                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Tổng Bài Thi</p>
-                    <p class="text-2xl font-bold sm:text-3xl">320</p>
+        <!-- Total Exams -->
+        <div class="bg-gradient-to-r rounded-xl from-green-500 to-green-600 p-6 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <p class="text-opacity-80 text-xs font-medium tracking-wider uppercase">Tổng bài thi</p>
+                    <p class="text-3xl font-bold sm:text-4xl">@Model.TotalExams</p>
                 </div>
-                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
-                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <!-- Icon: file-alt -->
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h6v6h6v10H6z" />
+                <div class="bg-opacity-20 rounded-lg p-3">
+                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-r transform rounded-xl from-yellow-500 to-yellow-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
-            <div class="flex items-start justify-between">
-                <div class="space-y-1">
-                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Lớp Học</p>
-                    <p class="text-2xl font-bold sm:text-3xl">45</p>
+        <!-- Total Classes -->
+        <div class="bg-gradient-to-r rounded-xl from-yellow-500 to-yellow-600 p-6 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <p class="text-opacity-80 text-xs font-medium tracking-wider uppercase">Lớp Học</p>
+                    <p class="text-3xl font-bold sm:text-4xl">@Model.TotalClasses</p>
                 </div>
-                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
-                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <!-- Icon: school -->
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm-1 12.91L5.09 13 3 14.09 12 19l9-5v-1.09L12 17.91zM12 6.09v5.82l6-3.27V5.82L12 3v3.09z" />
+                <div class="bg-opacity-20 rounded-lg p-3">
+                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-r transform rounded-xl from-purple-500 to-purple-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
-            <div class="flex items-start justify-between">
-                <div class="space-y-1">
-                    <p class="text-xs font-medium tracking-wider uppercase opacity-80 sm:text-sm">Môn Học</p>
-                    <p class="text-2xl font-bold sm:text-3xl">80</p>
+        <!-- Total Subjects -->
+        <div class="bg-gradient-to-r rounded-xl from-purple-500 to-purple-600 p-6 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <p class="text-opacity-80 text-xs font-medium tracking-wider uppercase">Môn Học</p>
+                    <p class="text-3xl font-bold sm:text-4xl">@Model.TotalSubjects</p>
                 </div>
-                <div class="bg-opacity-10 rounded-lg bg-black p-2 sm:p-3">
-                    <svg class="h-6 w-6 opacity-70 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <!-- Icon: book -->
-                        <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm12 16H6v-6h12v6zm0-8h-7V4h7v8z" />
+                <div class="bg-opacity-20 rounded-lg p-3">
+                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
-        <h3 class="mb-4 border-b pb-2 text-lg font-semibold text-gray-700 sm:text-xl">Hoạt động gần đây</h3>
-        <ul class="space-y-4">
-            <li class="flex flex-col items-start rounded-md bg-gray-50 p-3 transition duration-150 ease-in-out hover:bg-gray-100 sm:items-center sm:flex-row">
-                <img class="mr-0 mb-2 h-8 w-8 rounded-full border border-gray-200 object-cover sm:h-10 sm:w-10 sm:mr-4 sm:mb-0" src="https://i.pravatar.cc/50?u=a" alt="User Avatar">
-                <div class="flex-grow">
-                    <span class="text-sm text-gray-700"><strong>Nguyễn Văn A</strong> đã thêm bài thi mới: "Kiểm tra giữa kỳ Toán 10".</span>
-                </div>
-                <span class="mt-1 ml-0 text-xs text-gray-400 sm:ml-auto sm:mt-0">2 phút trước</span>
-            </li>
-            <li class="flex flex-col items-start rounded-md bg-gray-50 p-3 transition duration-150 ease-in-out hover:bg-gray-100 sm:items-center sm:flex-row">
-                <img class="mr-0 mb-2 h-8 w-8 rounded-full border border-gray-200 object-cover sm:h-10 sm:w-10 sm:mr-4 sm:mb-0" src="https://i.pravatar.cc/50?u=b" alt="User Avatar">
-                <div class="flex-grow">
-                    <span class="text-sm text-gray-700"><strong>Trần Thị B</strong> đã cập nhật thông tin lớp 11A1.</span>
-                </div>
-                <span class="mt-1 ml-0 text-xs text-gray-400 sm:ml-auto sm:mt-0">15 phút trước</span>
-            </li>
+    <div class="mt-10 rounded-xl bg-white p-6 shadow-lg sm:p-8">
+        <h3 class="mb-6 border-b-2 border-gray-200 pb-3 text-xl font-semibold text-gray-700 sm:text-2xl">Hoạt động gần đây</h3>
+        <ul class="max-h-96 space-y-5 overflow-y-auto">
+            @foreach (var n in Model.Notifications)
+            {
+                <li class="flex flex-col items-start rounded-lg bg-gray-50 p-4 transition duration-150 ease-in-out hover:bg-gray-100 sm:flex-row sm:items-center">
+                    <div class="flex-grow">
+                        <span class="text-base text-gray-700 sm:text-lg">
+                            <strong>@n.Role</strong> "@n.UserName" vừa tham gia Nquiz
+                        </span>
+                    </div>
+                    <span class="mt-2 ml-0 text-sm text-gray-400 sm:ml-auto sm:mt-0">
+                        @n.CreatedAt.ToString("HH:mm dd/MM/yyyy")
+                    </span>
+                </li>
+            }
         </ul>
     </div>
 </div>

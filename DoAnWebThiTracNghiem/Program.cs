@@ -21,6 +21,7 @@ builder.Services.AddScoped<ISubjectRepository, EFSubjectRepository>();
 builder.Services.AddScoped<IClassTnRepository, EFClassTnRepository>();
 builder.Services.AddScoped<IExamRepository, EFExamRepository>();
 builder.Services.AddScoped<IQuestionRepository, EFQuestionRepository>();
+builder.Services.AddScoped<IAIUsageLogRepository, EFAIUsageLogRepository>();
 builder.Services.AddSingleton<ChatbotService>();
 
 builder.Services.Configure<FormOptions>(options =>

@@ -15,7 +15,7 @@
                     <img id="avatarPreview"
                          src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/images/default-avatar.png" : Model.AvatarUrl)"
                          alt="Avatar"
-                         class="border-4 h-24 w-24 rounded-full border-blue-400 object-cover shadow transition group-hover:opacity-70" />
+                         class="h-24 w-24 rounded-full border-4 border-blue-400 object-cover shadow transition group-hover:opacity-70" />
                     @if (isEdit)
                     {
                         <div class="bg-opacity-30 absolute inset-0 flex items-center justify-center rounded-full bg-black opacity-0 transition group-hover:opacity-100">
@@ -30,12 +30,12 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-blue-700">@Model.FullName</h1>
-                <p class="mt-1 text-xs text-purple-600"><span class="font-bold">@Model.Role?.Name</span></p>
+                <p class="mt-1 text-xs text-purple-600"><span class="font-bold">Giáo viên</span></p>
             </div>
         </div>
 
         <section class="mb-8">
-            <h2 class="mb-4 font-bold text-blue-700">Account</h2>
+            <h2 class="mb-4 font-bold text-blue-700">Thông tin tài khoản</h2>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label class="text-purple-700">Email</label>
@@ -49,7 +49,7 @@
                     }
                 </div>
                 <div>
-                    <label class="text-purple-700">Phone</label>
+                    <label class="text-purple-700">Số điện thoại</label>
                     @if (isEdit)
                     {
                         <input asp-for="PhoneNumber" class="form-input w-full border-blue-300 focus:border-blue-500" />
@@ -60,19 +60,19 @@
                     }
                 </div>
                 <div>
-                    <label class="text-purple-700">Password</label>
+                    <label class="text-purple-700">Mật khẩu</label>
                     <div class="flex items-center gap-2">
                         <input type="password" value="@Model.Password" readonly class="form-input w-full border-blue-300" id="passwordField" style="letter-spacing: 3px;" />
                         <button type="button" onclick="togglePassword()" class="text-xs text-blue-600 underline">Xem</button>
                     </div>
-                    <p class="mt-1 text-xs text-gray-400">Created: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
-                    <p class="text-xs text-gray-400">Last updated: @Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="mt-1 text-xs text-gray-400">Ngày tạo: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="text-xs text-gray-400">Cập nhật gần nhất: @Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
                 </div>
             </div>
         </section>
         <hr class="my-8 border-blue-200" />
         <section>
-            <h2 class="mb-4 font-bold text-blue-700">Contact Information</h2>
+            <h2 class="mb-4 font-bold text-blue-700">Thông tin cá nhân</h2>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label class="text-purple-700">Full Name</label>
@@ -87,7 +87,7 @@
                 </div>
                 
                 <div class="md:col-span-2">
-                    <label class="text-purple-700">Address</label>
+                    <label class="text-purple-700">Địa chỉ</label>
                     @if (isEdit)
                     {
                         <input asp-for="Address" class="form-input w-full border-blue-300 focus:border-blue-500" />
@@ -124,13 +124,13 @@
                 field.type = 'password';
             }
         }
-        // function previewAvatar(event) {
-        //     var reader = new FileReader();
-        //     reader.onload = function(){
-        //         var output = document.getElementById('avatarPreview');
-        //         output.src = reader.result;
-        //     };
-        //     reader.readAsDataURL(event.target.files[0]);
-        // }
+        function previewAvatar(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('avatarPreview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
     </script>
 }

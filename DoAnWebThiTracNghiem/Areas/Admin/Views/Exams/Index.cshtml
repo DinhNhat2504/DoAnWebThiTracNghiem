@@ -6,16 +6,23 @@
 }
 
 <div class="content-section">
+    
     <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">
-        <div class="mb-6 flex flex-col items-start justify-between border-b pb-4 sm:flex-row sm:items-center">
-            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách Bài thi</h3>
-            <a asp-action="Create"
-               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+        <div class="mb-6 flex flex-col justify-between border-b pb-4 sm:flex-row sm:items-center">
+            <h3 class="mb-3 text-lg font-semibold text-gray-700 sm:text-xl sm:mb-0">Danh sách bài thi</h3>
+            <form method="get" class="mb-4 flex flex-col items-center space-x-2 sm:flex-row">
+                <input type="text" name="search" value="@Model.Search" placeholder="Tìm kiếm bài thi ..." class="w-full rounded border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 sm:w-auto" />
+                <button type="submit" class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+            <button onclick="openModal('addModal')"
+                    class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
                 <span>Thêm Bài thi</span>
-            </a>
+            </button>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -23,8 +30,8 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Tên bài thi</th>
                         <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Môn học</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Số câu hỏi</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Thời lượng</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Người tạo</th>
+
                         <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Ngày thi</th>
                         <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Trạng thái</th>
                         <th class="px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">Hành động</th>
@@ -36,8 +43,8 @@
                         <tr>
                             <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-800">@item.Exam_Name</td>
                             <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Subject?.Subject_Name</td>
-                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.TotalQuestions</td>
-                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Duration</td>
+                            <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Creator?.FullName</td>
+
                             <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600">@item.Exam_Date.ToString("dd/MM/yyyy")</td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 @if (item.IsActive)
@@ -50,7 +57,9 @@
                                 }
                             </td>
                             <td class="space-x-2 px-4 py-3 text-center text-sm font-medium whitespace-nowrap">
-                                <button type="button" onclick="openEditExamModal(@item.Exam_ID)" class="p-1 text-blue-600 hover:text-blue-800" title="Sửa">
+                                <button type="button"
+                                        onclick="handleEditExamClick(@item.Exam_ID, @(item.Creator?.RoleId ?? 0), @item.IsActive.ToString().ToLower())"
+                                        class="p-1 text-blue-600 hover:text-blue-800" title="Sửa">
                                     <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                     </svg>
@@ -60,7 +69,7 @@
                                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                                     </svg>
                                 </a>
-                                <button type="button" onclick="deleteExam(@item.Exam_ID)" class="p-1 text-red-600 hover:text-red-800" title="Xóa">
+                                <button type="button" onclick="handleDeleteExamClick(@item.Exam_ID, @(item.Creator?.RoleId ?? 0), @item.IsActive.ToString().ToLower())" class="p-1 text-red-600 hover:text-red-800" title="Xóa">
                                     <svg class="inline h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                     </svg>
@@ -77,31 +86,113 @@
                 Hiển thị trang @Model.PageNumber trên tổng @Model.TotalPages, tổng @Model.TotalItems bài thi
             </span>
             <div class="flex space-x-1">
-                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" asp-route-search="@Model.Search" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <a asp-action="Index" asp-route-page="@i"
+                    <a asp-action="Index" asp-route-page="@i" asp-route-search="@Model.Search"
                        class="rounded-md border px-3 py-1 text-sm @(i == Model.PageNumber ? "bg-blue-600 border-blue-600 text-white hover:bg-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50")">
                         @i
                     </a>
                 }
-                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
+                <a asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" asp-route-search="@Model.Search" class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 @(Model.PageNumber == Model.TotalPages ? "pointer-events-none opacity-50" : "")">Sau</a>
             </div>
         </div>
+    </div>
+</div>
+<!-- Modal thêm bài thi -->
+<div id="addModal" class="absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center">
+    <div class="relative w-full max-w-lg scale-95 transform rounded-lg bg-white p-6 shadow-lg">
+        <h3 class="mb-4 text-xl font-bold">Thêm bài thi</h3>
+        <form asp-action="Create" method="post">
+            <div class="mb-4">
+                <label for="Exam_Name" class="block text-sm font-medium text-gray-700">Tên bài thi</label>
+                <input type="text" id="Exam_Name" name="Exam_Name" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                <span id="Exam_NameError" class="text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="TotalQuestions" class="block text-sm font-medium text-gray-700">Tổng số câu hỏi</label>
+                <input type="number" id="TotalQuestions" name="TotalQuestions" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                <span id="TotalQuestionsError" class="text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="Duration" class="block text-sm font-medium text-gray-700">Thời gian làm bài</label>
+                <input type="number" id="Duration" name="Duration" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                <span id="DurationError" class="text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="PassScore" class="block text-sm font-medium text-gray-700">Điểm đạt</label>
+                <input type="number" id="PassScore" name="PassScore" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                <span id="PassScoreError" class="text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="Exam_Date" class="block text-sm font-medium text-gray-700">Ngày thi</label>
+                <input type="date" id="Exam_Date" name="Exam_Date" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required />
+                <span id="Exam_DateError" class="text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="Subject_ID" class="block text-sm font-medium text-gray-700">Môn học</label>
+                <select id="Subject_ID" name="Subject_ID" class="mt-1 w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                    <option value="">Chọn môn học</option>
+                    @foreach (var subject in (IEnumerable<DoAnWebThiTracNghiem.Models.Subject>)ViewData["Subjects"])
+                    {
+                        <option value="@subject.Subject_Id">@subject.Subject_Name</option>
+                    }
+                </select>
+                <span id="Subject_IDError" class="text-red-500"></span>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('addModal')" class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Hủy</button>
+                <button type="submit" class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">Lưu</button>
+            </div>
+        </form>
     </div>
 </div>
 <!-- Modal sửa exam -->
 <div id="editExamModal" class="bg-opacity-40 fixed inset-0 z-50 flex hidden items-center justify-center">
     <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
         <button type="button" onclick="closeEditExamModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700">
-            <!-- SVG close -->
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
         </button>
         <form id="editExamForm">
             <input type="hidden" name="Exam_ID" id="editExamId" />
             <div class="mb-3">
                 <label class="block text-sm font-medium text-gray-700">Tên bài thi</label>
                 <input type="text" name="Exam_Name" id="editExamName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EExam_NameError" class="text-red-500"></span>
             </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Tổng số câu hỏi</label>
+                <input type="number" name="TotalQuestions" id="editTotalQuestions" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="ETotalQuestionsError" class="text-red-500"></span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Thời gian làm bài</label>
+                <input type="number" name="Duration" id="editDuration" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EDurationError" class="text-red-500"></span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Điểm đạt</label>
+                <input type="number" name="PassScore" id="editPassScore" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EPassScoreError" class="text-red-500"></span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Ngày thi</label>
+                    <input type="date" name="Exam_Date" id="editExam_Date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EExam_DateError" class="text-red-500"></span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Thời gian bắt đầu</label>
+                <input type="datetime-local" name="StartTime" id="editStartTime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EStartTimeError" class="text-red-500"></span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">Thời gian kết thúc</label>
+                <input type="datetime-local" name="EndTime" id="editEndTime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required />
+                <span id="EEndTimeError" class="text-red-500"></span>
+            </div>
+            <input type="hidden" name="Subject_ID" id="editSubject_ID" />  
             <!-- Các trường khác: TotalQuestions, Duration, PassScore, Exam_Date, IsActive, Subject_ID ... -->
             <div class="flex justify-end">
                 <button type="button" onclick="closeEditExamModal()" class="mr-2 rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300">Hủy</button>
@@ -110,14 +201,107 @@
         </form>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+        function handleEditExamClick(examId, creatorRoleId, isActive) {
+        // So sánh số, không phải chuỗi
+        if (creatorRoleId === 2 && isActive === true) {
+            Swal.fire({
+                title: 'Cảnh báo',
+                text: 'Việc sửa bài đang hoạt động của giáo viên này sẽ ảnh hưởng tới việc làm bài thi và kết quả của học sinh do giáo viên này quản lý. Bạn có chắc muốn sửa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sửa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    openEditExamModal(examId);
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Cảnh báo',
+                text: 'Bạn có chắc muốn sửa bài thi này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sửa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    openEditExamModal(examId);
+                }
+            });
+        }
+    }
+    function handleDeleteExamClick(examId, creatorRoleId, isActive) {
+        // So sánh số, không phải chuỗi
+        if (creatorRoleId === 2 && isActive === true) {
+            Swal.fire({
+                title: 'Cảnh báo',
+                text: 'Việc xóa bài đang hoạt động của giáo viên này sẽ ảnh hưởng tới việc làm bài thi và kết quả của học sinh do giáo viên này quản lý. Bạn có chắc muốn xóa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    deleteExam(examId)
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Cảnh báo',
+                text: 'Bạn có chắc muốn xóa bài thi này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    deleteExam(examId)
+                }
+            });
+        }
+    }
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+      function openModal(modalId) {
+             document.getElementById(modalId).classList.remove('hidden');
+         }
     function openEditExamModal(examId) {
         fetch(`/Admin/Exams/GetExam/${examId}`)
             .then(res => res.json())
             .then(exam => {
                 document.getElementById('editExamId').value = exam.exam_ID;
                 document.getElementById('editExamName').value = exam.exam_Name || '';
-                // ... set các trường khác ...
+                document.getElementById('editTotalQuestions').value = exam.totalQuestions || '';
+                document.getElementById('editDuration').value = exam.duration || '';
+                document.getElementById('editPassScore').value = exam.passScore || '';
+                document.getElementById('editSubject_ID').value = exam.subject_ID;
+                document.getElementById('editExam_Date').value = exam.exam_Date ? exam.exam_Date.substring(0, 10) : '';
+                document.getElementById('editStartTime').value = exam.startTime || '';
+                document.getElementById('editEndTime').value = exam.endTime|| '';
+
+                if (exam.creator.roleId === 2) {
+                document.getElementById('editExam_Date').setAttribute('readonly', true);
+                document.getElementById('editStartTime').setAttribute('readonly', true);
+                document.getElementById('editEndTime').setAttribute('readonly', true);
+                document.getElementById('editTotalQuestions').setAttribute('readonly', true);
+                document.getElementById('editDuration').setAttribute('readonly', true);
+                document.getElementById('editPassScore').setAttribute('readonly', true);
+
+            } else {
+                document.getElementById('editExam_Date').removeAttribute('readonly');
+                document.getElementById('editStartTime').removeAttribute('readonly');
+                document.getElementById('editEndTime').removeAttribute('readonly');
+                document.getElementById('editTotalQuestions').removeAttribute('readonly');
+                document.getElementById('editDuration').removeAttribute('readonly');
+                document.getElementById('editPassScore').removeAttribute('readonly');
+            }
+
                 document.getElementById('editExamModal').classList.remove('hidden');
             });
     }
@@ -126,25 +310,135 @@
     }
     document.getElementById('editExamForm').addEventListener('submit', function (e) {
         e.preventDefault();
+        // Xóa lỗi cũ
+        document.getElementById('EExam_NameError').innerText = '';
+        document.getElementById('ETotalQuestionsError').innerText = '';
+        document.getElementById('EDurationError').innerText = '';
+        document.getElementById('EPassScoreError').innerText = '';
+        document.getElementById('EExam_DateError').innerText = '';
+        document.getElementById('EStartTimeError').innerText = '';
+        document.getElementById('EEndTimeError').innerText = ''; 
         const form = e.target;
         const formData = new FormData(form);
         fetch('/Admin/Exams/EditInline', {
             method: 'POST',
             body: formData
-        }).then(res => {
-            if (res.ok) location.reload();
-            else alert('Có lỗi xảy ra khi cập nhật!');
-        });
+        }).then(async res => {
+        const data = await res.json();
+            if (res.ok && data.success) {
+                showAlert("Cập nhật thành công!", "success");
+                       setTimeout(() => location.reload(), 1200);
+            }
+            else { if (data.message) {
+                showAlert(data.message, "error");
+            }
+            if (data.errors) {
+                if (data.errors.Exam_Name)
+                    document.getElementById('EExam_NameError').innerText = data.errors.Exam_Name[0];
+                if (data.errors.TotalQuestions)
+                    document.getElementById('ETotalQuestionsError').innerText = data.errors.TotalQuestions[0];
+                if (data.errors.Duration)
+                    document.getElementById('EDurationError').innerText = data.errors.Duration[0];
+                if (data.errors.PassScore)
+                    document.getElementById('EPassScoreError').innerText = data.errors.PassScore[0];
+                if (data.errors.Exam_Date)
+                    document.getElementById('EExam_DateError').innerText = data.errors.Exam_Date[0];
+                if (data.errors.StartTime)
+                    document.getElementById('EStartTimeError').innerText = data.errors.StartTime[0];
+                if (data.errors.EndTime)
+                    document.getElementById('EEndTimeError').innerText = data.errors.EndTime[0];
+            }
+        }
+        }).catch(() => {
+            console.log("Cac");
+        showAlert("Có lỗi xảy ra khi cập nhật!", "error");
+    });
+
     });
     function deleteExam(examId) {
-        if (confirm('Bạn có chắc chắn muốn xóa bài thi này?')) {
+        
             fetch(`/Admin/Exams/DeleteInline?id=${examId}`, { method: 'POST' })
                 .then(res => {
-                    if (res.ok) location.reload();
-                    else alert('Có lỗi xảy ra khi xóa!');
+                    if (res.ok) {
+                       showAlert("Xóa thành công!", "success");
+                       setTimeout(() => location.reload(), 1200);
+                    }
+                    else showAlert("Có lỗi xảy ra khi xóa!", "errol");
                 });
-        }
+        
     }
+    function showAlert(message, type = "success") {
+        
+        if (type === "success") {
+            Swal.fire({
+                    
+                    text: message,
+                    icon: "success"
+                    });
+        } else {
+                Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: message,
+      
+    });
+        }
+       
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var addUserForm = document.querySelector('#addModal form');
+        if (addUserForm) {
+            addUserForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Xóa lỗi cũ
+                document.getElementById('Exam_NameError').innerText = '';
+                document.getElementById('TotalQuestionsError').innerText = '';
+                document.getElementById('DurationError').innerText = '';
+                document.getElementById('PassScoreError').innerText = '';
+                document.getElementById('Exam_DateError').innerText = '';
+                document.getElementById('Subject_IDError').innerText = '';
+
+                var formData = new FormData(addUserForm);
+
+                  fetch('/Admin/Exams/Create', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (res.ok && data.success) {
+            showAlert(data.message || "Thêm bài thi thành công!", "success");
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            if (data.message) {
+                showAlert(data.message, "error");
+            }
+            if (data.errors) {
+                if (data.errors.Exam_Name)
+                    document.getElementById('Exam_NameError').innerText = data.errors.Exam_Name[0];
+                if (data.errors.TotalQuestions)
+                    document.getElementById('TotalQuestionsError').innerText = data.errors.TotalQuestions[0];
+                if (data.errors.Duration)
+                    document.getElementById('DurationError').innerText = data.errors.Duration[0];
+                if (data.errors.PassScore)
+                    document.getElementById('PassScoreError').innerText = data.errors.PassScoreError[0];
+                if (data.errors.Exam_Date)
+                    document.getElementById('Exam_DateError').innerText = data.errors.Exam_Date[0];
+                if (data.errors.Subject_ID)
+                    document.getElementById('Subject_IDError').innerText = data.errors.Subject_ID[0];
+            }
+        }
+    })
+    .catch(() => {
+        showAlert("Có lỗi xảy ra khi gửi dữ liệu!", "error");
+    });
+            });
+        }
+    });
 </script>
 
 

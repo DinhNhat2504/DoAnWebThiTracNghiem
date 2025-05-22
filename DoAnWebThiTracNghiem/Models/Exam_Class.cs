@@ -8,6 +8,8 @@ namespace DoAnWebThiTracNghiem.Models
         [Key]
         public int EC_ID { get; set; }
         [ForeignKey("Exam")]
+        [Required(ErrorMessage = "Vui lòng chọn 1 bài thi !")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn bài thi hợp lệ")]
         public int Exam_ID { get; set; }
         [ForeignKey("ClassTn")]
         public int ClassTNClass_Id { get; set; }

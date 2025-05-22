@@ -1,0 +1,114 @@
+﻿@model DoAnWebThiTracNghiem.ViewModel.StudentProfileViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    var selectedAchievement = Model.ClassAchievements.FirstOrDefault(c => c.ClassId == Model.SelectedClassId);
+
+}
+
+<section class="mx-auto mt-8 max-w-4xl">
+    <h2 class="mb-4 text-2xl font-bold">Thông tin cá nhân</h2>
+    <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data" class="mb-8 space-y-4 rounded bg-white p-6 shadow">
+        <input type="hidden" asp-for="UserId" />
+        <div class="flex items-center gap-4">
+           
+            <div>
+                <label for="fileUpload" class="cursor-pointer">
+                    <img id="avatarPreview" src="@(!string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : "/images/default-avatar.png")"
+                         alt="Avatar" class="h-24 w-24 rounded-full border object-cover" />
+                </label>
+                <input id="fileUpload" asp-for="AvatarFile" type="file" accept="image/*" class="hidden" onchange="previewAvatar(event)" />
+
+
+            </div>
+        </div>
+        <div>
+            <label class="block font-medium">Họ tên</label>
+            <input asp-for="FullName" class="w-full rounded border px-3 py-2" />
+        </div>
+        <div>
+            <label class="block font-medium">Email</label>
+            <input asp-for="Email" class="w-full rounded border px-3 py-2" />
+        </div>
+        <div>
+            <label class="block font-medium">Số điện thoại</label>
+            <input asp-for="Phone" class="w-full rounded border px-3 py-2" />
+        </div>
+        <div>
+            <label class="block font-medium">Địa chỉ</label>
+            <input asp-for="Address" class="w-full rounded border px-3 py-2" />
+        </div>
+        <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">Lưu thay đổi</button>
+    </form>
+
+    <h2 class="mb-4 text-2xl font-bold">Thành tích cá nhân</h2>
+    <div class="mb-8 rounded bg-white p-6 shadow">
+        <div class="mb-4">
+            <span class="font-semibold">Tổng số lớp đã tham gia:</span> @Model.TotalClasses
+        </div>
+        <form method="get" class="mb-4 flex flex-wrap items-center gap-2">
+            <label class="font-semibold">Lọc theo lớp:</label>
+            <select name="classId" class="rounded border px-3 py-2" onchange="this.form.submit()">
+                @foreach (var c in Model.Classes)
+                {
+                    <option value="@c.Class_Id" selected="@(c.Class_Id == Model.SelectedClassId)"> @c.ClassName</option>
+                }
+            </select>
+
+        </form>
+        @if (selectedAchievement != null)
+        {
+            <div class="mb-2">
+                <span class="font-semibold">Tổng bài thi đã làm:</span> @selectedAchievement.ExamsTaken
+            </div>
+            <div class="mb-2">
+                <span class="font-semibold">Điểm trung bình:</span> @selectedAchievement.AverageScore
+            </div>
+            <div>
+                <span class="font-semibold">Biểu đồ điểm các bài thi:</span>
+                <div class="mt-2">
+                    <canvas id="scoreChart" height="120"></canvas>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div>Chưa có dữ liệu thành tích cho lớp này.</div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function previewAvatar(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('avatarPreview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+        const examNames = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(selectedAchievement?.ExamScores.Select(e => e.ExamName) ?? new List<string>()));
+        const examScores = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(selectedAchievement?.ExamScores.Select(e => e.Score) ?? new List<double>()));
+        if (document.getElementById('scoreChart')) {
+            new Chart(document.getElementById('scoreChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: examNames,
+                    datasets: [{
+                        label: 'Điểm',
+                        data: examScores,
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, max: 10 }
+                    }
+                }
+            });
+        }
+    </script>
+}
+

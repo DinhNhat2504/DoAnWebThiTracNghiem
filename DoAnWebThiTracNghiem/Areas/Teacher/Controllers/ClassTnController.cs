@@ -81,11 +81,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         }
 
 
-        //public IActionResult ViewExam(int id)
-        //{
-        //    return RedirectToAction("ManageExam", "Exam");
-        //}
-        // Hiển thị chi tiết lớp học
+
         public async Task<IActionResult> Details(int classId)
         {
             var userId = HttpContext.Session.GetString("UserId");
@@ -128,7 +124,15 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 .Where(sc => sc.Class_ID == classId)
                 .Select(sc => sc.User)
                 .ToListAsync();
-
+            var examIds = await _context.ClassExams
+                .Where(ec => ec.ClassTNClass_Id == classId)
+               .Select(ec => ec.Exam_ID)
+    .ToListAsync();
+            var examCounts = await _context.ExamResult
+    .Where(er => examIds.Contains(er.Exam_ID))
+    .GroupBy(er => er.User_ID)
+    .Select(g => new { UserId = g.Key, Count = g.Count() })
+    .ToDictionaryAsync(x => x.UserId, x => x.Count);
             var viewModel = new ClassDetailsViewModel
             {
                 Class = classTn,
@@ -144,6 +148,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             ViewData["Notifications"] = notifications;
             ViewData["Exams"] = exams;
             ViewData["Students"] = students;
+            ViewData["StudentExamCounts"] = examCounts;
             ViewData["AvailableExams"] = availableExams;
 
             return View(viewModel);
@@ -175,11 +180,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             return RedirectToAction("Details", new { classId });
         }
         // Tạo lớp học mới
-        public IActionResult Create()
-        {
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "Subject_Id", "Subject_Name");
-            return View();
-        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ClassTn classTn)
         {
@@ -191,11 +192,29 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 classTn.UpdatedAt = DateTime.Now;
                 classTn.InviteCode = await GenerateUniqueInviteCode();
                 await _classTnRepository.AddAsync(classTn);
+                TempData["SuccessMessage"] = "Thêm lớp học thành công!";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "Subject_Id", "Subject_Name", classTn.SubjectId);
-            return View(classTn);
+
+            // Nếu lỗi, nạp lại danh sách môn học và truyền lỗi về Index
+            var userId = HttpContext.Session.GetString("UserId");
+            int teacherId = int.Parse(userId);
+            var subjects = await _context.Subjects.Where(s => s.CreatorUser_Id == teacherId).ToListAsync();
+            ViewData["Subjects"] = subjects;
+
+            // Lấy lại danh sách lớp để truyền về Index
+            var classes = await _context.ClassTn
+                .Include(c => c.Subject)
+                .Include(c => c.Creator)
+                .Include(c => c.Student_Classes)
+                .Where(c => c.CreatorUser_Id == teacherId)
+                .ToListAsync();
+
+            // Truyền ModelState lỗi về Index
+            TempData["ErrorMessage"] = "Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin.";
+            return View("Index", classes);
         }
+
         // Chỉnh sửa lớp học
         public async Task<IActionResult> Edit(int id)
         {
@@ -288,10 +307,27 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            try
+            {
+                var classTn = await _classTnRepository.GetByIdAsync(id);
+                if (classTn == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy lớp học để xóa.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-            await _classTnRepository.DeleteAsync(id);
+                await _classTnRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Xóa lớp học thành công.";
+            }
+            catch (Exception e)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa lớp học.";
+                Console.WriteLine(e);
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
         private async Task<string> GenerateUniqueInviteCode()
         {
             string inviteCode;

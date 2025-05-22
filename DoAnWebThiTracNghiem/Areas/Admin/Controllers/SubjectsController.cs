@@ -1,6 +1,8 @@
 ﻿using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
+using DoAnWebThiTracNghiem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
 {
@@ -12,21 +14,28 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
         {
             _Scontext = Scontext;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 5, string search = "")
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            var adminId = int.Parse(userId);
-            var subjects = await _Scontext.GetAllAsync(adminId);
-            return View();
+            var UserId = HttpContext.Session.GetString("UserId");
+            var RoleId = HttpContext.Session.GetString("RoleId");
+            int userId = int.Parse(UserId);
+            int roleId = int.Parse(RoleId);
+            var total = await _Scontext.CountAsync(roleId, userId, search);
+            var items = await _Scontext.GetPagedAsync(roleId, userId, page, pageSize, search);
+
+            var model = new PagedResult<Subject>
+            {
+                Items = items,
+                PageNumber = page,
+                TotalPages = (int)Math.Ceiling(total / (double)pageSize),
+                TotalItems = total,
+                Search = search
+            };
+
+            return View(model);
         }
-        public IActionResult Details()
-        {
-            return View();
-        }
-        public IActionResult Create()
-        {
-            return View();
-        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Subject subject)
@@ -36,55 +45,58 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
                 var userId = HttpContext.Session.GetString("UserId");
                 int adminId = int.Parse(userId);
                 subject.CreatorUser_Id = adminId;
+                subject.CreateAt = DateTime.Now;
                 await _Scontext.AddAsync(subject);
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, message = "Thêm môn học thành công !" });
             }
-            return View(subject);
+            // Trả về lỗi ModelState dạng JSON
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+            return BadRequest(new { success = false, errors });
         }
-        public async Task<IActionResult> Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> GetSubject(int id)
         {
             var subject = await _Scontext.GetByIdAsync(id);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-            return View(subject);
+            if (subject == null) return NotFound();
+            return Json(subject);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Subject subject)
+        public async Task<IActionResult> EditSub(Subject subject)
         {
-            if (id != subject.Subject_Id)
+            if (subject == null) return BadRequest();
+            var existing = await _Scontext.GetByIdAsync(subject.Subject_Id);
+            if (existing == null) return BadRequest();
+            // Trả về lỗi ModelState dạng JSON
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return BadRequest(new { success = false, errors });
             }
-            if (ModelState.IsValid)
-            {
-                await _Scontext.UpdateAsync(subject);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(subject);
+            await _Scontext.UpdateAsync(existing);
+            return Ok();
+
         }
-        public IActionResult Delete(int id)
-        {
-            var subject = _Scontext.GetByIdAsync(id);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-            return View(subject);
-        }
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteInline(int id)
         {
             var subject = await _Scontext.GetByIdAsync(id);
             if (subject == null)
             {
-                return NotFound();
+                return BadRequest(new { success = false });
             }
             await _Scontext.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            return Ok();
         }
     }
 }
