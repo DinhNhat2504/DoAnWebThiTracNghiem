@@ -30,8 +30,8 @@ namespace DoAnWebThiTracNghiem.Data
         public DbSet<Student_Class> ClassStudents { get; set; }
         public DbSet<Exam_Class> ClassExams { get; set; }
 
-
         
+
 
 
     }

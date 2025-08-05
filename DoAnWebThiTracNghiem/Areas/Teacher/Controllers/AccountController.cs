@@ -97,51 +97,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             return "/images/" + fileName;
         }
 
-        // Trả về trang thay đổi mật khẩu 
-        public IActionResult ChangePassword()
-        {
-            // Kiểm tra xem người dùng đã đăng nhập chưa
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
-            {
-                return RedirectToAction("Login"); // Chuyển đến trang Login nếu người dùng chưa đăng nhập
-            }
-
-            return View();
-        }
-        // Xử lý khi người dùng thay đổi mật khẩu
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword)
-        {
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Lấy thông tin người dùng từ cơ sở dữ liệu
-            var user = await _Ucontext.GetByIdAsync(int.Parse(userId));
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            // Kiểm tra mật khẩu hiện tại
-            if (user.Password != currentPassword) // So sánh trực tiếp mật khẩu
-            {
-                ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không đúng.");
-                return View();
-            }
-
-            // Cập nhật mật khẩu mới
-            user.Password = newPassword; // Lưu trực tiếp mật khẩu mới
-            user.UpdatedAt = DateTime.Now;
-
-            await _Ucontext.UpdateAsync(user);
-
-            TempData["Message"] = "Mật khẩu đã được thay đổi thành công.";
-            return RedirectToAction("Index", "Home");
-        }
+       
        
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
 using DoAnWebThiTracNghiem.ViewModel;
 using DoAnWebThiTracNghiem.Services;
+using BCrypt.Net;
 
 namespace DoAnWebThiTracNghiem.Controllers
 {
@@ -24,59 +25,8 @@ namespace DoAnWebThiTracNghiem.Controllers
             _Dbcontext = Dbcontext;
             _emailService = emailService;
         }
-        // Trả về Index 
-        public async Task<IActionResult> Index()
-        {
-            var users = await _Ucontext.GetAllAsync();
-            return View(users);
-        }
-      
-        // Trả về trang chi tiết người dùng
-        public async Task<IActionResult> Details(int id)
-        {
-            var user = await _Ucontext.GetByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
-        }
-        // Trả về trang thêm mới người dùng
-        public IActionResult Create()
-        {
-            ViewData["RoleId"] = new SelectList(_Dbcontext.Roles, "Id", "Name");
-            return View();
-        }
-        // Xử lý khi người dùng thêm mới người dùng
-        [HttpPost]
-        public async Task<IActionResult> Create(Users user, IFormFile avatarUrl)
-        {
-            
-                if (ModelState.IsValid)
-                {
-                    if (avatarUrl != null)
-                    {
-                        user.AvatarUrl = await SaveImage(avatarUrl);
-                    }
 
-                    await _Ucontext.AddAsync(user);
-                    return RedirectToAction(nameof(Index));
-                }
-           
 
-            ViewData["RoleId"] = new SelectList(_Dbcontext.Roles, "Id", "Name", user.RoleId);
-            return View(user);
-        }
-        // Lưu hình ảnh vào thư mục wwwroot/images
-        private async Task<string> SaveImage(IFormFile image)
-        {
-            var savePath = Path.Combine("wwwroot/images", image.FileName);
-            using (var fileStream = new FileStream(savePath, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
-            return "/images/" + image.FileName;
-        }
         // Trả về trang đăng ký tài khoản 
         public IActionResult Register()
         {
@@ -85,7 +35,9 @@ namespace DoAnWebThiTracNghiem.Controllers
                 .Where(r => r.Name == "Teacher" || r.Name == "Student")
                 .ToList();
 
-            ViewBag.Roles = new SelectList(roles, "Id", "Name");
+            ViewBag.Roles = new SelectList(
+            roles.Select(r => new { r.Id, Name = r.Name == "Teacher" ? "Giáo viên" : "Học sinh/Sinh viên" }),
+            "Id", "Name");
             return View();
         }
 
@@ -108,6 +60,7 @@ namespace DoAnWebThiTracNghiem.Controllers
                 }
 
                 // Lưu thông tin người dùng
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
                 user.CreatedAt = DateTime.Now;
                 user.UpdatedAt = DateTime.Now;
 
@@ -124,20 +77,26 @@ namespace DoAnWebThiTracNghiem.Controllers
             return View(user);
         }
 
-         // Trả về trang đăng nhập
+        // Trả về trang đăng nhập
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
-         // Xử lý khi người dùng đăng nhập
+        // Xử lý khi người dùng đăng nhập
         [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Login(Users model)
         {
-            var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.Email == email);
-            if (user == null || user.Password != password)
+            ModelState.Remove("FullName");
+            ModelState.Remove("RoleId");
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.Email == model.Email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
             {
                 ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không đúng.");
-                return View();
+                return View(model); // Trả lại view với lỗi
             }
 
             // Lưu thông tin người dùng vào Session
@@ -145,30 +104,23 @@ namespace DoAnWebThiTracNghiem.Controllers
             HttpContext.Session.SetString("UserName", user.FullName);
             HttpContext.Session.SetString("RoleId", user.RoleId.ToString());
 
-            // Lưu quyền vào Session
             var role = _Dbcontext.Roles.FirstOrDefault(r => r.Id == user.RoleId);
             if (role != null)
             {
                 HttpContext.Session.SetString("UserRole", role.Name);
-                // Chuyển hướng dựa trên quyền
                 if (role.Name == "Admin")
-                {
                     return RedirectToAction("Index", "Home", new { area = "Admin" });
-                }
-                else if (role.Name == "Teacher")
-                {
+                if (role.Name == "Teacher")
                     return RedirectToAction("Index", "Home", new { area = "Teacher" });
-                }
-                else if (role.Name == "Student")
-                {
+                if (role.Name == "Student")
                     return RedirectToAction("Index", "Home", new { area = "Student" });
-                }
             }
 
             return RedirectToAction("Index", "Home");
         }
 
         // Trả về trang thay đổi mật khẩu 
+        [HttpGet]
         public IActionResult ChangePassword()
         {
             // Kiểm tra xem người dùng đã đăng nhập chưa
@@ -181,8 +133,21 @@ namespace DoAnWebThiTracNghiem.Controllers
         }
         // Xử lý khi người dùng thay đổi mật khẩu
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePasswordPost(ChangePasswordViewModel model)
         {
+
+            if (model.CurrentPassword == model.NewPassword)
+            {
+                ModelState.AddModelError("NewPassword", "Mật khẩu mới không được giống mật khẩu hiện tại.");
+            }
+
+            // Kiểm tra hợp lệ model
+            if (!ModelState.IsValid)
+            {
+                return View("ChangePassword", model);
+            }
+
             // Lấy UserId từ session
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
@@ -198,19 +163,16 @@ namespace DoAnWebThiTracNghiem.Controllers
             }
 
             // Kiểm tra mật khẩu hiện tại
-            if (user.Password != currentPassword) // So sánh trực tiếp mật khẩu
+            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.Password))
             {
-                ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không đúng.");
-                return View();
+                ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không đúng.");
+                return View("ChangePassword", model);
             }
 
             // Cập nhật mật khẩu mới
-            user.Password = newPassword; // Lưu trực tiếp mật khẩu mới
+            user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             user.UpdatedAt = DateTime.Now;
-
             await _Ucontext.UpdateAsync(user);
-
-            TempData["Message"] = "Mật khẩu đã được thay đổi thành công.";
             return RedirectToAction("Index", "Home");
         }
         // Đăng xuất
@@ -230,69 +192,7 @@ namespace DoAnWebThiTracNghiem.Controllers
             return View();
         }
         // Xử lý khi người dùng xem thông tin cá nhân
-        public async Task<IActionResult> Profile()
-        {
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login");
-            }
 
-            // Lấy thông tin người dùng từ cơ sở dữ liệu
-            var user = await _Ucontext.GetByIdAsync(int.Parse(userId));
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-        // Xử lý khi người dùng cập nhật thông tin cá nhân
-        [HttpPost]
-        public async Task<IActionResult> Profile(Users user , IFormFile avatarUrl)
-        {
-            ModelState.Remove("AvatarUrl");
-            if (ModelState.IsValid)
-            {
-                // Lấy UserId từ session
-                var userId = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userId) || user.User_Id != int.Parse(userId))
-                {
-                    return Unauthorized();
-                }
-
-                // Cập nhật thông tin người dùng
-                var existingUser = await _Ucontext.GetByIdAsync(user.User_Id);
-                if (existingUser == null)
-                {
-                    return NotFound();
-                }
-
-                existingUser.FullName = user.FullName;
-                existingUser.PhoneNumber = user.PhoneNumber;
-                existingUser.Address = user.Address;
-                existingUser.UpdatedAt = DateTime.Now;
-
-                if (avatarUrl == null)
-                {
-                    user.AvatarUrl = existingUser.AvatarUrl;
-                     
-                }
-                else
-                {
-                    // Lưu hình ảnh mới
-                    user.AvatarUrl = await SaveImage(avatarUrl);
-                    existingUser.AvatarUrl = user.AvatarUrl;
-                }
-
-                await _Ucontext.UpdateAsync(existingUser);
-                TempData["Message"] = "Thông tin cá nhân đã được cập nhật thành công.";
-                return RedirectToAction(nameof(Profile));
-            }
-
-            return View(user);
-        }
         [HttpGet]
         public IActionResult ForgotPassword()
         {
@@ -307,7 +207,7 @@ namespace DoAnWebThiTracNghiem.Controllers
                 var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.Email == model.Email);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Email không tồn tại.");
+                    ModelState.AddModelError("Email", "Email không tồn tại.");
                     return View(model);
                 }
 
@@ -329,7 +229,7 @@ namespace DoAnWebThiTracNghiem.Controllers
             return View(model);
         }
 
-        
+
 
         [HttpGet]
         public IActionResult ResetPassword(string token)
@@ -350,13 +250,13 @@ namespace DoAnWebThiTracNghiem.Controllers
                 var user = (await _Ucontext.GetAllAsync()).FirstOrDefault(u => u.ResetPasswordToken == model.Token && u.ResetPasswordTokenExpiry > DateTime.Now);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Token không hợp lệ hoặc đã hết hạn.");
+                    ModelState.AddModelError("Token", "Token không hợp lệ hoặc đã hết hạn.");
                     return View(model);
                 }
 
                 // Cập nhật mật khẩu mới
-                user.Password = model.NewPassword;
-                user.ResetPasswordToken = null; // Xóa token sau khi sử dụng
+                user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+                user.ResetPasswordToken = null;
                 user.ResetPasswordTokenExpiry = null;
                 await _Ucontext.UpdateAsync(user);
 

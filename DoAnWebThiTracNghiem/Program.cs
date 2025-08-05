@@ -11,8 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<AppDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .EnableSensitiveDataLogging()); // B?t logging chi ti?t
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure())
+           .EnableSensitiveDataLogging());
 
 
 builder.Services.AddControllersWithViews();

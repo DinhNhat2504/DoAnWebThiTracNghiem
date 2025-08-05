@@ -36,7 +36,6 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
 
             return View(joinedClasses);
         }
-
         [HttpPost]
         public async Task<IActionResult> JoinClass(string inviteCode)
         {
@@ -74,12 +73,20 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             };
 
             _context.ClassStudents.Add(studentClass);
+
+            // Nếu lớp học đang ở trạng thái không hoạt động, chuyển sang hoạt động
+            if (!classTn.IsActive)
+            {
+                classTn.IsActive = true;
+                classTn.UpdatedAt = DateTime.Now;
+                _context.ClassTn.Update(classTn);
+            }
+
             await _context.SaveChangesAsync();
 
             TempData["Message"] = "Bạn đã tham gia lớp học thành công.";
             return RedirectToAction("Index");
         }
-
 
         public async Task<IActionResult> Details(int id)
         {
@@ -101,7 +108,18 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             var exams = await _context.ClassExams
                 .Include(ec => ec.Exam)
                 .Where(ec => ec.ClassTNClass_Id == id)
+                .OrderByDescending(ec => ec.AssignedAt)
                 .ToListAsync();
+
+            // Chuyển đổi giờ về giờ Việt Nam cho từng bài thi
+            foreach (var ec in exams)
+            {
+                if (ec.Exam != null)
+                {
+                    ec.Exam.StartTime = ToVietnamTime(ec.Exam.StartTime);
+                    ec.Exam.EndTime = ToVietnamTime(ec.Exam.EndTime);
+                }
+            }
 
             var userId = HttpContext.Session.GetString("UserId");
             int studentId = int.Parse(userId);
@@ -114,11 +132,18 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             ViewData["Notifications"] = notifications;
             ViewData["Exams"] = exams;
             ViewData["ExamResults"] = examResults;
-            ViewData["UserId"] = userId; // Thêm UserId vào ViewData
+            ViewData["UserId"] = userId;
 
             return View();
         }
 
+        // Thêm hàm này vào controller
+        private DateTime ToVietnamTime(DateTime utcDateTime)
+        {
+            var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var utc = DateTime.SpecifyKind(utcDateTime, DateTimeKind.Utc);
+            return TimeZoneInfo.ConvertTimeFromUtc(utc, vnTimeZone);
+        }
 
         [HttpPost]
         public async Task<IActionResult> LeaveClass(int id)
@@ -143,7 +168,5 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
 
             return RedirectToAction("Index", "StudentClass");
         }
-
-
     }
 }

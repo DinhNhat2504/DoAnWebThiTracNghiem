@@ -1,4 +1,6 @@
-﻿namespace DoAnWebThiTracNghiem.ViewModel
+﻿using DoAnWebThiTracNghiem.Models;
+
+namespace DoAnWebThiTracNghiem.ViewModel
 {
     public class StatisticsViewModel
     {
@@ -22,5 +24,8 @@
         // Sinh viên
         public StudentStatistics? TopStudentByExams { get; set; }
         public StudentStatistics? TopStudentByAverageScore { get; set; }
+        public List<ClassTn> Classes { get; set; }
+        public int? SelectedClassId { get; set; }
+        public List<StudentStatistics> Top10StudentsByScore { get; set; } = new();
     }
 }

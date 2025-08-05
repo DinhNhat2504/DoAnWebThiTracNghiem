@@ -30,7 +30,7 @@ namespace DoAnWebThiTracNghiem.Services
                         new { text = prompt }
                     }
                 }
-            }
+            } 
             };
 
             var requestUrl = $"{_apiUrl}{_apiKey}";

@@ -40,10 +40,15 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Subject subject)
         {
+            var userId = HttpContext.Session.GetString("UserId");
+            int adminId = int.Parse(userId);
             if (ModelState.IsValid)
             {
-                var userId = HttpContext.Session.GetString("UserId");
-                int adminId = int.Parse(userId);
+                var existingSubject = await _Scontext.GetAllAsync(1, adminId);
+                if (existingSubject.Any(u => u.Subject_Name == subject.Subject_Name))
+                {
+                    return BadRequest(new { success = false, message = "Môn học này đã tồn tại!" });
+                }
                 subject.CreatorUser_Id = adminId;
                 subject.CreateAt = DateTime.Now;
                 await _Scontext.AddAsync(subject);

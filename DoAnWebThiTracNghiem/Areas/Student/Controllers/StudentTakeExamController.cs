@@ -59,15 +59,15 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             var studentId = int.Parse(userId);
             try
             {
-                // Kiểm tra quyền truy cập
-                var classExams = await _context.ClassExams
-                    .Where(ce => ce.Exam_ID == examId)
-                    .ToListAsync();
+                //// Kiểm tra quyền truy cập
+                //var classExams = await _context.ClassExams
+                //    .Where(ce => ce.Exam_ID == examId)
+                //    .ToListAsync();
 
 
-                var classStudents = await _context.ClassStudents
-                    .Where(cs => cs.User_ID == studentId)
-                    .ToListAsync();
+                //var classStudents = await _context.ClassStudents
+                //    .Where(cs => cs.User_ID == studentId)
+                //    .ToListAsync();
 
 
                 var isAssigned = await _context.ClassExams
@@ -94,10 +94,14 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
                 }
 
                 // Kiểm tra thời gian hợp lệ
-                var currentTime = DateTime.Now;
-                if (currentTime > exam.EndTime || currentTime.Date != exam.Exam_Date.Date)
+                var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                var nowVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+                // Chuyển exam.StartTime và exam.EndTime từ UTC về giờ Việt Nam
+                var examStartVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(exam.StartTime, DateTimeKind.Utc), vnTimeZone);
+                var examEndVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(exam.EndTime, DateTimeKind.Utc), vnTimeZone);
+                var examDateVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(exam.Exam_Date, DateTimeKind.Utc), vnTimeZone).Date;
+                if (nowVn > examEndVn || nowVn.Date != examDateVn)
                 {
-
                     TempData["ErrorMessage"] = "Bài thi đã hết hạn hoặc không hợp lệ.";
                     return RedirectToAction("Index", "StudentExam");
                 }
@@ -149,7 +153,7 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
                 // Truyền dữ liệu vào ViewData
                 ViewData["Questions"] = questionsToDisplay;
                 ViewData["AllQuestions"] = allQuestions;
-                ViewData["RemainingTime"] = remainingTime;
+                ViewData["RemainingTime"] = (int)Math.Ceiling(remainingTime);
                 ViewData["CurrentPage"] = page;
                 ViewData["TotalPages"] = totalPages;
                 ViewData["ExamId"] = examId;
@@ -353,7 +357,8 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             int studentId = int.Parse(userId);
-
+            var exam = await _context.Exams
+                            .FirstOrDefaultAsync(e => e.Exam_ID == examId);
             // Lấy kết quả bài thi
             var examResult = await _context.ExamResult
                 .Include(er => er.Exam)
@@ -363,7 +368,7 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             {
                 return NotFound();
             }
-
+            var pass = (decimal)exam.PassScore;
             // Lấy danh sách câu trả lời của sinh viên, bao gồm QuestionType
             var studentAnswers = await _context.Answers
                 .Where(sa => sa.Result_ID1 == examResult.Result_ID)
@@ -379,7 +384,8 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
                 Score = examResult.Score,
                 CorrectAnswers = examResult.CorrectAnswers,
                 WrongAnswers = examResult.WrongAnswers,
-                StudentAnswers = studentAnswers
+                StudentAnswers = studentAnswers,
+                Pass = pass
             };
 
             return View(viewModel);

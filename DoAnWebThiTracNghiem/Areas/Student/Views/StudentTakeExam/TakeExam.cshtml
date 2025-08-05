@@ -130,7 +130,7 @@
         <div class="md:w-1/4">
             <div class="sticky top-24 rounded-lg bg-white p-4 shadow-md">
                 <h3 class="mb-4 text-lg font-semibold text-indigo-600">Điều hướng câu hỏi</h3>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-4 gap-2">
                     @for (int i = 1; i <= allQuestions.Count; i++)
                     {
                         var question = allQuestions[i - 1];
@@ -160,39 +160,35 @@ else
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        let remainingTime = @Html.Raw(Json.Serialize(ViewData["RemainingTime"]));
-        console.log("[TakeExam] Initial Remaining Time: " + remainingTime);
-
+          let remainingTime = Math.floor(@Html.Raw(Json.Serialize(ViewData["RemainingTime"])));
         if (isNaN(remainingTime) || remainingTime <= 0) {
             remainingTime = 40 * 60;
-            console.log("[TakeExam] RemainingTime không hợp lệ, đặt mặc định: " + remainingTime);
         }
 
         const timerElement = document.getElementById('countdown-timer');
         let isSubmitting = false;
+        let timerInterval; // <-- Khai báo ở đây
+
+        function updateTimer() {
+            if (remainingTime <= 0 && !isSubmitting) {
+                clearInterval(timerInterval);
+                timerElement.textContent = 'Hết giờ!';
+                alert('Thời gian làm bài đã hết!');
+                isSubmitting = true;
+                const examForm = document.getElementById('examForm');
+                if (examForm) examForm.submit();
+                return;
+            }
+            let minutes = Math.floor(remainingTime / 60);
+            let seconds = remainingTime % 60;
+            let secondsStr = seconds < 10 ? '0' + seconds : seconds;
+            timerElement.textContent = `${minutes}:${secondsStr}`;
+            remainingTime--;
+        }
 
         if (timerElement) {
-            function updateTimer() {
-                if (remainingTime <= 0 && !isSubmitting) {
-                    clearInterval(timerInterval);
-                    timerElement.textContent = 'Hết giờ!';
-                    alert('Thời gian làm bài đã hết!');
-                    isSubmitting = true;
-                    const examForm = document.getElementById('examForm');
-                    if (examForm) examForm.submit();
-                    return;
-                }
-
-                let minutes = Math.floor(remainingTime / 60);
-                let seconds = remainingTime % 60;
-                minutes = minutes < 10 ? '0' + minutes : minutes;
-                seconds = seconds < 10 ? '0' + seconds : seconds;
-                timerElement.textContent = `${minutes}:${seconds}`;
-                remainingTime--;
-            }
-
             updateTimer();
-            const timerInterval = setInterval(updateTimer, 1000);
+            timerInterval = setInterval(updateTimer, 1000); // <-- Gán giá trị ở đây
         }
 
         const examForm = document.getElementById('examForm');

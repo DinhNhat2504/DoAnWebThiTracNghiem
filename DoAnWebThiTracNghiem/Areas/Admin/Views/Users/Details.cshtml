@@ -8,17 +8,20 @@
 
 <div class="mx-auto mt-8 max-w-2xl rounded-xl bg-white p-8 shadow-md">
     <div class="flex flex-col items-center">
-        <img class="border-4 mb-4 h-28 w-28 rounded-full border-blue-400 object-cover"
+        <img class="mb-4 h-28 w-28 rounded-full border-4 border-blue-400 object-cover"
              src="@(string.IsNullOrEmpty(user.AvatarUrl) ? $"https://i.pravatar.cc/150?u={user.Email}" : user.AvatarUrl)"
              alt="@user.FullName" />
         <h2 class="mb-1 text-2xl font-bold text-gray-800">@user.FullName</h2>
         <span class="mb-4 text-sm text-gray-500">@user.Email</span>
     </div>
-    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-            <label class="block font-medium text-gray-600">Mật khẩu</label>
-            <div class="text-gray-800">@user.Password</div>
+    <div>
+        <label class="block font-medium text-gray-600">Mật khẩu</label>
+        <div class="w-full max-w-xs truncate text-gray-800">
+            @user.Password
         </div>
+    </div>
+    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        
         <div>
             <label class="block font-medium text-gray-600">Số điện thoại</label>
             <div class="text-gray-800">@user.PhoneNumber</div>

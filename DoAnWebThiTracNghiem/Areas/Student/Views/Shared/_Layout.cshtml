@@ -19,7 +19,7 @@
                 <li><a asp-action="Index" asp-controller="StudentClass" class="text-white transition-colors duration-300 hover:text-yellow-300">Lớp học</a></li>
                 <li><a href="/Student/StudentExam/Index" class="text-white transition-colors duration-300 hover:text-yellow-300">Bài thi</a></li>
                 
-                <li><a href="/Student/Account/Index" class="text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
+                <li><a href="/Student/Account/Index" class="hidden text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
             </ul>
             <div class="relative flex items-center space-x-2">
                 @await Component.InvokeAsync("AvatarDropDown")
@@ -34,7 +34,7 @@
                     <li class="my-5"><a <a asp-action="Index" asp-controller="StudentClass" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Lớp học</a></li>
                     <li class="my-5"><a href="/Student/StudentExam/Index" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Bài thi</a></li>
                     <li class="my-5"><a href="/Student/Account/Index" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Trang cá nhân</a></li>
-                    <li class="my-5"><a href="#" class="text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
+                    <li class="my-5"><a href="#" class="hidden text-2xl text-white transition-colors duration-300 hover:text-yellow-300">Hướng dẫn</a></li>
                 </ul>
             </div>
             <div class="text-center">
@@ -44,7 +44,7 @@
     </header>
 
     <!-- Thân trang (Main Content) -->
-    <main class="container mx-auto flex-grow px-4 py-6 text-lg md:py-10 md:px-6">
+    <main class="container mx-auto flex-grow px-4 py-6 text-lg md:px-6 md:py-10">
         
         @RenderBody()
     </main>

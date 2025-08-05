@@ -61,9 +61,12 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
         public async Task<List<Users>> GetUsersCreatedBetween(DateTime start, DateTime end)
         {
+            // Đảm bảo end là cuối ngày
+            var endOfDay = end.Date.AddDays(1).AddTicks(-1);
             return await _context.Users
-         .Where(u => u.CreatedAt >= start && u.CreatedAt <= end)
-         .ToListAsync();
+                .Where(u => u.CreatedAt >= start.Date && u.CreatedAt <= endOfDay)
+                .Include(u => u.Role) // Nếu cần lấy Role.Name
+                .ToListAsync();
         }
         public async Task<List<UserActivityCountViewModel>> GetUserActivityCountsAsync(List<int> userIds, List<int> roleIds)
         {

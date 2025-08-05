@@ -20,22 +20,30 @@
     <!-- Người dùng -->
     <div class="rounded-lg bg-white p-4 shadow">
         <h2 class="mb-2 font-bold">Người dùng mới</h2>
+        <div class="mb-2 text-sm text-gray-600">
+            Tổng: <span class="font-semibold">@(@Model.TotalTeachers + @Model.TotalStudents)</span>
+            &nbsp;|&nbsp; Giáo viên: <span class="font-semibold">@Model.TotalTeachers</span>
+            &nbsp;|&nbsp; Sinh viên: <span class="font-semibold">@Model.TotalStudents</span>
+        </div>
         <canvas id="userChart" height="120"></canvas>
     </div>
     <!-- Lớp học -->
     <div class="rounded-lg bg-white p-4 shadow">
         <h2 class="mb-2 font-bold">Lớp học mới</h2>
+        <div class="mb-2 text-sm text-gray-600">
+            Tổng: <span class="font-semibold">@Model.TotalClasses</span>
+        </div>
         <canvas id="classChart" height="120"></canvas>
-        <div class="mt-4">
-            <h3 class="font-semibold">Lớp đang hoạt động</h3>
-            <ul class="ml-5 list-disc text-green-700">
+        <div class="mt-4 hidden">
+            <h3 class="font-semibold">Lớp đang hoạt động (<span class="font-semibold">@Model.ActiveClasses.Count</span>)</h3>
+            <ul class="ml-5 max-h-32 list-disc overflow-y-auto text-green-700">
                 @foreach (var c in Model.ActiveClasses)
                 {
                     <li>@c.ClassName</li>
                 }
             </ul>
-            <h3 class="mt-2 font-semibold">Lớp không hoạt động</h3>
-            <ul class="ml-5 list-disc text-red-700">
+            <h3 class="mt-2 font-semibold">Lớp không hoạt động (<span class="font-semibold">@Model.InactiveClasses.Count</span>)</h3>
+            <ul class="ml-5 max-h-32 list-disc overflow-y-auto text-red-700">
                 @foreach (var c in Model.InactiveClasses)
                 {
                     <li>@c.ClassName</li>
@@ -46,22 +54,76 @@
     <!-- Bài thi -->
     <div class="rounded-lg bg-white p-4 shadow">
         <h2 class="mb-2 font-bold">Bài thi mới</h2>
+        <div class="mb-2 text-sm text-gray-600">
+            Tổng: <span class="font-semibold">@Model.TotalExams</span>
+        </div>
         <canvas id="examChart" height="120"></canvas>
     </div>
     <!-- Câu hỏi -->
     <div class="rounded-lg bg-white p-4 shadow">
         <h2 class="mb-2 font-bold">Câu hỏi mới</h2>
+        <div class="mb-2 text-sm text-gray-600">
+            Tổng: <span class="font-semibold">@Model.TotalQuestions</span>
+        </div>
         <canvas id="questionChart" height="120"></canvas>
     </div>
     <!-- Môn học -->
     <div class="rounded-lg bg-white p-4 shadow">
         <h2 class="mb-2 font-bold">Môn học mới</h2>
+        <div class="mb-2 text-sm text-gray-600">
+            Tổng: <span class="font-semibold">@Model.TotalSubjects</span>
+        </div>
         <canvas id="subjectChart" height="120"></canvas>
     </div>
 </div>
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        function renderMultiLineChart(id, labels, datasets) {
+            new Chart(document.getElementById(id), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Biểu đồ người dùng mới: 2 luồng
+        const userLabels = @Html.Raw(Json.Serialize(Model.TeacherStats.Select(x => x.Date)));
+        const teacherData = @Html.Raw(Json.Serialize(Model.TeacherStats.Select(x => x.Count)));
+        const studentData = @Html.Raw(Json.Serialize(Model.StudentStats.Select(x => x.Count)));
+
+        renderMultiLineChart('userChart', userLabels, [
+            {
+                label: 'Giáo viên mới',
+                data: teacherData,
+                borderColor: '#6366F1',
+                backgroundColor: '#6366F133',
+                fill: true,
+                tension: 0.3
+            },
+            {
+                label: 'Sinh viên mới',
+                data: studentData,
+                borderColor: '#3B82F6',
+                backgroundColor: '#3B82F633',
+                fill: true,
+                tension: 0.3
+            }
+        ]);
+
+        // Các biểu đồ khác giữ nguyên
         function renderLineChart(id, labels, data, label, color) {
             new Chart(document.getElementById(id), {
                 type: 'line',
@@ -88,11 +150,6 @@
                 }
             });
         }
-
-        // Dữ liệu từ server
-        const userLabels = @Html.Raw(Json.Serialize(Model.UserStats.Select(x => x.Date)));
-        const userData = @Html.Raw(Json.Serialize(Model.UserStats.Select(x => x.Count)));
-        renderLineChart('userChart', userLabels, userData, 'Người dùng', '#3B82F6');
 
         const classLabels = @Html.Raw(Json.Serialize(Model.ClassStats.Select(x => x.Date)));
         const classData = @Html.Raw(Json.Serialize(Model.ClassStats.Select(x => x.Count)));

@@ -184,21 +184,10 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ClassTn classTn)
         {
-            if (ModelState.IsValid)
-            {
-                var userID = HttpContext.Session.GetString("UserId");
-                classTn.CreatorUser_Id = int.Parse(userID);
-                classTn.CreatedAt = DateTime.Now;
-                classTn.UpdatedAt = DateTime.Now;
-                classTn.InviteCode = await GenerateUniqueInviteCode();
-                await _classTnRepository.AddAsync(classTn);
-                TempData["SuccessMessage"] = "Thêm lớp học thành công!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Nếu lỗi, nạp lại danh sách môn học và truyền lỗi về Index
             var userId = HttpContext.Session.GetString("UserId");
             int teacherId = int.Parse(userId);
+            // Nếu lỗi, nạp lại danh sách môn học và truyền lỗi về Index
+
             var subjects = await _context.Subjects.Where(s => s.CreatorUser_Id == teacherId).ToListAsync();
             ViewData["Subjects"] = subjects;
 
@@ -209,30 +198,38 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 .Include(c => c.Student_Classes)
                 .Where(c => c.CreatorUser_Id == teacherId)
                 .ToListAsync();
+            if (ModelState.IsValid)
+            {
+                // Kiểm tra trùng tên lớp trong cùng môn học của giáo viên (không phân biệt hoa thường)
+                var isDuplicate = await _context.ClassTn.AnyAsync(c =>
+                    c.CreatorUser_Id == teacherId &&
+                    c.SubjectId == classTn.SubjectId &&
+                    c.ClassName.ToLower() == classTn.ClassName.ToLower());
+
+                if (isDuplicate)
+                {
+                    TempData["CLErrorMessage"] = "Tên lớp học của môn học này đã tồn tại. Vui lòng chọn tên khác.";
+
+                    return View("Index", classes);
+                }
+
+                classTn.CreatorUser_Id = int.Parse(userId);
+                classTn.CreatedAt = DateTime.Now;
+                classTn.UpdatedAt = DateTime.Now;
+                classTn.InviteCode = await GenerateUniqueInviteCode();
+                await _classTnRepository.AddAsync(classTn);
+                TempData["CLSuccessMessage"] = "Thêm lớp học thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+
+
 
             // Truyền ModelState lỗi về Index
-            TempData["ErrorMessage"] = "Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin.";
+            TempData["CLErrorMessage"] = "Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin.";
             return View("Index", classes);
         }
 
         // Chỉnh sửa lớp học
-        public async Task<IActionResult> Edit(int id)
-        {
-            var classTn = await _classTnRepository.GetByIdAsync(id);
-            if (classTn == null)
-            {
-                return NotFound();
-            }
-
-            var userId = HttpContext.Session.GetString("UserId");
-            if (classTn.CreatorUser_Id != int.Parse(userId))
-            {
-                return Unauthorized();
-            }
-
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "Subject_Id", "Subject_Name", classTn.SubjectId);
-            return View(classTn);
-        }
         [HttpPost]
         public async Task<IActionResult> Edit(int id, ClassTn classTn)
         {
@@ -240,10 +237,11 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             {
                 return NotFound();
             }
-
+            var userId = HttpContext.Session.GetString("UserId");
+            int teacherId = int.Parse(userId);
             if (ModelState.IsValid)
             {
-                var userId = HttpContext.Session.GetString("UserId");
+                
                 var existingClass = await _classTnRepository.GetByIdAsync(id);
                 if (existingClass == null)
                 {
@@ -254,7 +252,19 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 {
                     return Unauthorized();
                 }
+                // Kiểm tra trùng tên lớp trong cùng môn học của giáo viên (không phân biệt hoa thường, loại trừ chính nó)
+                var isDuplicate = await _context.ClassTn.AnyAsync(c =>
+                    c.CreatorUser_Id == teacherId &&
+                    c.SubjectId == classTn.SubjectId &&
+                    c.ClassName.ToLower() == classTn.ClassName.ToLower() &&
+                    c.Class_Id != id);
 
+                if (isDuplicate)
+                {
+                    TempData["CLError"] = "Tên lớp học này đã tồn tại trong môn học. Vui lòng chọn tên khác.";
+                    ViewData["Subjects"] = _context.Subjects.ToList();
+                    return View("Details", classTn);
+                }
                 // Kiểm tra nếu môn học thay đổi
                 if (existingClass.SubjectId != classTn.SubjectId)
                 {
@@ -276,12 +286,12 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 
                 await _classTnRepository.UpdateAsync(existingClass);
 
-                TempData["SuccessMessage"] = "Cập nhật lớp học thành công!";
+                TempData["CLSuccess"] = "Cập nhật lớp học thành công!";
                 return RedirectToAction("Details", new { classId = id });
             }
 
             // Nếu ModelState không hợp lệ, hiển thị lại trang với thông báo lỗi
-            TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật lớp học. Vui lòng kiểm tra lại thông tin.";
+            TempData["CLError"] = "Có lỗi xảy ra khi cập nhật lớp học. Vui lòng kiểm tra lại thông tin.";
             ViewData["Subjects"] = _context.Subjects.ToList();
             return View("Details", classTn);
         }
@@ -290,20 +300,6 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 
 
         // Xóa lớp học
-        public async Task<IActionResult> Delete(int id)
-        {
-            var classTn = await _classTnRepository.GetByIdAsync(id);
-            if (classTn == null)
-            {
-                return NotFound();
-            }
-            var userId = HttpContext.Session.GetString("UserId");
-            if (classTn.CreatorUser_Id != int.Parse(userId))
-            {
-                return Unauthorized();
-            }
-            return View(classTn);
-        }
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -312,16 +308,16 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 var classTn = await _classTnRepository.GetByIdAsync(id);
                 if (classTn == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy lớp học để xóa.";
+                    TempData["CLErrorMessage"] = "Không tìm thấy lớp học để xóa.";
                     return RedirectToAction(nameof(Index));
                 }
 
                 await _classTnRepository.DeleteAsync(id);
-                TempData["SuccessMessage"] = "Xóa lớp học thành công.";
+                TempData["CLSuccessMessage"] = "Xóa lớp học thành công.";
             }
             catch (Exception e)
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa lớp học.";
+                TempData["CLErrorMessage"] = "Có lỗi xảy ra khi xóa lớp học.";
                 Console.WriteLine(e);
             }
 
@@ -380,8 +376,11 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
-            }
+                TempData["CLSuccess"] = "Xóa bài thi thành công.";
+                return RedirectToAction("Details", new { classId = examClass.ClassTNClass_Id });
 
+            }
+            TempData["CLError"] = "Đã có lỗi khi xóa bài thi.";
             return RedirectToAction("Details", new { classId = examClass.ClassTNClass_Id });
         }
 
@@ -393,7 +392,10 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             {
                 _context.ClassStudents.Remove(studentClass);
                 await _context.SaveChangesAsync();
+                TempData["CLSuccess"] = "Xóa sinh viên học thành công!";
+                return RedirectToAction("Details", new { classId = studentClass.Class_ID });
             }
+            TempData["CLSuccess"] = "Đã có lỗi khi xóa học viên!";
             return RedirectToAction("Details", new { classId = studentClass.Class_ID });
         }
         // Giao bài thi cho lớp
@@ -402,10 +404,19 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
         {
             if (selectedExams == null || !selectedExams.Any())
             {
-                TempData["Error"] = "Vui lòng chọn ít nhất một bài thi.";
+                TempData["CLError"] = "Vui lòng chọn ít nhất một bài thi.";
                 return RedirectToAction("Details", new { classId });
             }
-
+            // Kiểm tra bài thi không có câu hỏi
+            foreach (var examId in selectedExams)
+            {
+                var questionCount = await _context.ExamQuestions.CountAsync(eq => eq.Exam_ID == examId);
+                if (questionCount == 0)
+                {
+                    TempData["CLError"] = "Giao bài thi không thành công, vui lòng thêm câu hỏi vào bài thi!";
+                    return RedirectToAction("Details", new { classId });
+                }
+            }
             foreach (var examId in selectedExams)
             {
                 // Kiểm tra trạng thái IsActive của bài thi
@@ -427,7 +438,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             }
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Giao bài thành công.";
+            TempData["CLSuccess"] = "Giao bài thành công.";
             return RedirectToAction("Details", new { classId });
         }
 

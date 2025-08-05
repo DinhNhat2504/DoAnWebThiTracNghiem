@@ -79,7 +79,14 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
                 Exam = ec.Exam,
                 ClassName = ec.ClassTN.ClassName
             }).ToList();
-            
+
+            // Chuyển đổi giờ về giờ Việt Nam
+            foreach (var item in latestExams)
+            {
+                item.Exam.StartTime = ToVietnamTime(item.Exam.StartTime);
+                item.Exam.EndTime = ToVietnamTime(item.Exam.EndTime);
+            }
+
             var examResults = await _context.ExamResult
                 .Where(er => er.User_ID == userId)
                 .ToListAsync();
@@ -93,7 +100,13 @@ namespace DoAnWebThiTracNghiem.Areas.Student.Controllers
             return View();
         }
 
-
+        private DateTime ToVietnamTime(DateTime utcDateTime)
+        {
+            var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            // Đảm bảo đầu vào là UTC
+            var utc = DateTime.SpecifyKind(utcDateTime, DateTimeKind.Utc);
+            return TimeZoneInfo.ConvertTimeFromUtc(utc, vnTimeZone);
+        }
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

@@ -11,12 +11,17 @@ namespace DoAnWebThiTracNghiem.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Subject>> GetAllAsync()
+        public async Task<IEnumerable<Subject>> GetAllAsync(int roleid, int id)
         {
-            
+            if (roleid == 1)
+            {
                 return await _context.Subjects.ToListAsync();
-            
-            
+            }
+            else
+            {
+                return await _context.Subjects.Where(s => s.CreatorUser_Id == id).ToListAsync();
+            }
+
 
         }
         public async Task<Subject> GetByIdAsync(int id)
@@ -87,5 +92,5 @@ namespace DoAnWebThiTracNghiem.Repositories
         }
     }
 
-    }
+}
 

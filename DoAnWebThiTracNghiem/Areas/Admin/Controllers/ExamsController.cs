@@ -23,7 +23,7 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
             int adminId = int.Parse(userId);
             var totalExams = await _Econtext.CountAsync(1,adminId,search);
             var exams = await _Econtext.GetPagedAsync(1,adminId, page, pageSize, search);
-            var subjects = await _Scontext.GetAllAsync();
+            var subjects = await _Scontext.GetAllAsync(1, adminId);
             var model = new PagedResult<Exam>
             {
                 Items = exams,

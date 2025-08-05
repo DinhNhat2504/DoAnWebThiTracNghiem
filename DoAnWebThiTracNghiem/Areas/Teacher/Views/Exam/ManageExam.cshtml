@@ -5,75 +5,108 @@
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
 }
 
-<div class="mx-auto max-w-6xl px-4 py-8">
-    <h1 class="mb-6 text-3xl font-bold text-blue-700">Quản lý bài thi</h1>
+<div class="mx-auto min-h-screen max-w-7xl bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
+    <h1 class="mb-6 text-center text-3xl font-bold text-indigo-700 sm:text-left">Quản lý bài thi</h1>
 
     <!-- Thông báo -->
     @if (TempData["MnErrorMessage"] != null)
     {
-        <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
+        <div class="mb-6 rounded-lg border border-red-400 bg-red-100 p-4 text-red-700">
             @TempData["MnErrorMessage"]
         </div>
     }
     @if (TempData["MnSuccessMessage"] != null)
     {
-        <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
+        <div class="mb-6 rounded-lg border border-green-400 bg-green-100 p-4 text-green-700">
             @TempData["MnSuccessMessage"]
         </div>
     }
 
     <!-- Form chỉnh sửa thông tin bài thi -->
-    <form asp-action="ManageExam" method="post" class="mb-8 space-y-6 rounded-lg bg-white p-6 shadow">
+    <form asp-action="ManageExam" method="post" class="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-md">
         <input type="hidden" asp-for="Exam.Exam_ID" />
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-                <label class="mb-1 block font-semibold">Tên bài thi</label>
-                <input asp-for="Exam.Exam_Name" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Tên bài thi</label>
+                <input asp-for="Exam.Exam_Name" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 <span asp-validation-for="Exam.Exam_Name" class="text-sm text-red-500"></span>
             </div>
             <div>
-                <label class="mb-1 block font-semibold">Số lượng câu hỏi</label>
-                <input asp-for="Exam.TotalQuestions" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Thời lượng (phút)</label>
+                <input asp-for="Exam.Duration" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
             </div>
             <div>
-                <label class="mb-1 block font-semibold">Thời lượng (phút)</label>
-                <input asp-for="Exam.Duration" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Điểm đạt</label>
+                <input asp-for="Exam.PassScore" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
             </div>
             <div>
-                <label class="mb-1 block font-semibold">Điểm đạt</label>
-                <input asp-for="Exam.PassScore" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Ngày thi</label>
+                <input asp-for="Exam.Exam_Date" type="date" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
             </div>
             <div>
-                <label class="mb-1 block font-semibold">Ngày thi</label>
-                <input asp-for="Exam.Exam_Date" type="date" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Thời gian bắt đầu</label>
+                <input asp-for="Exam.StartTime" type="time" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
             </div>
             <div>
-                <label class="mb-1 block font-semibold">Thời gian bắt đầu</label>
-                <input asp-for="Exam.StartTime" type="time" class="w-full rounded border px-3 py-2" />
+                <label class="mb-2 block text-sm font-medium text-gray-700">Thời gian kết thúc</label>
+                <input asp-for="Exam.EndTime" type="time" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
             </div>
-            <div>
-                <label class="mb-1 block font-semibold">Thời gian kết thúc</label>
-                <input asp-for="Exam.EndTime" type="time" class="w-full rounded border px-3 py-2" />
-            </div>
-            
         </div>
-        <button type="submit" name="actionType" value="Edit" class="mt-4 rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700">Lưu thông tin</button>
+        <button type="submit" name="actionType" value="Edit" class="mt-6 rounded-lg bg-indigo-600 px-6 py-2 text-white transition duration-300 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none">Lưu thông tin</button>
     </form>
 
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <!-- Bộ lọc -->
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+        <div class="w-full sm:w-auto">
+            <label for="QuestionTypeId" class="block text-sm font-medium text-gray-700">Loại câu hỏi</label>
+            <select id="QuestionTypeId" class="w-full rounded-lg border border-gray-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" asp-items="ViewBag.QuestionTypeId">
+                <option value="">-- Tất cả --</option>
+            </select>
+        </div>
+        <div class="w-full sm:w-auto">
+            <label for="DifficultyLevel" class="block text-sm font-medium text-gray-700">Độ khó</label>
+            <select id="DifficultyLevel" class="w-full rounded-lg border border-gray-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none" asp-items="ViewBag.DifficultyLevels">
+                <option value="">-- Tất cả --</option>
+            </select>
+        </div>
+    </div>
+
+    <h2 class="mb-4 text-xl font-bold text-gray-700">Câu hỏi trong bài thi</h2>
+   <div class="mb-6 flex flex-col justify-between gap-4 rounded-lg border border-gray-200 bg-white p-2 shadow-md sm:flex-row sm:items-center">
+    <div class="flex flex-wrap items-center gap-2">
+        <span id="selectedCount" class="text-base font-semibold text-indigo-700">Đã chọn: 0 câu hỏi</span>
+        <span id="easyCount" class="text-sm text-green-600"></span>
+        <span id="mediumCount" class="text-sm text-yellow-600"></span>
+        <span id="hardCount" class="text-sm text-red-600"></span>
+    </div>
+    <div class="w-full sm:w-1/2">
+        <label class="mb-1 block text-sm font-medium text-gray-700">Mức độ</label>
+        <div class="flex h-6 w-full overflow-hidden rounded-lg border border-gray-300">
+            <div id="easyBar" class="h-6 bg-green-400 transition-all duration-300 hover:bg-green-500" style="width:0%"></div>
+            <div id="mediumBar" class="h-6 bg-yellow-400 transition-all duration-300 hover:bg-yellow-500" style="width:0%"></div>
+            <div id="hardBar" class="h-6 bg-red-400 transition-all duration-300 hover:bg-red-500" style="width:0%"></div>
+        </div>
+        <div class="mt-1.5 flex justify-between text-xs font-medium">
+            <span id="easyPercent" class="text-green-600">0% Dễ</span>
+            <span id="mediumPercent" class="text-yellow-600">0% TB</span>
+            <span id="hardPercent" class="text-red-600">0% Khó</span>
+        </div>
+    </div>
+</div>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <!-- Danh sách câu hỏi đã có trong bài thi -->
         <div>
-            <h2 class="mb-4 text-xl font-bold text-gray-700">Câu hỏi trong bài thi</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full rounded-lg bg-white shadow">
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">Câu hỏi trong bài thi</h3>
+            <div class="max-h-96 overflow-x-auto overflow-y-auto">
+                <table id="examQuestionsTable" class="min-w-full rounded-lg bg-white shadow-md">
                     <thead>
-                        <tr class="bg-blue-100">
-                            <th class="px-4 py-2">STT</th>
-                            <th class="px-4 py-2">Nội dung</th>
-                            <th class="px-4 py-2">Loại</th>
-                            <th class="px-4 py-2">Độ khó</th>
-                            <th class="px-4 py-2">Điểm</th>
-                            <th class="px-4 py-2">Xóa</th>
+                        <tr class="bg-indigo-100">
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">STT</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Nội dung</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Mức độ</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Điểm</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Xóa</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,18 +115,17 @@
                             int stt = 1;
                             foreach (var eq in Model.ExamQuestions)
                             {
-                                <tr class="hover:bg-gray-50">
-                                    <td class="border px-4 py-2">@stt</td>
-                                    <td class="border px-4 py-2">@eq.Question?.Question_Content</td>
-                                    <td class="border px-4 py-2">@eq.Question?.QuestionType?.Name</td>
-                                    <td class="border px-4 py-2">@eq.Question?.Level?.LevelName</td>
-                                    <td class="border px-4 py-2">@eq.Points</td>
-                                    <td class="border px-4 py-2 text-center">
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm text-gray-900">@stt</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">@eq.Question?.Question_Content</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">@eq.Question?.Level?.LevelName</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">@eq.Points</td>
+                                    <td class="px-4 py-2 text-center">
                                         <form asp-action="ManageExam" method="post" class="inline">
                                             <input type="hidden" name="Exam.Exam_ID" value="@Model.Exam.Exam_ID" />
                                             <input type="hidden" name="questionId" value="@eq.Question_ID" />
-                                            <button type="submit" name="actionType" value="RemoveQuestion" class="font-bold text-red-600 hover:text-red-800" title="Xóa">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <button type="submit" name="actionType" value="RemoveQuestion" class="text-red-600 transition duration-300 hover:text-red-800 focus:outline-none" title="Xóa">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
@@ -106,7 +138,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-gray-500">Chưa có câu hỏi nào trong bài thi.</td>
+                                <td colspan="5" class="py-4 text-center text-sm text-gray-500">Chưa có câu hỏi nào trong bài thi.</td>
                             </tr>
                         }
                     </tbody>
@@ -116,20 +148,18 @@
 
         <!-- Danh sách câu hỏi có thể thêm vào bài thi -->
         <div>
-            <h2 class="mb-4 text-xl font-bold text-gray-700">Thêm câu hỏi vào bài thi</h2>
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">Thêm câu hỏi vào bài thi</h3>
             <form asp-action="ManageExam" method="post">
                 <input type="hidden" name="Exam.Exam_ID" value="@Model.Exam.Exam_ID" />
-                <div class="overflow-x-auto">
-                    <table class="min-w-full rounded-lg bg-white shadow">
+                <div class="max-h-96 overflow-x-auto overflow-y-auto">
+                    <table id="availableQuestionsTable" class="min-w-full rounded-lg bg-white shadow-md">
                         <thead>
                             <tr class="bg-green-100">
-                                <th class="px-4 py-2 text-center">
-                                    <input type="checkbox" id="selectAllQuestions" />
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                                    <input type="checkbox" id="selectAllQuestions" class="accent-indigo-600" />
                                     <span class="ml-1">Chọn</span>
                                 </th>
-                                <th class="px-4 py-2">Nội dung</th>
-                                <th class="px-4 py-2">Loại</th>
-                                <th class="px-4 py-2">Độ khó</th>
+                                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Nội dung</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,27 +167,24 @@
                             {
                                 foreach (var q in Model.AvailableQuestions)
                                 {
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="border px-4 py-2 text-center">
-                                            <input type="checkbox" name="questionIds" value="@q.Question_ID" class="question-checkbox accent-blue-600" />
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-center">
+                                            <input type="checkbox" name="questionIds" value="@q.Question_ID" class="question-checkbox accent-indigo-600" />
                                         </td>
-                                        <td class="border px-4 py-2">@q.Question_Content</td>
-                                        <td class="border px-4 py-2">@q.QuestionType?.Name</td>
-                                        <td class="border px-4 py-2">@q.Level?.LevelName</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900">@q.Question_Content</td>
                                     </tr>
-                                    <span asp-validation-for="AvailableQuestions" class="text-sm text-red-500"></span>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="4" class="py-4 text-center text-gray-500">Không còn câu hỏi nào để thêm.</td>
+                                    <td colspan="2" class="py-4 text-center text-sm text-gray-500">Không còn câu hỏi nào để thêm.</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-                <button type="submit" name="actionType" value="AddQuestion" class="mt-4 rounded bg-green-600 px-6 py-2 text-white transition hover:bg-green-700">Thêm câu hỏi đã chọn</button>
+                <button type="submit" name="actionType" value="AddQuestion" class="mt-6 rounded-lg bg-green-600 px-6 py-2 text-white transition duration-300 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none">Thêm câu hỏi đã chọn</button>
             </form>
         </div>
     </div>
@@ -166,12 +193,126 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        document.getElementById('selectAllQuestions')?.addEventListener('change', function () {
-            var checkboxes = document.querySelectorAll('.question-checkbox');
-            for (var i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].checked = this.checked;
+        var allExamQuestions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.ExamQuestions.Select(eq => new {
+                Question_ID = eq.Question_ID,
+                Question_Content = eq.Question?.Question_Content,
+                Level = eq.Question?.Level?.LevelName ?? "",
+                Points = eq.Points
+            })
+        ));
+        var examQuestions = [...allExamQuestions];
+
+        // Chọn tất cả
+        $(document).on('change', '#selectAllQuestions', function () {
+            $('.question-checkbox').prop('checked', this.checked);
+        });
+
+        // Lọc câu hỏi cho cả hai bảng
+        function filterQuestions() {
+            var examId = @Model.Exam.Exam_ID;
+            var questionTypeId = $('#QuestionTypeId').val();
+            var difficultyLevel = $('#DifficultyLevel').val();
+
+            $.get('@Url.Action("FilterExamQuestions", "Exam")', {
+                examId: examId,
+                questionTypeId: questionTypeId,
+                difficultyLevel: difficultyLevel
+            }, function (data) {
+                var examTbody = $('#examQuestionsTable tbody');
+                examTbody.empty();
+                if (data.examQuestions.length > 0) {
+                    data.examQuestions.forEach(function (eq, idx) {
+                        examTbody.append(`
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2 text-sm text-gray-900">${idx + 1}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">${eq.question_Content}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">${eq.level}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">${eq.points}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <form action="@Url.Action("ManageExam", "Exam")" method="post" class="inline">
+                                        <input type="hidden" name="Exam.Exam_ID" value="@Model.Exam.Exam_ID" />
+                                        <input type="hidden" name="questionId" value="${eq.question_ID}" />
+                                        <button type="submit" name="actionType" value="RemoveQuestion" class="text-red-600 transition duration-300 hover:text-red-800 focus:outline-none" title="Xóa">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    examTbody.append('<tr><td colspan="5" class="py-4 text-center text-sm text-gray-500">Chưa có câu hỏi nào trong bài thi.</td></tr>');
+                }
+
+                var availTbody = $('#availableQuestionsTable tbody');
+                availTbody.empty();
+                if (data.availableQuestions.length > 0) {
+                    data.availableQuestions.forEach(function (q) {
+                        availTbody.append(`
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2 text-center">
+                                    <input type="checkbox" name="questionIds" value="${q.question_ID}" class="question-checkbox accent-indigo-600" />
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-900">${q.question_Content}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    availTbody.append('<tr><td colspan="2" class="py-4 text-center text-sm text-gray-500">Không còn câu hỏi nào để thêm.</td></tr>');
+                }
+            });
+        }
+
+        $('#QuestionTypeId, #DifficultyLevel').change(filterQuestions);
+
+        function updateExamQuestionStats() {
+            var easy = 0, medium = 0, hard = 0;
+            var total = allExamQuestions.length;
+
+            allExamQuestions.forEach(function(eq) {
+                var levelText = (eq.Level || "").toLowerCase();
+                if (levelText.includes('dễ')) easy++;
+                else if (levelText.includes('tb') || levelText.includes('trung bình')) medium++;
+                else if (levelText.includes('khó')) hard++;
+            });
+
+            var easyP = total > 0 ? Math.round((easy / total) * 100) : 0;
+            var mediumP = total > 0 ? Math.round((medium / total) * 100) : 0;
+            var hardP = total > 0 ? Math.round((hard / total) * 100) : 0;
+
+            var sum = easyP + mediumP + hardP;
+            if (sum !== 100 && total > 0) {
+                var diff = 100 - sum;
+                if (easyP > 0) easyP += diff;
+                else if (mediumP > 0) mediumP += diff;
+                else if (hardP > 0) hardP += diff;
+            }
+
+            $('#selectedCount').html('Tổng: <span style="color:#3b21ca;font-weight:bold">' + total + ' câu hỏi</span>');
+            $('#easyCount').html('<span style="color:#16a34a">' + easy + ' Dễ</span>');
+            $('#mediumCount').html('<span style="color:#eab308">' + medium + ' TB</span>');
+            $('#hardCount').html('<span style="color:#dc2626">' + hard + ' Khó</span>');
+            $('#easyBar').css('width', easyP + '%');
+            $('#mediumBar').css('width', mediumP + '%');
+            $('#hardBar').css('width', hardP + '%');
+            $('#easyPercent').text(easyP + '% Dễ');
+            $('#mediumPercent').text(mediumP + '% TB');
+            $('#hardPercent').text(hardP + '% Khó');
+        }
+
+        $(document).ready(updateExamQuestionStats);
+
+        $('form[action*="ManageExam"]').on('submit', function(e) {
+            var actionType = $(this).find('button[name="actionType"]').val();
+            if (actionType === 'RemoveQuestion') {
+                var questionId = $(this).find('input[name="questionId"]').val();
+                allExamQuestions = allExamQuestions.filter(q => q.Question_ID != questionId);
+                examQuestions = [...allExamQuestions];
+                setTimeout(updateExamQuestionStats, 100);
             }
         });
     </script>
-}
 }

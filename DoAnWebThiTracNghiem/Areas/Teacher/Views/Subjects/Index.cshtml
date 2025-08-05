@@ -7,16 +7,16 @@
 }
 
 <div class="content-section">
-    @if (TempData["ErrorMessage"] != null)
+    @if (TempData["SErrorMessage"] != null)
     {
         <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
-            @TempData["ErrorMessage"]
+            @TempData["SErrorMessage"]
         </div>
     }
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["SSuccessMessage"] != null)
     {
         <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
-            @TempData["SuccessMessage"]
+            @TempData["SSuccessMessage"]
         </div>
     }
     <div class="rounded-xl bg-white p-4 shadow-lg sm:p-6">

@@ -5,76 +5,188 @@
     Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-6 text-center text-2xl font-bold">Kết quả bài thi: @Model.Exam.Exam_Name</h2>
+<div class="container mx-auto px-4 py-8">
+    <h2 class="mb-6 text-center text-2xl font-bold text-indigo-700">Kết quả bài thi: @Model.Exam.Exam_Name</h2>
 
-<div class="mb-4">
-    <p class="text-lg">Điểm: <span class="font-semibold">@Model.Score</span></p>
-    <p class="text-lg">Số câu đúng: <span class="font-semibold">@Model.CorrectAnswers</span></p>
-    <p class="text-lg">Số câu sai: <span class="font-semibold">@Model.WrongAnswers</span></p>
-</div>
+    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+        @{
+            if (@Model.Pass <= @Model.Score)
+            {
+                <p class="mb-4 text-center font-semibold text-green-600">Bạn đã vượt qua bài thi!</p>
+            }
+            else
+            {
+                <p class="mb-4 text-center font-semibold text-red-600">Bạn đã không vượt qua bài thi. Cần cố gắng hơn!</p>
+            }
 
-<div class="space-y-6">
-    @foreach (var answer in Model.StudentAnswers.OrderBy(a => a.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order))
-    {
-        <div class="rounded-lg border bg-white p-4 shadow-md">
-            <p class="text-lg font-semibold">
-                Câu @answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order:
-                @answer.Question.Question_Content
-                <span class="text-sm text-gray-500">(@answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Points điểm)</span>
-            </p>
-            <div class="mt-4">
-                @if (answer.Question.QuestionType.Name == "Chọn 1 đáp án")
-                {
-                    @for (int i = 0; i < answer.Question.Options.Count; i++)
+        }
+        <div class="grid gap-4 text-lg md:grid-cols-4">
+            <p>Điểm: <span class="font-semibold text-indigo-600">@Model.Score</span></p>
+            <p>Số câu đúng: <span class="font-semibold text-green-600">@Model.CorrectAnswers</span></p>
+            <p>Số câu sai: <span class="font-semibold text-red-600">@Model.WrongAnswers</span></p>
+            <p>Điểm cần đạt: <span class="font-semibold text-indigo-600">@Model.Pass</span></p>
+        </div>
+
+    </div>
+
+    <div class="space-y-6">
+        @foreach (var answer in Model.StudentAnswers.OrderBy(a => a.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order))
+        {
+            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        @{
+                            var isAnswerCorrect = false;
+                            if (answer.Selected_Option != null && answer.Question.Correct_Option != null)
+                            {
+                                if (answer.Question.QuestionType.Name == "Đúng/Sai")
+                                {
+                                    isAnswerCorrect = (answer.Selected_Option.ToString().ToLower() == "true" && answer.Question.Correct_Option.ToString().ToLower() == "true") ||
+                                    (answer.Selected_Option.ToString().ToLower() == "false" && answer.Question.Correct_Option.ToString().ToLower() == "false");
+                                }
+                                else if (answer.Question.QuestionType.Name == "Chọn 1 đáp án")
+                                {
+                                    isAnswerCorrect = answer.Selected_Option.ToString() == answer.Question.Correct_Option.ToString();
+                                }
+                                else if (answer.Question.QuestionType.Name == "Điền từ đúng")
+                                {
+                                    isAnswerCorrect = answer.Selected_Option.ToString().Trim().ToLower() == answer.Question.Correct_Option.ToString().Trim().ToLower();
+                                }
+                            }
+                            <span class="@(isAnswerCorrect ? "text-green-600" : "text-red-600")">(@(isAnswerCorrect ? "Đúng" : "Sai")) </span>
+                        }
+                        Câu @answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Question_Order:
+                        @answer.Question.Question_Content
+                    </h3>
+                    <span class="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800">
+                        @answer.Question.Exam_Questions.FirstOrDefault(eq => eq.Exam_ID == Model.Exam.Exam_ID)?.Points điểm
+                    </span>
+                </div>
+
+                <div class="space-y-3">
+                    @if (answer.Question.QuestionType.Name == "Chọn 1 đáp án")
                     {
-                        <div class="mb-2 flex items-center">
-                            <input type="radio" id="option-@answer.Question.Question_ID-@i" name="answers[@answer.Question.Question_ID]" value="@answer.Question.Options[i]" class="mr-2" disabled @(answer.Selected_Option == answer.Question.Options[i] ? "checked" : "")>
-                            <label for="option-@answer.Question.Question_ID-@i" class="text-gray-700">
-                                @((char)(65 + i)). @answer.Question.Options[i]
-                            </label>
+                        @for (int i = 0; i < answer.Question.Options.Count; i++)
+                        {
+                            var isCorrect = answer.Question.Options[i] == answer.Question.Correct_Option;
+                            var isSelected = answer.Question.Options[i] == answer.Selected_Option;
+                            var optionClass = isSelected
+                            ? (isCorrect ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200")
+                            : (isCorrect ? "bg-green-50 border-green-200" : "bg-white border-gray-200");
+
+                            <div class="@($"flex items-center space-x-3 rounded-lg border p-3 {optionClass}")">
+                                <div class="flex h-5 w-5 items-center justify-center">
+                                    @if (isSelected)
+                                    {
+                                        <div class="@(isCorrect ? "text-green-600" : "text-red-600")">
+                                            @if (isCorrect)
+                                            {
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            }
+                                            else
+                                            {
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            }
+                                        </div>
+                                    }
+                                    else if (isCorrect)
+                                    {
+                                        <div class="text-green-600">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </div>
+                                <span class="@(isSelected ? (isCorrect ? "text-green-700" : "text-red-700") : (isCorrect ? "text-green-700" : "text-gray-700"))">
+                                    @((char)(65 + i)). @answer.Question.Options[i]
+                                </span>
+                            </div>
+                        }
+                    }
+                    else if (answer.Question.QuestionType.Name == "Đúng/Sai")
+                    {
+                        var options = new List<string> { "Đúng", "Sai" };
+                        foreach (var option in options)
+                        {
+                            var isCorrect = (option == "Đúng" && answer.Question.Correct_Option == "Đúng") || (option == "Sai" && answer.Question.Correct_Option == "Sai");
+                            var isSelected = (option == "Đúng" && answer.Selected_Option == "Đúng") || (option == "Sai" && answer.Selected_Option == "Sai");
+                            var optionClass = isSelected
+                            ? (isCorrect ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200")
+                            : (isCorrect ? "bg-green-50 border-green-200" : "bg-white border-gray-200");
+
+                            <div class="@($"flex items-center space-x-3 rounded-lg border p-3 {optionClass}")">
+                                <div class="flex h-5 w-5 items-center justify-center">
+                                    @if (isSelected)
+                                    {
+                                        <div class="@(isCorrect ? "text-green-600" : "text-red-600")">
+                                            @if (isCorrect)
+                                            {
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            }
+                                            else
+                                            {
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            }
+                                        </div>
+                                    }
+                                    else if (isCorrect)
+                                    {
+                                        <div class="text-green-600">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </div>
+                                <span class="@(isSelected ? (isCorrect ? "text-green-700" : "text-red-700") : (isCorrect ? "text-green-700" : "text-gray-700"))">
+                                    @option
+                                </span>
+                            </div>
+                        }
+                    }
+                    else if (answer.Question.QuestionType.Name == "Điền từ đúng")
+                    {
+                        var isCorrect = answer.Selected_Option != null && answer.Question.Correct_Option != null &&
+                        answer.Selected_Option.ToString().Trim().ToLower() == answer.Question.Correct_Option.ToString().Trim().ToLower();
+                        var optionClass = isCorrect ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200";
+
+                        <div class="@($"flex items-center space-x-3 rounded-lg border p-3 {optionClass}")">
+                            <div class="flex h-5 w-5 items-center justify-center">
+                                @if (isCorrect)
+                                {
+                                    <div class="text-green-600">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-red-600">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                }
+                            </div>
+                            <input type="text" value="@answer.Selected_Option" class="w-full rounded-lg border p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" disabled>
+                            @if (!isCorrect)
+                            {
+                                <span class="ml-2 text-green-700">✔ @answer.Question.Correct_Option</span>
+                            }
                         </div>
                     }
-                }
-                else if (answer.Question.QuestionType.Name == "Đúng/Sai")
-                {
-                    <div class="mb-2 flex items-center">
-                        <input type="radio" id="true-@answer.Question.Question_ID" name="answers[@answer.Question.Question_ID]" value="Đúng" class="mr-2" disabled @(answer.Selected_Option == "True" ? "checked" : "")>
-                        <label for="true-@answer.Question.Question_ID" class="text-gray-700">Đúng</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="radio" id="false-@answer.Question.Question_ID" name="answers[@answer.Question.Question_ID]" value="Sai" class="mr-2" disabled @(answer.Selected_Option == "False" ? "checked" : "")>
-                        <label for="false-@answer.Question.Question_ID" class="text-gray-700">Sai</label>
-                    </div>
-                }
-                else if (answer.Question.QuestionType.Name == "Điền từ đúng")
-                {
-                    <input type="text" name="answers[@answer.Question.Question_ID]" value="@answer.Selected_Option" class="w-full rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-                }
+                </div>
             </div>
-            
-            <div class="mt-4">
-                <p class="text-sm">
-                    Đáp án đúng: <span class="font-semibold text-green-600">@answer.Question.Correct_Option</span>
-                </p>
-                @if (answer.Question.QuestionType?.Name == "Chọn 1 đáp án")
-                {
-                    <p class="text-sm">
-                        Lựa chọn của bạn:
-                        <span class="font-semibold @(answer.Selected_Option == answer.Question.Correct_Option ? "text-green-600" : "text-red-600")">
-                           @((char)(65 + answer.Question.Options.IndexOf(answer.Selected_Option)))
-                        </span>
-                    </p>
-                }
-                else
-                {
-                    <p class="text-sm">
-                        Lựa chọn của bạn:
-                        <span class="font-semibold @(answer.Selected_Option == answer.Question.Correct_Option ? "text-green-600" : "text-red-600")">
-                            @answer.Selected_Option
-                        </span>
-                    </p>
-                }
-            </div>
-        </div>
-    }
+        }
+    </div>
 </div>

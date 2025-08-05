@@ -231,7 +231,13 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                         ModelState.AddModelError($"Questions[{validQuestions.IndexOf(question)}].Options", "Vui lòng điền đầy đủ các đáp án và chọn đáp án đúng.");
                         continue;
                     }
-
+                    // Kiểm tra đáp án trùng nhau
+                    var distinctOptions = question.Options.Where(opt => !string.IsNullOrWhiteSpace(opt)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                    if (distinctOptions.Count != question.Options.Count)
+                    {
+                        ModelState.AddModelError($"Questions[{validQuestions.IndexOf(question)}].Options", "Các đáp án không được trùng nhau.");
+                        continue;
+                    }
                     if (!question.Options.Contains(question.Correct_Option))
                     {
                         Console.WriteLine($"Đáp án đúng không hợp lệ: CorrectOption={question.Correct_Option}, Options={string.Join(",", question.Options)}");
@@ -392,7 +398,7 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 }
 
                 var noteText = string.IsNullOrWhiteSpace(request.Note) ? "" : $" ({request.Note})";
-                var prompt = request.QuestionTypeId switch
+                var prompt = request.QuestionTypeId switch 
                 {
                     1 => $@"Tạo {request.NumberOfQuestions} câu hỏi trắc nghiệm về chủ đề '{subjectName}{noteText}' 
 với độ khó '{levelName}'. Mỗi câu hỏi phải có đúng 4 đáp án, chỉ 1 đáp án đúng. 

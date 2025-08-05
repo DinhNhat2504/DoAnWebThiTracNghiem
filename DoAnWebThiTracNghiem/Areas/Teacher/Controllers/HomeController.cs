@@ -58,7 +58,10 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             return View(model);
         }
 
-
+        public IActionResult Instruct()
+        {
+            return View();
+        }
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

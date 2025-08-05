@@ -1,24 +1,10 @@
 ﻿@model DoAnWebThiTracNghiem.Models.Users
 <header class="flex items-center justify-between bg-white p-4 shadow">
-    <div class="flex items-center">
-        <p>Xin chào Admin @Html.DisplayFor(model => model.FullName)</p>
+    <div class="flex items-center uppercase">
+        <p class="font-bold">Xin chào Admin @Html.DisplayFor(model => model.FullName)</p>
     </div>
     <div class="relative flex items-center">
-        <div class="flex items-center" id="userDropdown">
-            
-            <div id="userDropdownToggle" class="relative flex cursor-pointer items-center">
-                <img class="mr-2 h-8 w-8 rounded-full" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/40?u=" + Model.Email : Model.AvatarUrl) " alt="User Avatar">
-                <p class="cursor-pointer">@Html.DisplayFor(model => model.FullName)</p>
-                <svg class="ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-                <div id="userDropdownContent" class="absolute top-full right-0 z-10 mt-2 hidden w-48 rounded-md border border-gray-200 bg-gray-100 shadow-lg">
-                    
-                    <a asp-action="Profile" asp-controller="Account" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Xem hồ sơ</a>
-                    <a asp-action="Logout" asp-controller="Home" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Đổi mật khẩu</a>
-                </div>
-            </div>
-        </div>
+       
         <button id="menuToggle" class="ml-4 p-2 text-indigo-600 hover:text-indigo-800 focus:outline-none md:hidden">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>

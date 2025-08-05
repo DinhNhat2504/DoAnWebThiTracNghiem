@@ -8,18 +8,19 @@
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <div class="mb-2 flex justify-center"><img src="~/images/logo-removebg.png" class="mt-2 ml-2 h-10 w-auto" /></div>
         <h1 class="mb-4 text-center text-2xl font-bold text-gray-800">Chào mừng bạn trở lại!</h1>
+        @Html.ValidationSummary(true, "", new { @class = "text-red-500 mb-2" })
         <form asp-action="Login" method="post" class="space-y-6">
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input asp-for="Email" type="email" id="email" required
+                <input asp-for="Email" type="email" id="email" required invalid
                        class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <span asp-validation-for="Email" class="text-red-500"></span>
             </div>
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
                 <input asp-for="Password" type="password" id="password" required
                        class="mt-1 w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <span asp-validation-for="Password" class="text-red-500"></span>
             </div>
             <div>
                 <button type="submit"
@@ -39,8 +40,10 @@
         
     </div>
 </div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+       
 }

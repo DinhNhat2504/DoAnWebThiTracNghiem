@@ -12,8 +12,7 @@ namespace DoAnWebThiTracNghiem.Models
         [StringLength(200, ErrorMessage = "Tên kỳ thi không được vượt quá 200 ký tự")]
         public string? Exam_Name { get; set; }
 
-        [Required(ErrorMessage = "Số lượng câu hỏi là bắt buộc")]
-        [Range(1,200, ErrorMessage = "Số lượng câu hỏi phải lớn hơn 0, tối đa là 200")]
+        
         public int TotalQuestions { get; set; }
          
         [Required(ErrorMessage = "Thời gian làm bài là bắt buộc")]
@@ -21,7 +20,7 @@ namespace DoAnWebThiTracNghiem.Models
         public int Duration { get; set; }
 
         [Required(ErrorMessage = "Điểm đậu là bắt buộc")]
-        [Range(0.0, 100.0, ErrorMessage = "Điểm đậu phải từ 0 đến 100")]
+        [Range(0.0, 10.0, ErrorMessage = "Điểm đậu phải từ 0 đến 100")]
         public double PassScore { get; set; }
 
         [Required(ErrorMessage = "Thời gian bắt đầu là bắt buộc")]

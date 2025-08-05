@@ -18,18 +18,27 @@
                 <button type="submit" class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto">Tìm kiếm</button>
             </form>
         </div>
-        <div class="mb-6 flex flex-col items-start justify-between pb-4 sm:flex-row sm:items-center">
+        <div class="mb-6 flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <!-- Nút thêm câu hỏi -->
             <a asp-action="Create"
-               class="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
+               class="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white shadow transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md sm:w-auto">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
                 <span>Thêm Câu hỏi</span>
             </a>
-            <form asp-action="ImportExcel" asp-controller="Question" enctype="multipart/form-data" method="post" class="mt-5 mb-5 sm:mt-0">
-                <div class="input-group">
-                    <input type="file" name="excelFile" accept=".xlsx" class="w-full rounded border px-2 py-1 sm:w-auto" required />
-                    <button type="submit" class="mt-5 w-full rounded bg-green-500 px-4 py-1 text-white sm:mt-0 sm:w-auto">Import Excel</button>
+
+            <!-- Form nhập file Excel -->
+            <form asp-action="ImportExcel" asp-controller="Question" enctype="multipart/form-data" method="post" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                <a href="~/excel/cauhoimau.xlsx" download class="rounded bg-green-500 px-4 py-2 text-center font-semibold text-white transition hover:bg-green-600 sm:items-center">
+                    Tải file mẫu Excel
+                </a>
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                    <input type="file" name="excelFile" accept=".xlsx" class="rounded border px-3 py-2 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 focus:outline-none focus:ring-2 focus:ring-green-500 hover:file:bg-violet-100" required />
+                    <button type="submit" class="rounded bg-green-500 px-4 py-2 font-semibold text-white transition hover:bg-green-600">
+                        Import Excel
+                    </button>
                 </div>
             </form>
         </div>

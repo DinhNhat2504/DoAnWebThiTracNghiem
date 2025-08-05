@@ -1,4 +1,4 @@
-﻿ using DoAnWebThiTracNghiem.Areas.Admin.Models;
+﻿using DoAnWebThiTracNghiem.Areas.Admin.Models;
 using DoAnWebThiTracNghiem.Data;
 using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
@@ -132,7 +132,6 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
             ModelState.Remove("RoleId");
             ModelState.Remove("AvatarFile");
 
-
             // Kiểm tra hợp lệ dữ liệu
             if (!ModelState.IsValid)
             {
@@ -150,7 +149,11 @@ namespace DoAnWebThiTracNghiem.Areas.Admin.Controllers
 
             existing.FullName = user.FullName;
             existing.Email = user.Email;
-            if (!string.IsNullOrEmpty(user.Password)) existing.Password = user.Password;
+            if (!string.IsNullOrEmpty(user.Password))
+            {
+                // Mã hóa mật khẩu mới nếu có nhập
+                existing.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            }
             existing.PhoneNumber = user.PhoneNumber;
             existing.Address = user.Address;
             existing.UpdatedAt = DateTime.Now;

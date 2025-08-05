@@ -3,6 +3,7 @@ using DoAnWebThiTracNghiem.Models;
 using DoAnWebThiTracNghiem.Repositories;
 using DoAnWebThiTracNghiem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
@@ -38,21 +39,30 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
 
             return View(model);
         }
-        public IActionResult Create()
-        {
-            return View();
-        }
+
         [HttpPost]
         public async Task<IActionResult> Create(Subject subject)
         {
+            var userID = HttpContext.Session.GetString("UserId");
+            int userId = int.Parse(userID);
+
             if (ModelState.IsValid)
             {
-                var userID = HttpContext.Session.GetString("UserId");
-                subject.CreatorUser_Id = int.Parse(userID);
+                var existingSubject = await _subjectRepository.GetAllAsync(2, userId);
+                if (existingSubject.Any(u => u.Subject_Name == subject.Subject_Name))
+                {
+
+                    TempData["SErrorMessage"] = "Tên môn học này đã tồn tại";
+                    return RedirectToAction(nameof(Index));
+
+                }
+
+                subject.CreatorUser_Id = userId;
                 await _subjectRepository.AddAsync(subject);
+                TempData["SSuccessMessage"] = "Thêm môn học mới thành công !";
                 return RedirectToAction(nameof(Index));
             }
-            return View(subject);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -72,22 +82,22 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             });
         }
         [HttpPost]
-        public async Task<IActionResult> Edit( Subject subject)
+        public async Task<IActionResult> Edit(Subject subject)
         {
             try
             {
                 if (subject == null) return BadRequest();
                 var existing = await _subjectRepository.GetByIdAsync(subject.Subject_Id);
                 if (existing == null) return NotFound();
-                
+
                 var userID = HttpContext.Session.GetString("UserId");
-                
+
                 subject.CreatorUser_Id = int.Parse(userID);
                 existing.Subject_Name = subject.Subject_Name;
-                
-                
+
+
                 await _subjectRepository.UpdateAsync(existing);
-                
+
                 return Ok();
 
 
@@ -96,23 +106,10 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
             {
                 return BadRequest();
             }
-           
+
 
         }
-        public async Task<IActionResult> Delete(int id)
-        {
-            var subject = await _subjectRepository.GetByIdAsync(id);
-            var userId = HttpContext.Session.GetString("UserId");
-            if (subject.CreatorUser_Id != int.Parse(userId))
-            {
-                return Unauthorized();
-            }
-            if (subject == null)
-            {
-                return NotFound();
-            }
-            return View(subject);
-        }
+
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -121,16 +118,16 @@ namespace DoAnWebThiTracNghiem.Areas.Teacher.Controllers
                 var classTn = await _subjectRepository.GetByIdAsync(id);
                 if (classTn == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy lớp học để xóa.";
+                    TempData["SErrorMessage"] = "Không tìm thấy môn học để xóa.";
                     return RedirectToAction(nameof(Index));
                 }
 
                 await _subjectRepository.DeleteAsync(id);
-                TempData["SuccessMessage"] = "Xóa lớp học thành công.";
+                TempData["SSuccessMessage"] = "Xóa môn học thành công.";
             }
             catch (Exception e)
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa lớp học.";
+                TempData["SErrorMessage"] = "Có lỗi xảy ra khi xóa môn học.";
                 Console.WriteLine(e);
             }
 

@@ -5,18 +5,8 @@
 }
 
 <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
-            @TempData["ErrorMessage"]
-        </div>
-    }
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
-            @TempData["SuccessMessage"]
-        </div>
-    }
+    
+   
     <!-- Header Section -->
     <div class="mb-8">
         <!-- Title and Search Bar Row -->
@@ -66,13 +56,19 @@
             </form>
         </div>
     </div>
-
+    @if (TempData["CLErrorMessage"] != null)
+    {
+        <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-xl border-l-4 border-red-500 bg-green-50 p-4 text-red-700 shadow-sm"
+             style="@("animation: fadeIn 0.5s ease-out; @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }")">
+            @TempData["CLErrorMessage"]
+        </div>
+    }
     <!-- Success Message -->
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["CLSuccessMessage"] != null)
     {
         <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-xl border-l-4 border-green-500 bg-green-50 p-4 text-green-700 shadow-sm"
              style="@("animation: fadeIn 0.5s ease-out; @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }")">
-            @TempData["SuccessMessage"]
+            @TempData["CLSuccessMessage"]
         </div>
     }
 

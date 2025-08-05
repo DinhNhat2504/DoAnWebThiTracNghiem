@@ -158,7 +158,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function handleEditClassClick(classId, creatorRoleId, isActive) {
-            let alertText = ( creatorRoleId === 2 && isActive === true)? 'Việc sửa bài đang hoạt động của giáo viên này sẽ ảnh hưởng tới việc làm bài thi và kết quả của học sinh do giáo viên này quản lý. Bạn có chắc muốn sửa?': 'Bạn có chắc muốn sửa bài thi này?';
+            let alertText = ( creatorRoleId === 2 && isActive === true)? 'Việc sửa bài thi đang hoạt động của giáo viên này sẽ ảnh hưởng tới việc làm bài thi và kết quả của học sinh do giáo viên này quản lý. Bạn có chắc muốn sửa?': 'Bạn có chắc muốn sửa bài thi này?';
 
     Swal.fire({
         title: 'Cảnh báo',

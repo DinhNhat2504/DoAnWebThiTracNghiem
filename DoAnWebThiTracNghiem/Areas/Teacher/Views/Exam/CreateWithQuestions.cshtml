@@ -1,23 +1,31 @@
-﻿@model DoAnWebThiTracNghiem.Models.Exam
+﻿@using DoAnWebThiTracNghiem.Models
+@model DoAnWebThiTracNghiem.Models.Exam
 
 @{
     ViewData["Title"] = "Tạo bài thi và thêm câu hỏi";
     Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+    var simpleQuestions = ((List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
+        .Select(q => new
+        {
+            Question_ID = q.Question_ID,
+            Question_Content = q.Question_Content,
+            Level_ID = q.Level_ID
+        }).ToList();
 }
 
-<div class="bg-gradient-to-br min-h-screen from-indigo-50 to-purple-50 p-8">
-    <h2 class="mb-8 border-b-4 border-indigo-500 pb-2 text-4xl font-extrabold text-gray-900">@ViewData["Title"]</h2>
+<div class="bg-gradient-to-br min-h-screen from-indigo-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+    <h2 class="mb-6 border-b-4 border-indigo-500 pb-2 text-center text-3xl font-bold text-gray-900 sm:text-left">@ViewData["Title"]</h2>
 
     <!-- Thông báo -->
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="mb-4 rounded border border-red-400 bg-red-100 p-4 text-red-700">
+        <div class="mb-6 rounded-lg border border-red-400 bg-red-100 p-4 text-red-700">
             @TempData["ErrorMessage"]
         </div>
     }
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
+        <div class="mb-6 rounded-lg border border-green-400 bg-green-100 p-4 text-green-700">
             @TempData["SuccessMessage"]
         </div>
     }
@@ -25,87 +33,106 @@
     <form asp-action="CreateWithQuestions" method="post" class="space-y-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- Form tạo bài thi -->
-            <div class="rounded-xl bg-white p-6 shadow-lg">
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-md">
+                <div>
+                    <label asp-for="Exam_Name" class="block text-sm font-medium text-gray-700">Tên bài thi</label>
+                    <input asp-for="Exam_Name" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                    <span asp-validation-for="Exam_Name" class="text-sm text-red-500"></span>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    
                     <div>
-                        <label asp-for="Exam_Name" class="block text-lg font-semibold text-gray-800">Tên bài thi</label>
-                        <input asp-for="Exam_Name" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
-                        <span asp-validation-for="Exam_Name" class="text-sm text-red-500"></span>
-                    </div>
-                    <div>
-                        <label for="SubjectId" class="block text-lg font-semibold text-gray-800">Môn học</label>
-                        <select id="SubjectId" name="Subject_ID" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.SubjectId">
+                        <label for="SubjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
+                        <select id="SubjectId" name="Subject_ID" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" asp-items="ViewBag.SubjectId">
                             <option value="">-- Chọn môn học --</option>
                         </select>
                         <span asp-validation-for="Subject_ID" class="text-sm text-red-500"></span>
                     </div>
                     <div>
-                        <label asp-for="TotalQuestions" class="block text-lg font-semibold text-gray-800">Số câu hỏi</label>
-                        <input asp-for="TotalQuestions" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
-                        <span asp-validation-for="TotalQuestions" class="text-sm text-red-500"></span>
-                    </div>
-                    <div>
-                        <label asp-for="StartTime" class="block text-lg font-semibold text-gray-800">Thời gian bắt đầu</label>
-                        <input asp-for="StartTime" type="time" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <label asp-for="StartTime" class="block text-sm font-medium text-gray-700">Thời gian bắt đầu</label>
+                        <input asp-for="StartTime" type="time" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <span asp-validation-for="StartTime" class="text-sm text-red-500"></span>
                     </div>
                     <div>
-                        <label asp-for="EndTime" class="block text-lg font-semibold text-gray-800">Thời gian kết thúc</label>
-                        <input asp-for="EndTime" type="time" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <label asp-for="EndTime" class="block text-sm font-medium text-gray-700">Thời gian kết thúc</label>
+                        <input asp-for="EndTime" type="time" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <span asp-validation-for="EndTime" class="text-sm text-red-500"></span>
                     </div>
                     <div>
-                        <label asp-for="Exam_Date" class="block text-lg font-semibold text-gray-800">Ngày thi</label>
-                        <input asp-for="Exam_Date" type="date" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <label asp-for="Exam_Date" class="block text-sm font-medium text-gray-700">Ngày thi</label>
+                        <input asp-for="Exam_Date" type="date" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <span asp-validation-for="Exam_Date" class="text-sm text-red-500"></span>
                     </div>
                     <div>
-                        <label asp-for="Duration" class="block text-lg font-semibold text-gray-800">Thời gian làm bài</label>
-                        <input asp-for="Duration" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <label asp-for="Duration" class="block text-sm font-medium text-gray-700">Thời gian làm bài</label>
+                        <input asp-for="Duration" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <span asp-validation-for="Duration" class="text-sm text-red-500"></span>
                     </div>
                     <div>
-                        <label asp-for="PassScore" class="block text-lg font-semibold text-gray-800">Điểm đạt</label>
-                        <input asp-for="PassScore" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 focus:outline-none focus:ring-4 focus:ring-indigo-300" />
+                        <label asp-for="PassScore" class="block text-sm font-medium text-gray-700">Điểm đạt</label>
+                        <input asp-for="PassScore" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                         <span asp-validation-for="PassScore" class="text-sm text-red-500"></span>
                     </div>
                 </div>
             </div>
 
             <!-- Form lọc câu hỏi và bảng chọn câu hỏi -->
-            <div class="rounded-xl bg-white p-6 shadow-lg">
-                <div class="mb-6">
-                    <label for="QuestionTypeId" class="mb-2 block text-lg font-semibold text-gray-800">Loại câu hỏi</label>
-                    <select id="QuestionTypeId" name="questionTypeId" class="w-full rounded-lg border border-gray-300 bg-white p-3 shadow-sm transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.QuestionTypeId">
+            <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-md" id="questionSection">
+                <div class="mb-4">
+                    <label for="QuestionTypeId" class="block text-sm font-medium text-gray-700">Loại câu hỏi</label>
+                    <select id="QuestionTypeId" name="questionTypeId" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" asp-items="ViewBag.QuestionTypeId">
                         <option value="">-- Chọn loại câu hỏi --</option>
                     </select>
                 </div>
-                <div class="mb-6">
-                    <label for="DifficultyLevel" class="mb-2 block text-lg font-semibold text-gray-800">Độ khó</label>
-                    <select id="DifficultyLevel" name="difficultyLevel" class="w-full rounded-lg border border-gray-300 bg-white p-3 shadow-sm transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300" asp-items="ViewBag.DifficultyLevels">
+                <div class="mb-4">
+                    <label for="DifficultyLevel" class="block text-sm font-medium text-gray-700">Độ khó</label>
+                    <select id="DifficultyLevel" name="difficultyLevel" class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" asp-items="ViewBag.DifficultyLevels">
                         <option value="">-- Chọn độ khó --</option>
                     </select>
                 </div>
-                <h3 class="mb-4 border-l-4 border-purple-500 pl-2 text-2xl font-bold text-gray-900">Chọn câu hỏi</h3>
-                <div class="overflow-x-auto">
+                <div class="mb-6 flex flex-col justify-between gap-4 rounded-lg border border-gray-200 bg-white p-2 shadow-md sm:flex-row sm:items-center">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span id="selectedCount" class="text-base font-semibold text-indigo-700">Đã chọn: 0 câu hỏi</span>
+                        <div class="flex items-center gap-2">
+                            <span id="easyCount" class="text-sm text-green-600"></span>
+                            <span id="mediumCount" class="text-sm text-yellow-600"></span>
+                            <span id="hardCount" class="text-sm text-red-600"></span>
+                        </div>
+                    </div>
+                    <div class="w-full sm:w-1/2">
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Mức độ</label>
+                        <div class="flex h-6 w-full overflow-hidden rounded-lg border border-gray-300">
+                            <div id="easyBar" class="h-6 bg-green-400 transition-all duration-300 hover:bg-green-500" style="width:0%"></div>
+                            <div id="mediumBar" class="h-6 bg-yellow-400 transition-all duration-300 hover:bg-yellow-500" style="width:0%"></div>
+                            <div id="hardBar" class="h-6 bg-red-400 transition-all duration-300 hover:bg-red-500" style="width:0%"></div>
+                        </div>
+                        <div class="mt-1.5 flex justify-between text-xs font-medium">
+                            <span id="easyPercent" class="text-green-600">0% Dễ</span>
+                            <span id="mediumPercent" class="text-yellow-600">0% TB</span>
+                            <span id="hardPercent" class="text-red-600">0% Khó</span>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="mb-4 border-l-4 border-purple-500 pl-2 text-xl font-semibold text-gray-900">Chọn câu hỏi</h3>
+                <div class="max-h-96 overflow-x-auto overflow-y-auto">
                     <table id="questionsTable" class="w-full border-collapse text-gray-700">
                         <thead class="bg-indigo-600 text-white">
                             <tr>
-                                <th class="px-6 py-3 text-center font-semibold">
-                                    <input type="checkbox" id="selectAllQuestions" />
+                                <th class="px-4 py-2 text-center font-medium">
+                                    <input type="checkbox" id="selectAllQuestions" class="accent-indigo-600" />
                                     <span class="ml-1">Chọn</span>
                                 </th>
-                                <th class="px-6 py-3 text-left font-semibold">Nội dung câu hỏi</th>
+                                <th class="px-4 py-2 text-left font-medium">Nội dung câu hỏi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @foreach (var question in (List<DoAnWebThiTracNghiem.Models.Question>)ViewData["Questions"])
                             {
-                                <tr class="text-center transition duration-200 hover:bg-gray-50">
-                                    <td class="px-6 py-4">
-                                        <input type="checkbox" name="questionIds" value="@question.Question_ID" class="form-checkbox question-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
+                                <tr class="text-center transition duration-200 hover:bg-gray-50" data-level="@question.Level_ID">
+                                    <td class="px-4 py-2">
+                                        <input type="checkbox" name="questionIds" value="@question.Question_ID" data-level="@question.Level_ID" class="question-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
                                     </td>
-                                    <td class="max-w-xs overflow-auto overflow-x-auto px-6 py-4" style="white-space:nowrap;">@question.Question_Content</td>
+                                    <td class="max-w-xs overflow-auto px-4 py-2 text-sm text-gray-900" style="white-space: nowrap;">@question.Question_Content</td>
                                 </tr>
                             }
                         </tbody>
@@ -115,7 +142,7 @@
         </div>
 
         <div class="text-center">
-            <button type="submit" class="w-full rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white shadow-md transition duration-300 hover:bg-indigo-700 lg:w-auto">Tạo bài thi</button>
+            <button type="submit" class="w-full rounded-lg bg-indigo-600 px-6 py-2 font-semibold text-white shadow-md transition duration-300 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none sm:w-auto">Tạo bài thi</button>
         </div>
     </form>
 </div>
@@ -125,48 +152,139 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $(document).ready(function () {
-            $('#SubjectId, #QuestionTypeId, #DifficultyLevel').change(function () {
-                var subjectId = $('#SubjectId').val();
-                var questionTypeId = $('#QuestionTypeId').val();
-                var difficultyLevel = $('#DifficultyLevel').val();
+        var questions = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(simpleQuestions));
+        var initialQuestionCount = questions.length;
+        var selectedQuestions = {};
 
-                $.ajax({
-                    url: '@Url.Action("GetFilteredQuestions", "Exam", new { area = "Teacher" })',
-                    type: 'GET',
-                    data: { subjectId: subjectId, questionTypeId: questionTypeId, difficultyLevel: difficultyLevel },
-                    success: function (data) {
-                        $('#questionsTable tbody').empty();
-                        data.forEach(function (question) {
-                            $('#questionsTable tbody').append(`
-                                <tr class="transition duration-200 hover:bg-gray-50">
-                                    <td class="px-6 py-4">
-                                        <input type="checkbox" name="questionIds" value="${question.question_ID}" class="form-checkbox question-checkbox h-5 w-5 text-indigo-600 transition duration-200" />
-                                    </td>
-                                    <td class="px-6 py-4">${question.question_Content}</td>
-                                </tr>
-                            `);
-                        });
-                    },
-                    error: function () {
-                        alert('Không thể tải danh sách câu hỏi.');
-                    }
-                });
+        questions.forEach(function (q) {
+            selectedQuestions[q.Question_ID] = false;
+        });
+
+        function saveSelectedQuestions() {
+            $('.question-checkbox').each(function () {
+                selectedQuestions[$(this).val()] = $(this).is(':checked');
+            });
+        }
+
+        $('#SubjectId').change(function () {
+            var subjectId = $(this).val();
+            selectedQuestions = {};
+            questions.forEach(function (q) {
+                selectedQuestions[q.Question_ID] = false;
+            });
+            if (subjectId) {
+                $('#questionSection').show();
+                $('#QuestionTypeId').val('');
+                $('#DifficultyLevel').val();
+                $('#QuestionTypeId, #DifficultyLevel').trigger('change');
+            } else {
+                $('#questionSection').hide();
+            }
+            updateSelectedInfo();
+        });
+
+        $(document).on('change', '.question-checkbox', function () {
+            saveSelectedQuestions();
+            updateSelectedInfo();
+        });
+
+        $(document).on('change', '#selectAllQuestions', function () {
+            var checked = $(this).is(':checked');
+            $('.question-checkbox').prop('checked', checked).trigger('change');
+        });
+
+        $('#QuestionTypeId, #DifficultyLevel').change(function () {
+            var subjectId = $('#SubjectId').val();
+            if (!subjectId) return;
+            var questionTypeId = $('#QuestionTypeId').val();
+            var difficultyLevel = $('#DifficultyLevel').val();
+
+            $.ajax({
+                url: '@Url.Action("GetFilteredQuestions", "Exam", new { area = "Teacher" })',
+                type: 'GET',
+                data: { subjectId: subjectId, questionTypeId: questionTypeId, difficultyLevel: difficultyLevel },
+                success: function (data) {
+                    $('#questionsTable tbody').empty();
+                    data.forEach(function (question) {
+                        var checked = selectedQuestions[question.question_ID] ? 'checked' : '';
+                        $('#questionsTable tbody').append(`
+                            <tr class="transition duration-200 hover:bg-gray-50">
+                                <td class="px-4 py-2">
+                                    <input type="checkbox" name="questionIds" value="${question.question_ID}" data-level="${question.level_ID}" class="question-checkbox h-5 w-5 text-indigo-600 transition duration-200" ${checked} />
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-900">${question.question_Content}</td>
+                            </tr>
+                        `);
+                    });
+                    $('.question-checkbox').off('change').on('change', function () {
+                        saveSelectedQuestions();
+                        updateSelectedInfo();
+                    });
+                    updateSelectedInfo();
+                },
+                error: function () {
+                    alert('Không thể tải danh sách câu hỏi.');
+                }
             });
         });
 
-        // Xử lý chọn tất cả
-        $(document).on('change', '#selectAllQuestions', function () {
-            $('.question-checkbox').prop('checked', this.checked);
+        function updateSelectedInfo() {
+            var selectedCount = Object.values(selectedQuestions).filter(Boolean).length;
+            var easy = 0, medium = 0, hard = 0;
+            questions.forEach(function (q) {
+                if (selectedQuestions[q.Question_ID]) {
+                    if (q.Level_ID == 2) easy++;
+                    else if (q.Level_ID == 3) medium++;
+                    else if (q.Level_ID == 1) hard++;
+                }
+            });
+            var totalVisible = questions.length;
+            var easyP = selectedCount > 0 ? Math.round((easy / selectedCount) * 100) : 0;
+            var mediumP = selectedCount > 0 ? Math.round((medium / selectedCount) * 100) : 0;
+            var hardP = selectedCount > 0 ? Math.round((hard / selectedCount) * 100) : 0;
+            var sum = easyP + mediumP + hardP;
+            if (sum !== 100 && selectedCount > 0) {
+                var diff = 100 - sum;
+                if (diff > 0) {
+                    if (easyP > 0) easyP += diff;
+                    else if (mediumP > 0) mediumP += diff;
+                    else if (hardP > 0) hardP += diff;
+                }
+            }
+
+            $('#selectedCount').text('Đã chọn: ' + selectedCount + ' câu hỏi');
+            $('#easyCount').text(easy + ' Dễ');
+            $('#mediumCount').text(medium + ' TB');
+            $('#hardCount').text(hard + ' Khó');
+            $('#easyBar').css('width', easyP + '%');
+            $('#mediumBar').css('width', mediumP + '%');
+            $('#hardBar').css('width', hardP + '%');
+            $('#easyPercent').text(easyP + '% Dễ');
+            $('#mediumPercent').text(mediumP + '% TB');
+            $('#hardPercent').text(hardP + '% Khó');
+        }
+
+        $(document).ready(function () {
+            if (!$('#SubjectId').val()) {
+                $('#questionSection').hide();
+            } else {
+                $('#questionSection').show();
+            }
+            updateSelectedInfo();
         });
 
-        // Nếu có ajax load lại bảng, cần gán lại sự kiện cho checkbox mới
-        $(document).on('change', '.question-checkbox', function () {
-            if (!this.checked) {
-                $('#selectAllQuestions').prop('checked', false);
-            } else if ($('.question-checkbox:checked').length === $('.question-checkbox').length) {
-                $('#selectAllQuestions').prop('checked', true);
-            }
+        $('form').submit(function () {
+            var selected = Object.keys(selectedQuestions).filter(id => selectedQuestions[id]);
+            $('input[name="questionIds"][type="hidden"]').remove();
+            selected.forEach(function (id) {
+                if ($('input[name="questionIds"][value="' + id + '"]').length === 0) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'questionIds',
+                        value: id
+                    }).appendTo('form');
+                }
+            });
         });
     </script>
 }

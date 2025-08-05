@@ -16,9 +16,9 @@
         <a href="@Url.Action("Index", "StudentClass", new { area = "Student" })" class="text-sm hover:underline md:text-base">Xem thêm →</a>
     </div>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-        @if (classes != null)
+        @if (classes != null && classes.Count > 0)
         {
-            @foreach (var c in classes)
+            @foreach (var c in classes )
             {
                 <div class="mb-4 rounded bg-white p-4 shadow">
                     <div class="font-bold">@c.ClassName</div>

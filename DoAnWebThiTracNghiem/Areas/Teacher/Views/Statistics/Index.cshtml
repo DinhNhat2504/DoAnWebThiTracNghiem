@@ -59,26 +59,75 @@
         </div>
     </div>
 
-    <!-- Hàng 2: Sinh viên (Trái) và Câu hỏi (Phải) -->
+    <!--Sinh viên  và Câu hỏi  -->
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <!-- Sinh viên -->
         <div class="rounded-lg bg-white p-4 shadow-md">
             <h2 class="mb-3 text-lg font-semibold">Sinh Viên</h2>
-            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div class="rounded-lg bg-blue-100 p-3 text-center">
-                    <p class="text-sm font-medium">SV làm nhiều bài thi nhất</p>
-                    <p class="text-lg font-bold text-blue-600">@Model.TopStudentByExams?.FullName</p>
-                    <p class="text-xs">Số bài thi: @Model.TopStudentByExams?.ExamCount</p>
-                </div>
-                <div class="rounded-lg bg-green-100 p-3 text-center">
-                    <p class="text-sm font-medium">SV có điểm TB cao nhất</p>
-                    <p class="text-lg font-bold text-green-600">@Model.TopStudentByAverageScore?.FullName</p>
-                    <p class="text-xs">Điểm TB: @Model.TopStudentByAverageScore?.AverageScore</p>
-                </div>
-            </div>
+
+            <!-- Dropdown chọn lớp -->
+            <form method="get" asp-action="Index" class="mb-4">
+                <label for="selectedClassId" class="mr-2 font-medium">Chọn lớp:</label>
+                <select id="selectedClassId" name="selectedClassId" class="rounded border px-2 py-1"
+                        onchange="this.form.submit()">
+                    <option value="" disabled selected>-- Chọn lớp --</option>
+                    @if (Model.Classes != null)
+                    {
+                        foreach (var cls in Model.Classes)
+                        {
+                            <option value="@cls.Class_Id" selected="@(Model.SelectedClassId == cls.Class_Id ? "selected" : null)">
+                                @cls.ClassName
+                            </option>
+                        }
+                    }
+                </select>
+            </form>
+
             <div class="mt-4">
                 <canvas id="studentChart" style="max-height: 200px;"></canvas>
             </div>
+
+            @if (Model.Top10StudentsByScore != null && Model.Top10StudentsByScore.Any())
+            {
+                <div class="mt-4">
+                    <h3 class="mb-2 text-base font-semibold">
+                        Top 10 sinh viên điểm TB cao nhất
+                        @if (Model.SelectedClassId.HasValue)
+                        {
+                            var selectedClass = Model.Classes?.FirstOrDefault(c => c.Class_Id == Model.SelectedClassId);
+                            if (selectedClass != null)
+                            {
+                                <span>của lớp @selectedClass.ClassName</span>
+                            }
+                        }
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border text-center text-sm">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border px-2 py-1">#</th>
+                                    <th class="border px-2 py-1">Họ tên</th>
+                                    <th class="border px-2 py-1">Điểm TB</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Top10StudentsByScore.Count; i++)
+                                {
+                                    <tr>
+                                        <td class="border px-2 py-1">@((i + 1))</td>
+                                        <td class="border px-2 py-1">@Model.Top10StudentsByScore[i].FullName</td>
+                                        <td class="border px-2 py-1">@Model.Top10StudentsByScore[i].AverageScore</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else if (Model.SelectedClassId.HasValue)
+            {
+                <div class="mt-4 text-center text-gray-500">Không có dữ liệu sinh viên cho lớp này.</div>
+            }
         </div>
 
         <!-- Câu hỏi -->
@@ -161,26 +210,29 @@
             });
         }
 
-        // Biểu đồ sinh viên
-        const studentData = {
-            labels: ['Số bài thi', 'Điểm trung bình'],
-            datasets: [{
-                label: 'Thành tích sinh viên',
-                data: [@Model.TopStudentByExams?.ExamCount ?? 0, @Model.TopStudentByAverageScore?.AverageScore ?? 0],
-                backgroundColor: ['#3B82F6', '#22C55E']
-            }]
-        };
+        // Biểu đồ sinh viên - Top 10 điểm cao nhất
+        const top10Labels = @Html.Raw(Json.Serialize(Model.Top10StudentsByScore.Select(s => s.FullName)));
+        const top10Scores = @Html.Raw(Json.Serialize(Model.Top10StudentsByScore.Select(s => s.AverageScore ?? 0)));
         new Chart(document.getElementById('studentChart'), {
-            type: 'bar',
-            data: studentData,
+            type: 'bar', 
+            data: {
+                labels: top10Labels,
+                datasets: [{
+                    label: 'Điểm cao nhất',
+                    data: top10Scores,
+                    backgroundColor: '#3B82F6'
+                }]
+            },
             options: {
+                indexAxis: 'y',
                 responsive: true,
                 plugins: {
-                    legend: { position: 'top', labels: { font: { size: 12 } } },
-                    title: { display: true, text: 'Thành Tích Sinh Viên', font: { size: 14 } }
+                    legend: { display: false },
+                    title: { display: true, text: 'Top 10 sinh viên điểm TB cao nhất', font: { size: 14 } }
                 },
                 scales: {
-                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                    x: { beginAtZero: true, ticks: { font: { size: 10 } } },
+                    y: { ticks: { font: { size: 10 } } }
                 }
             }
         });
@@ -188,58 +240,60 @@
         // Biểu đồ câu hỏi
         const questionLabels = @Html.Raw(Json.Serialize(Model.QuestionsByType.Select(q => q.QuestionTypeName)));
         const questionCounts = @Html.Raw(Json.Serialize(Model.QuestionsByType.Select(q => q.QuestionCount)));
-        const questionData = {
-            labels: questionLabels,
-            datasets: [{
-                label: 'Số câu hỏi',
-                data: questionCounts,
-                backgroundColor: '#3B82F6'
-            }]
-        };
-        new Chart(document.getElementById('questionChart'), {
-            type: 'bar',
-            data: questionData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top', labels: { font: { size: 12 } } },
-                    title: { display: true, text: 'Phân Loại Câu Hỏi', font: { size: 14 } }
+        if (questionLabels.length > 0 && questionCounts.length > 0 && document.getElementById('questionChart')) {
+            new Chart(document.getElementById('questionChart'), {
+                type: 'bar',
+                data: {
+                    labels: questionLabels,
+                    datasets: [{
+                        label: 'Số câu hỏi',
+                        data: questionCounts,
+                        backgroundColor: '#3B82F6'
+                    }]
                 },
-                scales: {
-                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 12 } } },
+                        title: { display: true, text: 'Phân Loại Câu Hỏi', font: { size: 14 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Biểu đồ môn học
         const subjectLabels = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.SubjectName)));
         const subjectExamCounts = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.ExamCount)));
         const subjectQuestionCounts = @Html.Raw(Json.Serialize(Model.Subjects.Select(s => s.QuestionCount)));
-        const subjectData = {
-            labels: subjectLabels,
-            datasets: [{
-                label: 'Số bài thi',
-                data: subjectExamCounts,
-                backgroundColor: '#3B82F6'
-            }, {
-                label: 'Số câu hỏi',
-                data: subjectQuestionCounts,
-                backgroundColor: '#10B981'
-            }]
-        };
-        new Chart(document.getElementById('subjectChart'), {
-            type: 'bar',
-            data: subjectData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top', labels: { font: { size: 12 } } },
-                    title: { display: true, text: 'Thống Kê Môn Học', font: { size: 14 } }
+        if (subjectLabels.length > 0 && document.getElementById('subjectChart')) {
+            new Chart(document.getElementById('subjectChart'), {
+                type: 'bar',
+                data: {
+                    labels: subjectLabels,
+                    datasets: [{
+                        label: 'Số bài thi',
+                        data: subjectExamCounts,
+                        backgroundColor: '#3B82F6'
+                    }, {
+                        label: 'Số câu hỏi',
+                        data: subjectQuestionCounts,
+                        backgroundColor: '#10B981'
+                    }]
                 },
-                scales: {
-                    y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 12 } } },
+                        title: { display: true, text: 'Thống Kê Môn Học', font: { size: 14 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>

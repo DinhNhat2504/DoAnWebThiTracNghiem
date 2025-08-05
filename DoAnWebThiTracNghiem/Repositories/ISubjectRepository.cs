@@ -4,7 +4,7 @@ namespace DoAnWebThiTracNghiem.Repositories
 {
     public interface ISubjectRepository
     {
-        Task<IEnumerable<Subject>> GetAllAsync();
+        Task<IEnumerable<Subject>> GetAllAsync(int roleid, int id);
         Task<Subject> GetByIdAsync(int id);
         Task AddAsync(Subject subject);
         Task UpdateAsync(Subject subject);

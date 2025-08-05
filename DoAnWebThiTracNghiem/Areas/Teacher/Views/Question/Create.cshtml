@@ -19,11 +19,11 @@
             <form id="generateQuestionsForm" class="space-y-4">
                 <div>
                     <label for="numberOfQuestions" class="block text-sm font-medium text-gray-700">Số câu hỏi</label>
-                    <input type="number" id="numberOfQuestions" name="numberOfQuestions" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" min="1" required>
+                    <input type="number" id="numberOfQuestions" name="numberOfQuestions" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" min="1" required>
                 </div>
                 <div>
                     <label for="subjectId" class="block text-sm font-medium text-gray-700">Môn học</label>
-                    <select id="subjectId" name="subjectId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.SubjectId" required>
+                    <select id="subjectId" name="subjectId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" asp-items="ViewBag.SubjectId" required>
                         <option value="">-- Chọn môn học --</option>
                     </select>
                 </div>
@@ -33,13 +33,13 @@
                 </div>
                 <div>
                     <label for="levelId" class="block text-sm font-medium text-gray-700">Độ khó</label>
-                    <select id="levelId" name="levelId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.LevelId" required>
+                    <select id="levelId" name="levelId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" asp-items="ViewBag.LevelId" required>
                         <option value="">-- Chọn độ khó --</option>
                     </select>
                 </div>
                 <div>
                     <label for="questionTypeId" class="block text-sm font-medium text-gray-700">Loại câu hỏi</label>
-                    <select id="questionTypeId" name="questionTypeId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" asp-items="ViewBag.QuestionTypes" required>
+                    <select id="questionTypeId" name="questionTypeId" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" asp-items="ViewBag.QuestionTypes" required>
                         <option value="">-- Chọn loại câu hỏi --</option>
                     </select>
                 </div>
@@ -131,7 +131,7 @@
             template.find("#questionTypeContainer_" + (formIndex - 1)).attr("id", "questionTypeContainer_" + formIndex);
             template.find(".question-type-selector").attr("id", "QuestionTypeId_" + formIndex);
             template.find(".remove-form").on("click", function () {
-                template.hide();
+                template.remove();
             });
 
             // Reset các giá trị trong form mới
@@ -214,7 +214,7 @@
         }
 
         // Hàm kiểm tra dữ liệu trước khi gửi
-        function validateForms() {
+                function validateForms() {
             const forms = $(".question-form");
             let isValid = true;
 
@@ -241,8 +241,17 @@
                     ];
                     const correctOption = $(`input[name='Questions[${index}].Correct_Option']:checked`).val();
 
-                    if (!options.every(opt => opt.trim()) || !correctOption) {
+                    if (!options.every(opt => opt && opt.trim()) || !correctOption) {
                         alert(`Vui lòng điền đầy đủ các đáp án và chọn đáp án đúng cho câu hỏi ${index + 1}.`);
+                        isValid = false;
+                        return false;
+                    }
+
+                    // Kiểm tra đáp án trùng nhau (không phân biệt hoa thường, loại bỏ khoảng trắng)
+                    const normalized = options.map(opt => (opt || '').trim().toLowerCase());
+                    const unique = new Set(normalized);
+                    if (unique.size !== options.length) {
+                        alert(`Các đáp án không được trùng nhau cho câu hỏi ${index + 1}.`);
                         isValid = false;
                         return false;
                     }

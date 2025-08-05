@@ -18,8 +18,23 @@
         <button onclick="openModal('editModal')" class="absolute right-4 bottom-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">
             Sửa
         </button>
-        <a @Url.Action("Edit", "ClassTn", new { area = "Teacher", id = classTn.Class_Id })> Sửa </a>
+        
     </div>
+    @if (TempData["CLError"] != null)
+    {
+        <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-xl border-l-4 border-red-500 bg-green-50 p-4 text-red-700 shadow-sm"
+             style="@("animation: fadeIn 0.5s ease-out; @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }")">
+            @TempData["CLError"]
+        </div>
+    }
+    <!-- Success Message -->
+    @if (TempData["CLSuccess"] != null)
+    {
+        <div class="mb-6 animate-[fadeIn_0.5s_ease-out] rounded-xl border-l-4 border-green-500 bg-green-50 p-4 text-green-700 shadow-sm"
+             style="@("animation: fadeIn 0.5s ease-out; @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }")">
+            @TempData["CLSuccess"]
+        </div>
+    }
     <!-- Modal for Editing -->
     <div id="editModal" class="bg-opacity-30 fixed inset-0 z-50 flex hidden items-center justify-center">
         <div class="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">

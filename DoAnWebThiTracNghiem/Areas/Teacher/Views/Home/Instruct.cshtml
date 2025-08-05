@@ -1,0 +1,252 @@
+﻿
+@{
+    ViewData["Title"] = "Instruct";
+    Layout = "~/Areas/Teacher/Views/Shared/_layout.cshtml";
+}
+
+<div class="container mx-auto min-h-screen bg-gray-50 p-4 lg:p-6">
+    <h1 class="mb-6 flex items-center justify-center gap-2 text-center text-3xl font-bold text-indigo-600 sm:text-4xl">
+        
+        Hướng Dẫn Cho Người Mới Bắt Đầu
+    </h1>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Content Column -->
+        <div class="space-y-6">
+            <!-- Section 1: How to Create an Exam -->
+            <div>
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Làm thế nào để có thể tạo bài thi?</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Trước tiên các bạn cần phải tạo cho mình 1 môn học, bạn có thể vào <a href="#create-subject" class="text-indigo-600 transition duration-300 hover:text-indigo-800 hover:underline">trang môn học</a> để tạo.</li>
+                    <li>Tiếp theo, vào <a href="#create-question" class="text-indigo-600 transition duration-300 hover:text-indigo-800 hover:underline">trang câu hỏi</a> để tạo các câu hỏi cho bài thi (bạn có thể tạo bài thi trước nếu muốn).</li>
+                    <li>Vào trang bài thi của phần trắc nghiệm để tạo bài thi.</li>
+                    <li>Điền thông tin hợp lệ và chọn câu hỏi, sau đó nhấn tạo.</li>
+                    <li>Tạo bài thi thành công.</li>
+                </ol>
+            </div>
+
+            <!-- Section 2: How to Let Students Take an Exam -->
+            <div>
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Làm thế nào để sinh viên có thể làm bài thi?</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Trước tiên bạn phải tạo cho mình 1 lớp học, vào <a href="#create-class" class="text-indigo-600 transition duration-300 hover:text-indigo-800 hover:underline">trang lớp học</a> để tạo.</li>
+                    <li>Vào xem chi tiết của 1 lớp học để có thể giao bài thi vừa tạo.</li>
+                    <li>Sau đó giới thiệu trang web này và thông báo mã lớp học cho học sinh của bạn.</li>
+                    <li>Khi học sinh tham gia lớp học thành công, sẽ nhìn thấy được bài thi của bạn đã giao trong lớp học.</li>
+                </ol>
+            </div>
+
+            <!-- Section 3: How to Manage Students and Exam Results -->
+            <div>
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Quản lý sinh viên và các kết quả thi của sinh viên bằng cách nào?</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Điều kiện có 1 lớp học và có học sinh tham gia lớp, vào <a href="#create-class" class="text-indigo-600 transition duration-300 hover:text-indigo-800 hover:underline">trang lớp học</a> để tạo.</li>
+                    <li>Sau đó bạn vào trang chi tiết của 1 lớp học có sinh viên, trong này bạn nhấn vào xem ở phần danh sách sinh viên để có thể xem danh sách sinh viên.</li>
+                    <li>Trong này bạn có thể quản lý được các sinh viên của mình, bạn có thể xóa sinh viên hoặc xem các bài thi mà sinh viên đã làm được.</li>
+                    <li>Bạn có thể xem chi tiết câu trả lời từng bài thi trong danh sách bài thi của sinh viên.</li>
+                    <li>Bạn cũng có thể xem danh sách các sinh viên đã làm của 1 bài thi trong danh sách bài thi, bạn có thể xuất file Excel để tham khảo.</li>
+                </ol>
+            </div>
+
+            <!-- Section 4: Guide to Create Subject -->
+            <div id="create-subject">
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Hướng dẫn tạo môn học</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Vào trang môn học.</li>
+                    <li>Nhấn thêm môn học mới và nhập tên môn học.</li>
+                    <li>Nhấn tạo, môn học được thêm thành công.</li>
+                </ol>
+            </div>
+
+            <!-- Section 5: Guide to Create Question -->
+            <div id="create-question">
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Các bước tạo câu hỏi</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Vào trang câu hỏi của phần trắc nghiệm.</li>
+                    <li>Nhấn thêm câu hỏi, ở đây sẽ xuất hiện 2 lựa chọn cho bạn: thêm câu hỏi thủ công và tạo câu hỏi bằng AI.</li>
+                    <li>Lựa chọn 1 trong 2 để thêm câu hỏi và điền thông tin phù hợp, nhấn thêm tất cả câu hỏi để tạo câu hỏi mới (có hỗ trợ tạo nhiều câu hỏi cùng lúc).</li>
+                    <li>Câu hỏi được thêm thành công.</li>
+                    <li>Ngoài ra bạn cũng có thể thêm câu hỏi từ file Excel, nhưng điều kiện quan trọng là bạn phải tham khảo file Excel mẫu câu hỏi <a href="~/excel/cauhoimau.xlsx" class="text-indigo-600 transition duration-300 hover:text-indigo-800 hover:underline">Tại đây</a> trước để tránh việc thêm câu hỏi không thành công.</li>
+                </ol>
+            </div>
+            
+            <!-- Section 6: Guide to Create Class -->
+            <div id="create-class">
+                <h2 class="mb-3 text-xl font-semibold text-gray-800 sm:text-2xl">Hướng dẫn tạo lớp học</h2>
+                <ol class="list-inside list-decimal space-y-2 text-gray-700">
+                    <li>Tương tự như các phần trước, bạn chỉ cần vào trang lớp học để tạo lớp học mới.</li>
+                    <li>Ngoài ra khi vào trong trang chi tiết của lớp học, bạn có thể tạo thông báo cho lớp học và quản lý bài thi và sinh viên trong lớp này.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Image Slider Column -->
+        @* <div class="space-y-6">
+            <!-- Slider for Creating an Exam -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Tạo Bài Thi</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="~/images/CreatExam.png" alt="Step 1 Create Exam" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="~/images/CreateExam2.png" alt="Step 2 Create Exam" class="h-auto max-h-[150px] w-full object-cover">
+                            
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slider for Students Taking Exam -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Sinh Viên Làm Bài Thi</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="your-image-4.jpg" alt="Step 1 Students Exam" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-5.jpg" alt="Step 2 Students Exam" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-6.jpg" alt="Step 3 Students Exam" class="h-auto max-h-[150px] w-full object-cover">
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slider for Managing Students and Results -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Quản Lý Sinh Viên & Kết Quả</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="your-image-7.jpg" alt="Step 1 Manage Results" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-8.jpg" alt="Step 2 Manage Results" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-9.jpg" alt="Step 3 Manage Results" class="h-auto max-h-[150px] w-full object-cover">
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slider for Creating Subject -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Tạo Môn Học</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="your-image-10.jpg" alt="Step 1 Create Subject" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-11.jpg" alt="Step 2 Create Subject" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-12.jpg" alt="Step 3 Create Subject" class="h-auto max-h-[150px] w-full object-cover">
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slider for Creating Question -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Tạo Câu Hỏi</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="your-image-13.jpg" alt="Step 1 Create Question" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-14.jpg" alt="Step 2 Create Question" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-15.jpg" alt="Step 3 Create Question" class="h-auto max-h-[150px] w-full object-cover">
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slider for Creating Class -->
+            <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-md transition duration-300 hover:shadow-lg">
+                <h3 class="mb-2 text-lg font-semibold text-gray-800 sm:text-xl">Tạo Lớp Học</h3>
+                <div class="relative w-full">
+                    <div class="overflow-hidden">
+                        <div class="flex transition-transform duration-500 ease-in-out" style="width: 300%;">
+                            <img src="your-image-16.jpg" alt="Step 1 Create Class" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-17.jpg" alt="Step 2 Create Class" class="h-auto max-h-[150px] w-full object-cover">
+                            <img src="your-image-18.jpg" alt="Step 3 Create Class" class="h-auto max-h-[150px] w-full object-cover">
+                        </div>
+                    </div>
+                    <button class="absolute top-1/2 left-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slidePrev(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute top-1/2 right-0 -translate-y-1/2 transform rounded-full bg-indigo-600 p-1 text-white transition duration-300 hover:bg-indigo-700" onclick="slideNext(this)">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div> *@
+    </div>
+</div>
+
+@* <script>
+    function slidePrev(button) {
+        const slider = button.parentElement.querySelector('.flex');
+        const images = slider.children;
+        let currentTransform = parseInt(slider.style.transform.replace(/translateX\((-?\d+)px\)/, '$1')) || 0;
+        const imageWidth = images[0].offsetWidth;
+        if (currentTransform < 0) {
+            slider.style.transform = `translateX(${currentTransform + imageWidth}px)`;
+        }
+    }
+
+    function slideNext(button) {
+        const slider = button.parentElement.querySelector('.flex');
+        const images = slider.children;
+        let currentTransform = parseInt(slider.style.transform.replace(/translateX\((-?\d+)px\)/, '$1')) || 0;
+        const imageWidth = images[0].offsetWidth;
+        if (currentTransform > -(imageWidth * (images.length - 1))) {
+            slider.style.transform = `translateX(${currentTransform - imageWidth}px)`;
+        }
+    }
+</script> *@
