@@ -51,6 +51,7 @@ else
 app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
+app.UseHttpsRedirection();
 app.UseMiddleware<AdminAuthorizationMiddleware>();
 app.UseMiddleware<TeacherAuthorizationMiddleware>();
 app.UseMiddleware<StudentAuthorizationMiddleware>();

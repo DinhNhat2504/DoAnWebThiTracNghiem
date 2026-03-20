@@ -331,6 +331,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+# Không xem được đâu :v
+appsettings.json
+appsettings.Development.json
 
 # OpenCover UI analysis results
 OpenCover/
