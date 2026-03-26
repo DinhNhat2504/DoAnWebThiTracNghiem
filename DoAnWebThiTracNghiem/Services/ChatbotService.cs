@@ -9,7 +9,7 @@ namespace DoAnWebThiTracNghiem.Services
     public class ChatbotService
     {
         private readonly string _apiKey;
-        private readonly string _apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
+        private readonly string _apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
         public ChatbotService(IConfiguration configuration)
         {
